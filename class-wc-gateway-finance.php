@@ -597,8 +597,8 @@ function woocommerce_finance_init()
             global $product;
             if ($this->is_available($product) ) {
                 $this->getFinanceEnv($this->api_key, false);
-                $plans = $this->get_product_plans($product);
-                $price = $this->get_price_including_tax($product, '');
+                $this->get_product_plans($product);
+                $this->get_price_including_tax($product, '');
                 include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/calculator.php';
             }
         }
