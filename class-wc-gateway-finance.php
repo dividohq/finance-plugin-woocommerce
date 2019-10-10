@@ -56,7 +56,7 @@ function woocommerce_finance_init()
          *
          * @return void
          */
-        function __construct() 
+        function __construct()
         {
             $this->id           = 'finance';
             $this->method_title = __('Finance', 'finance_gateway_plugin');
@@ -139,7 +139,7 @@ function woocommerce_finance_init()
          * A helper for the shortcode widget
          *
          * @since 1.0.2
-         * 
+         *
          * @param  array  $atts  Optional Attributes array.
          * @return mixed
          */
@@ -193,7 +193,7 @@ function woocommerce_finance_init()
          * Calls Finance endpoint to return all finances for merchant
          *
          * @since 1.0.0
-         * 
+         *
          * @param  [string] $api_key The Finance Api Key.
          * @param  boolean  $reload  An optional parameter to say if the finances endpoint should be called again.
          * @return array
@@ -208,7 +208,7 @@ function woocommerce_finance_init()
                 $this->api_key
             );
             $sdk = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
-            
+
                 $finances       = false;
                 $transient_name = 'finances';
                 $finances = get_transient($transient_name);
@@ -233,10 +233,10 @@ function woocommerce_finance_init()
          * Enque Add Finance styles and scripts
          *
          * @since 1.0.0
-         * 
+         *
          * @return void
          */
-        function enqueue() 
+        function enqueue()
         {
             if ($this->api_key && is_product() || $this->api_key && is_checkout() ) {
                 $key      = preg_split('/\./', $this->api_key);
@@ -253,7 +253,7 @@ function woocommerce_finance_init()
              wp_enqueue_style('woocommerce-finance-gateway-style');
              wp_enqueue_script('woocommerce-finance-gateway-calculator');
              wp_enqueue_script('woocoomerce-finance-gateway-calculator_price_update');
-                
+
         }
         /**
          * Add Finance Javascript
@@ -261,16 +261,16 @@ function woocommerce_finance_init()
          * We need to add some specific js to the head of the page to ensure the element reloads
          *
          * @since 1.0.0
-         * 
+         *
          * @return void
          */
-        function add_api_to_head() 
+        function add_api_to_head()
         {
             if ($this->api_key ) {
                 $key = preg_split('/\./', $this->api_key);
-                
+
                 ?>
-               <script type='text/javascript'> 
+               <script type='text/javascript'>
                window.__widgetConfig = {
                      apiKey: '<?php echo esc_attr(strtolower($key[0])); ?>'
                 };
@@ -288,11 +288,11 @@ function woocommerce_finance_init()
         }, time);
        }
        }
-            
+
        jQuery( document ).ready(function() {
-        waitForElementToDisplay('#financeWidget', 1000); 
+        waitForElementToDisplay('#financeWidget', 1000);
        });
-                
+
         // ]]>
                </script>
 
@@ -305,11 +305,11 @@ function woocommerce_finance_init()
          * Display the extra data in the order admin panel.
          *
          * @since 1.0.0
-         * 
+         *
          * @param  [object] $order The Order view.
          * @return void
          */
-        function display_order_data_in_admin( $order ) 
+        function display_order_data_in_admin( $order )
         {
             $ref_and_finance = $this->get_ref_finance($order);
             if ($ref_and_finance['ref'] ) {
@@ -323,12 +323,12 @@ function woocommerce_finance_init()
          * Callback The callback function listens to calls from Finance
          *
          * @since 1.0.0
-         * 
+         *
          * @return void
          */
 
-         
-        function callback() 
+
+        function callback()
         {
             if (isset($_SERVER['HTTP_RAW_POST_DATA']) && wp_unslash($_SERVER['HTTP_RAW_POST_DATA']) ) { // Input var okay.
                 $data = file_get_contents(wp_unslash($_SERVER['HTTP_RAW_POST_DATA'])); // Input var okay.
@@ -336,7 +336,7 @@ function woocommerce_finance_init()
                 $data = file_get_contents('php://input');
             }
             // If secret is set, check against http header.
-            
+
             if ('' !== $this->secret ) {
                 $callback_sign = isset($_SERVER['HTTP_X_DIVIDO_HMAC_SHA256']) ?  $_SERVER['HTTP_X_DIVIDO_HMAC_SHA256']  : ''; // Input var okay.
                 $sign          = $this->create_signature($data, $this->secret);
@@ -370,7 +370,7 @@ function woocommerce_finance_init()
                             $this->send_json();
                         } else {
                             // Amount matches, update status.
-                            
+
                             if ('DECLINED' === $data_json->status ) {
                                  $order->update_status('failed');
                                  $this->send_json();
@@ -395,11 +395,11 @@ function woocommerce_finance_init()
          * Add Finance payment methods using filter woocommerce_payment_gateways
          *
          * @since 1.0.0
-         * 
+         *
          * @param  array $methods Array of payment methods.
          * @return array
          */
-        public function add_method( $methods ) 
+        public function add_method( $methods )
         {
             if (is_admin() ) {
                 $methods[] = 'WC_Gateway_Finance';
@@ -421,7 +421,7 @@ function woocommerce_finance_init()
          * @param  array      $args    Args array.
          * @return float
          */
-        private function get_price_including_tax( $product, $args ) 
+        private function get_price_including_tax( $product, $args )
         {
             if (version_compare(WC_VERSION, '2.7', '<') ) {
                 $args = wp_parse_args(
@@ -440,11 +440,11 @@ function woocommerce_finance_init()
          * Check if this gateway is enabled and available in the user's country.
          *
          * @since 1.0.0
-         * 
+         *
          * @param  boolean $product Product Instace.
          * @return float
          */
-        public function is_available( $product = false ) 
+        public function is_available( $product = false )
         {
             if ('yes' !== $this->enabled || '' === $this->api_key ) {
                 return false;
@@ -504,10 +504,10 @@ function woocommerce_finance_init()
          * Get any finance options set for the checkout
          *
          * @since 1.0.0
-         * 
+         *
          * @return array
          */
-        public function getCheckoutFinanceOptions() 
+        public function getCheckoutFinanceOptions()
         {
             global $woocommerce;
             if ('yes' !== $this->enabled ) {
@@ -530,11 +530,11 @@ function woocommerce_finance_init()
          * Get Product specific finance options.
          *
          * @since 1.0.0
-         * 
+         *
          * @param  object $product Product Instance.
          * @return array|false
          */
-        public function getProductFinanceOptions( $product ) 
+        public function getProductFinanceOptions( $product )
         {
             if ('yes' !== $this->enabled ) {
                 return false;
@@ -562,10 +562,10 @@ function woocommerce_finance_init()
          * Get Checkout specific finance plans.
          *
          * @since 1.0.0
-         * 
+         *
          * @return string|false
          */
-        public function get_checkout_plans() 
+        public function get_checkout_plans()
         {
             $finances = $this->get_finances($this->getCheckoutFinanceOptions());
             if (is_array($finances) ) {
@@ -577,11 +577,11 @@ function woocommerce_finance_init()
          * Get specific product plans.
          *
          * @since 1.0.0
-         * 
+         *
          * @param  object $product WC product instance.
          * @return string|false
          */
-        public function get_product_plans( $product ) 
+        public function get_product_plans( $product )
         {
             $finances = $this->getProductFinanceOptions($product);
             return ( is_array($finances) ) ? implode(',', $finances) : false;
@@ -592,11 +592,11 @@ function woocommerce_finance_init()
          * @param  object $product The current product.
          * @return void
          */
-        public function product_calculator( $product ) 
+        public function product_calculator( $product )
         {
             global $product;
             if ($this->is_available($product) ) {
-                $environment = $this->getFinanceEnv($this->api_key, false);
+                $this->getFinanceEnv($this->api_key, false);
                 $plans = $this->get_product_plans($product);
                 $price = $this->get_price_including_tax($product, '');
                 include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/calculator.php';
@@ -606,11 +606,11 @@ function woocommerce_finance_init()
          * Product widget helper.
          *
          * @since 1.0.0
-         * 
+         *
          * @param  object $product The current product.
          * @return void
          */
-        public function product_widget( $product ) 
+        public function product_widget( $product )
         {
             global $product;
             if($this->api_key) {
@@ -626,27 +626,27 @@ function woocommerce_finance_init()
                     if (! empty($this->footnote) ) {
                         $footnote = 'data-footnote="' . $this->footnote . '" ';
                     }
-                    
+
                     $plans = $this->get_product_plans($product);
                     include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/widget.php';
                 }
-            }    
+            }
         }
         /**
          * Function to add finance product into admin view this add tabs
          *
          * @since 1.0.0
-         * 
+         *
          * @return false
          */
-        public function product_write_panel_tab() 
+        public function product_write_panel_tab()
         {
             if ('yes' !== $this->enabled ) {
                 return false;
             }
 			$environment = $this->getFinanceEnv($this->api_key, false);
 			$tab_icon = 'https://s3-eu-west-1.amazonaws.com/content.divido.com/plugins/powered-by-divido/'.$environment.'/woocommerce/images/finance-icon.png';
-			
+
 			if (version_compare(WOOCOMMERCE_VERSION, '2.0.0') >= 0 ) {
                 $style        = 'content:"";padding:5px 5px 5px 22px; background-image:url(' . $tab_icon . '); background-repeat:no-repeat;background-size: 15px 15px;background-position:8px 8px;';
                 $active_style = '';
@@ -661,14 +661,14 @@ function woocommerce_finance_init()
             <?php echo esc_attr($active_style); ?>
             </style>
             <?php
-            
+
             echo '<li class="finance_tab"><a href="#finance_tab"><span>' . esc_attr(__('Finance', 'wc_finance_product_tab')) . '</span></a></li>';
         }
         /**
          * Function to add the product panel
          *
          * @since 1.0.0
-         * 
+         *
          * @return false
          */
         public function product_write_panel()
@@ -702,7 +702,7 @@ function woocommerce_finance_init()
         <label for="_hide_title"><?php esc_html_e('Selected plans', 'finance_gateway_plugin_domain'); ?></label>
 
             <?php
-    
+
             foreach ( $finances as $finance => $value ) {
 
         ?>
@@ -731,7 +731,7 @@ function woocommerce_finance_init()
          * A function to save metadata per product
          *
          * @since 1.0.0
-         * 
+         *
          * @param  [type] $post_id The product Post Id.
          * @param  [type] $post    The Post.
          * @return void
@@ -765,10 +765,10 @@ function woocommerce_finance_init()
          * Initialize Gateway Settings Form Fields.
          *
          * @since 1.0.0
-         * 
+         *
          */
-        function init_form_fields() 
-        { 
+        function init_form_fields()
+        {
             $this->init_settings();
             $this->form_fields = array(
              'apiKey' => array(
@@ -788,7 +788,7 @@ function woocommerce_finance_init()
                     $finance[ $finances->id ] = $finances->description;
                 }
                       $options = array();
-                
+
                 try {
                     foreach ( $finance as $key => $descriptions ) {
                         $options[ $key ] = $descriptions;
@@ -937,7 +937,7 @@ function woocommerce_finance_init()
                           'type'        => 'checkbox',
                           'description' => __('Automatically Send Cancel request on order cancellation', 'finance_gateway_plugin_domain'),
                           'default'     => false,
-                                  ),  
+                                  ),
                           )
                       );
                 } catch ( Exception $e ) {
@@ -949,9 +949,9 @@ function woocommerce_finance_init()
          * Admin Panel Options
          * - Payment options
          * @since 1.0.0
-         * 
+         *
          */
-        function admin_options() 
+        function admin_options()
         {
 
             ?>
@@ -1002,7 +1002,7 @@ function woocommerce_finance_init()
         /**
          * Get the users country either from their order, or from their customer data.
          */
-        function get_country_code() 
+        function get_country_code()
         {
             global $woocommerce;
             if (isset($_GET['order_id']) ) { // Input var okay.
@@ -1018,7 +1018,7 @@ function woocommerce_finance_init()
         /**
          * Payment form on checkout page.
          */
-        function payment_fields() 
+        function payment_fields()
         {
             $finances = $this->get_finances($this->getCheckoutFinanceOptions());
             if ($finances ) {
@@ -1042,11 +1042,11 @@ function woocommerce_finance_init()
          *
          * @param  int $order_id The order id integer.
          * @return array
-         * 
+         *
          * @since 1.0.0
-         * 
+         *
          */
-        function process_payment( $order_id ) 
+        function process_payment( $order_id )
         {
             global $woocommerce;
             $order = new WC_Order($order_id);
@@ -1055,7 +1055,7 @@ function woocommerce_finance_init()
                     return;
                 }
             }
-            
+
             $finances = $this->get_finances($this->getCheckoutFinanceOptions());
             foreach ( $finances as $_finance => $value ) {
                 if (isset($_POST['divido_plan']) && $_finance === $_POST['divido_plan'] ) { // Input var okay.
@@ -1090,7 +1090,7 @@ function woocommerce_finance_init()
                 if ($woocommerce->cart->needs_shipping() ) {
                     $shipping   = $order->get_total_shipping();
                     $shipping   = (float) $shipping;
-                    
+
                     $products[] = array(
                      'name'     => 'Shipping and handling',
                      'quantity' => 1,
@@ -1149,14 +1149,14 @@ function woocommerce_finance_init()
                 } else {
                     $data = file_get_contents('php://input');
                 }
- 
+
                 // Version 3.0+.
                 // Create an appication model with the application data.
                 if (version_compare($this->get_woo_version(), '3.0.0') >= 0 ) {
-                
+
                     $env                       = $this->environments($this->api_key);
                     $client                    = new \GuzzleHttp\Client();
-                    
+
                     $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                         new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
                         \Divido\MerchantSDK\Environment::CONFIGURATION[$env]['base_uri'],
@@ -1263,7 +1263,7 @@ function woocommerce_finance_init()
                     $result_redirect           = $decode->data->urls->application_url;
                 }
             }
-            
+
             try {
 
 				update_post_meta($order_id, '_finance_reference', $result_id);
@@ -1287,7 +1287,7 @@ function woocommerce_finance_init()
          * Get Finances helper function
          *
          * @since 1.0.0
-         * 
+         *
          * @param  boolean $selection true or false depending on checkout or widget use.
          * @return array Array of finances.
          */
@@ -1298,7 +1298,7 @@ function woocommerce_finance_init()
             }
             $response = $this->finance_options; // array.
             $finances = array();
-            
+
             try {
                 foreach ( $response as $_finance ) {
                     if (( ! $selection && ! is_array($selection) ) || in_array($_finance->id, $selection, true) ) {
@@ -1321,10 +1321,10 @@ function woocommerce_finance_init()
          * Define environment function
          *
          * @since 1.0.0
-         * 
+         *
          *  @param [string] $key - The Platform API key.
          */
-        function environments( $key ) 
+        function environments( $key )
         {
             $array       = explode('_', $key);
             $environment = strtoupper($array[0]);
@@ -1336,11 +1336,11 @@ function woocommerce_finance_init()
             case 'SANDBOX':
                 return constant("Divido\MerchantSDK\Environment::$environment");
               break;
-              
+
             case 'TESTING':
               return constant("Divido\MerchantSDK\Environment::$environment");
             break;
-              
+
             default:
                 return constant("Divido\MerchantSDK\Environment::SANDBOX");
               break;
@@ -1352,7 +1352,7 @@ function woocommerce_finance_init()
          * Get Finance Platform Environment function
          *
          * @since 1.0.0
-         * 
+         *
          * @param [string] $api_key - The platform API key.
          */
         public function getFinanceEnv($api_key, $reload)
@@ -1384,12 +1384,12 @@ function woocommerce_finance_init()
 
         /**
          * Enque Admin Styles Updates.
-         * 
-         * @since 1.0.0 
+         *
+         * @since 1.0.0
          *
          * @return true
          */
-        function wpdocs_enqueue_custom_admin_style( $hook_suffix ) 
+        function wpdocs_enqueue_custom_admin_style( $hook_suffix )
         {
             // Check if it's the ?page=yourpagename. If not, just empty return before executing the folowing scripts.
             if ('woocommerce_page_wc-settings' !== $hook_suffix ) {
@@ -1402,30 +1402,30 @@ function woocommerce_finance_init()
         /**
          * Validate the payment form.
          *
-         * @since 1.0.0 
-         * 
+         * @since 1.0.0
+         *
          * @return true
          */
-        function validate_fields() 
+        function validate_fields()
         {
             return true;
         }
         /**
          * Validate plugin settings.
          *
-         * @since 1.0.0 
-         * 
+         * @since 1.0.0
+         *
          * @return true
          */
-        function validate_settings() 
+        function validate_settings()
         {
             return true;
         }
         /**
          * Create HMAC SIGNATURE.
          *
-         * @since 1.0.0 
-         * 
+         * @since 1.0.0
+         *
          * @param  [string] $payload Payload value.
          * @param  [string] $secret  The secret value saved on Finance portal and WordPress.
          * @return string Returns a base64 encoded string.
@@ -1438,13 +1438,13 @@ function woocommerce_finance_init()
         /**
          * Wrapper function for sending JSON.
          *
-         * @since 1.0.0 
-         * 
+         * @since 1.0.0
+         *
          * @param  [string] $status  The status to send - defaults ok.
          * @param  [string] $message The message to send in the json.
          * @return void
          */
-        function send_json( $status = 'ok', $message = '' ) 
+        function send_json( $status = 'ok', $message = '' )
         {
             $plugindata = get_plugin_data(__FILE__);
             $response   = array(
@@ -1460,7 +1460,7 @@ function woocommerce_finance_init()
          *
          * @return string WooCommerce version.
          */
-        function get_woo_version() 
+        function get_woo_version()
         {
             if (! function_exists('get_plugins') ) {
                 include_once ABSPATH . 'wp-admin/includes/plugin.php';
@@ -1476,8 +1476,8 @@ function woocommerce_finance_init()
         /**
          * Access stored variables in post meta
          *
-         * @since 1.0.0 
-         * 
+         * @since 1.0.0
+         *
          * @param  [object] $order Instance of wc_get_order.
          * @return array An array containing the finance reference number and the finance id.
          */
@@ -1503,7 +1503,7 @@ function woocommerce_finance_init()
          *
          * @param [int] $order_id - The woocommerce order id.
          */
-        function send_finance_fulfillment_request( $order_id ) 
+        function send_finance_fulfillment_request( $order_id )
         {
             $wc_order_id = (string) $order_id;
             $name        = get_post_meta($order_id, '_payment_method', true);
@@ -1523,7 +1523,7 @@ function woocommerce_finance_init()
             }
         }
 
-        function send_refund_request( $order_id ) 
+        function send_refund_request( $order_id )
         {
             $wc_order_id = (string) $order_id;
             $name        = get_post_meta($order_id, '_payment_method', true);
@@ -1543,7 +1543,7 @@ function woocommerce_finance_init()
             }
         }
 
-        function send_cancellation_request( $order_id ) 
+        function send_cancellation_request( $order_id )
         {
             $wc_order_id = (string) $order_id;
             $name        = get_post_meta($order_id, '_payment_method', true);
@@ -1562,12 +1562,12 @@ function woocommerce_finance_init()
                 return false;
             }
         }
-        
+
         /**
          * Function that will activate an application or set to fulfilled on dividio.
          *
-         * @since 1.0.0 
-         * 
+         * @since 1.0.0
+         *
          * @param  [string] $application_id   - The Finance Application ID - fea4dcb7-e474-4fba-b1a4-123.....
          * @param  [string] $order_total      - Total amount of the order.
          * @param  [string] $order_id         - The Order ID from WooCommerce.
@@ -1576,7 +1576,7 @@ function woocommerce_finance_init()
          * @return void
          */
 
-        function set_cancelled ($application_id, $order_total, $order_id) 
+        function set_cancelled ($application_id, $order_total, $order_id)
         {
              // First get the application you wish to refund.
             $application = ( new \Divido\MerchantSDK\Models\Application() )
@@ -1588,7 +1588,7 @@ function woocommerce_finance_init()
                'price'    => $order_total * 100,
               ],
             ];
-             
+
              $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationCancellation())
              ->withAmount($items[0]['price'])
              ->withOrderItems($items);
@@ -1603,10 +1603,10 @@ function woocommerce_finance_init()
              $sdk                    = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
              $response = $sdk->applicationCancellations()->createApplicationCancellation($application, $applicationRefund);
              $refundResponseBody = $response->getBody()->getContents();
-         
+
         }
 
-        function set_refund ($application_id, $order_total, $order_id) 
+        function set_refund ($application_id, $order_total, $order_id)
         {
              // First get the application you wish to refund.
             $application = ( new \Divido\MerchantSDK\Models\Application() )
@@ -1618,7 +1618,7 @@ function woocommerce_finance_init()
                'price'    => $order_total * 100,
               ],
             ];
-             
+
              $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationRefund())
              ->withAmount($items[0]['price'])
              ->withOrderItems($items);
@@ -1633,12 +1633,12 @@ function woocommerce_finance_init()
              $sdk                    = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
              $response = $sdk->applicationRefunds()->createApplicationRefund($application, $applicationRefund);
              $refundResponseBody = $response->getBody()->getContents();
-         
+
         }
 
 
 
-        function set_fulfilled( $application_id, $order_total, $order_id, $shipping_method = null, $tracking_numbers = null ) 
+        function set_fulfilled( $application_id, $order_total, $order_id, $shipping_method = null, $tracking_numbers = null )
         {
             // First get the application you wish to create an activation for.
             $application = ( new \Divido\MerchantSDK\Models\Application() )
@@ -1685,7 +1685,7 @@ function woocommerce_finance_init()
 
             return $links;
         }
-    } 
+    }
 
     // end woocommerce_finance.
     global $woocommerce_finance;
