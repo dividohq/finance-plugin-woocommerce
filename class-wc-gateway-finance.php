@@ -72,8 +72,6 @@ function woocommerce_finance_init()
             $this->description = (!empty($this->settings['description'])) ? $this->settings['description'] : '';
             $this->enabled = (!empty($this->settings['enabled'])) ? $this->settings['enabled'] : false;
             $this->api_key = (!empty($this->settings['apiKey'])) ? $this->settings['apiKey'] : '';
-            $this->buttonText = (!empty($this->settings['widgetButtonText'])) ? $this->settings['widgetButtonText'] : ' ';
-            $this->footnote = (!empty($this->settings['widgetFootnote'])) ? $this->settings['widgetFootnote'] : ' ';
             $this->cart_threshold = (!empty($this->settings['cartThreshold'])) ? $this->settings['cartThreshold'] : 250;
             $this->max_loan_amount = (!empty($this->settings['maxLoanAmount'])) ? $this->settings['maxLoanAmount'] : 25000;
             $this->auto_fulfillment = (!empty($this->settings['autoFulfillment'])) ? $this->settings['autoFulfillment'] : false;
@@ -158,9 +156,7 @@ function woocommerce_finance_init()
             $attributes = shortcode_atts(array(
                 'amount' => '250',
                 'mode' => 'lightbox',
-                'buttonText' => '',
                 'plans' => '',
-                'footnote' => ''
             ), $atts, 'finance_widget');
 
             if (is_array($atts)) {
@@ -178,16 +174,7 @@ function woocommerce_finance_init()
             if ($attributes["plans"] != '') {
                 $plans = ' data-plans="' . $attributes["plans"] . '"';
             }
-
-            $buttonText = '';
-            if ($attributes["buttonText"] != '') {
-                $buttonText = ' data-button-text="' . $attributes["buttonText"] . '"';
-            }
-            $footnote = '';
-            if ($attributes["footnote"] != '') {
-                $footnote = ' data-footnote="' . $attributes["footnote"] . '"';
-            }
-            return '<div data-calculator-widget ' . $mode . ' data-amount="' . esc_attr($attributes["amount"]) . '" ' . $buttonText . ' ' . $footnote . ' ' . $plans . ' ></div>';
+            return '<div data-calculator-widget ' . $mode . ' data-amount="' . esc_attr($attributes["amount"]) . '" ' . ' ' . $plans . ' ></div>';
         }
 
 
@@ -637,14 +624,6 @@ function woocommerce_finance_init()
                 $plans = $this->get_product_plans($product);
                 $environment = $this->getFinanceEnv($this->api_key, false);
                 if ($this->is_available($product) && $price > ($this->widget_threshold)) {
-                    $button_text = '';
-                    if (!empty($this->button_text)) {
-                        $button_text = 'data-buttontext="' . $this->button_text . '" ';
-                    }
-                    $footnote = '';
-                    if (!empty($this->footnote)) {
-                        $footnote = 'data-footnote="' . $this->footnote . '" ';
-                    }
 
                     $plans = $this->get_product_plans($product);
                     include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/widget.php';
@@ -941,18 +920,6 @@ function woocommerce_finance_init()
                                 'type' => 'text',
                                 'description' => __('Product widget will only appear on products above this value'),
                                 'default' => '250',
-                            ),
-                            'buttonText' => array(
-                                'title' => __('Widget Button Text', 'finance_gateway_plugin_domain'),
-                                'type' => 'text',
-                                'description' => __('Eg. "or from $p per "', 'finance_gateway_plugin_domain'),
-                                'default' => '',
-                            ),
-                            'footnote' => array(
-                                'title' => __('Footnote', 'finance_gateway_plugin_domain'),
-                                'type' => 'text',
-                                'description' => __('Eg. "Available on instalments"', 'finance_gateway_plugin_domain'),
-                                'default' => '',
                             ),
                             'Order Settings' => array(
                                 'title' => __('Order Settings', 'finance_gateway_plugin_domain'),
