@@ -623,7 +623,7 @@ function woocommerce_finance_init()
                 $price = $this->get_price_including_tax($product, '');
                 $plans = $this->get_product_plans($product);
                 $environment = $this->getFinanceEnv($this->api_key, false);
-                if ($this->is_available($product) && $price > ($this->widget_threshold)) {
+                if ($this->is_available($product) && $price > ($this->widget_threshold * 100)) {
 
                     $plans = $this->get_product_plans($product);
                     include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/widget.php';
