@@ -822,7 +822,7 @@ function woocommerce_finance_init()
                                 'label' => __('Enable Finance', 'finance_gateway_plugin_domain'),
                                 'type' => 'checkbox',
                                 'description' => '',
-                                'default' => 'no',
+                                'default' => 'yes',
                             ),
                             'title' => array(
                                 'title' => __('Checkout Title', 'finance_gateway_plugin_domain'),
