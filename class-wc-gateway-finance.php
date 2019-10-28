@@ -833,7 +833,7 @@ function woocommerce_finance_init()
                                 'label' => __('Enable Finance', 'finance_gateway_plugin_domain'),
                                 'type' => 'checkbox',
                                 'description' => '',
-                                'default' => 'no',
+                                'default' => true,
                             ),
                             'title' => array(
                                 'title' => __('Checkout Title', 'finance_gateway_plugin_domain'),
@@ -948,21 +948,21 @@ function woocommerce_finance_init()
                                 'label' => __('Automatic Fulfillment', 'finance_gateway_plugin_domain'),
                                 'type' => 'checkbox',
                                 'description' => __('Automatically Send Fulfillment request on order completion', 'finance_gateway_plugin_domain'),
-                                'default' => false,
+                                'default' => true,
                             ),
                             'autoRefund' => array(
                                 'title' => __('Enable/Disable Automatic Refunds', 'finance_gateway_plugin_domain'),
                                 'label' => __('Automatic Refunds', 'finance_gateway_plugin_domain'),
                                 'type' => 'checkbox',
                                 'description' => __('Automatically Send Refund request on order refunded', 'finance_gateway_plugin_domain'),
-                                'default' => false,
+                                'default' => true,
                             ),
                             'autoCancel' => array(
                                 'title' => __('Enable/Disable Automatic Cancellations', 'finance_gateway_plugin_domain'),
                                 'label' => __('Automatic Cancellation', 'finance_gateway_plugin_domain'),
                                 'type' => 'checkbox',
                                 'description' => __('Automatically Send Cancel request on order cancellation', 'finance_gateway_plugin_domain'),
-                                'default' => false,
+                                'default' => true,
                             ),
                         )
                     );
