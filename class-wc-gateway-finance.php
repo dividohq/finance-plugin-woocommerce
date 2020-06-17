@@ -319,7 +319,7 @@ function woocommerce_finance_init()
                 ?>
                 <script type='text/javascript'>
                     window.__widgetConfig = {
-                        apiKey: '<?php echo esc_attr(strtolower($key[0])); ?>'
+                        apiKey: '<?php echo strpos($this->api_key, "_pk_") > 0 ? $this->api_key : esc_attr(strtolower($key[0])); ?>'
                     };
 
                     var <?php echo($this->get_finance_env($this->api_key, false))?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>' </script>
