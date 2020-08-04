@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      5.4.1
-Stable tag:        2.2.3
-Version:           2.2.3
+Stable tag:        2.2.4
+Version:           2.2.4
 
 License: GPLv2 or later
 
@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+
+Version 2.2.4
+Fix: Empty transient finance environment
 
 Version 2.2.3
 Feat: Add language override to calculator
