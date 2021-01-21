@@ -6,6 +6,6 @@
     },
     "conflict": {
         "symfony/polyfill-intl-idn": ">=1.18",
-        "symfony/polyfill-mbstring": ">1.22.0"
+        "symfony/polyfill-mbstring": ">=1.22.0"
     }
 }
