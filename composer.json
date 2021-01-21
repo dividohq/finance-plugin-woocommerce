@@ -1,7 +1,11 @@
 {
     "require": {
         "php": ">=5",
-        "divido/merchant-sdk-guzzle-6": "dev-refactor/remove-guzzle",
+        "divido/merchant-sdk-guzzle-6": "dev-master",
         "divido/merchant-sdk": "v2.1.1"
+    },
+    "conflict": {
+        "symfony/polyfill-intl-idn": ">=1.18",
+        "symfony/polyfill-mbstring": ">1.22.0"
     }
 }
