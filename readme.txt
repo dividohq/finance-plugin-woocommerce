@@ -7,7 +7,7 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      5.7.2
-Stable tag:        2.2.7
+Stable tag:        2.2.8
 Version:           2.2.6
 
 License: GPLv2 or later
@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.2.8
+Fix: Update calculator widget url for each environment
+
 Version 2.2.7
 Chore: Float payment gateway logo to the right and increase size for Nordea
 
