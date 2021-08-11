@@ -114,6 +114,8 @@ function woocommerce_finance_init()
             $this->secret = (!empty($this->settings['secret'])) ? $this->settings['secret'] : '';
             $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
+            // set the tenancy environment based on the user input "url" field or default it from the api key
+            $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_tenant_env($this->api_key);
 
             add_filter( 'woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2 );
 
@@ -269,7 +271,7 @@ function woocommerce_finance_init()
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
-                \Divido\MerchantSDK\Environment::CONFIGURATION[$env]['base_uri'],
+                $this->url,
                 $api_key
             );
             $sdk = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
@@ -903,6 +905,12 @@ function woocommerce_finance_init()
         {
             $this->init_settings();
             $this->form_fields = array(
+                'url' => array(
+                    'title' => __('backend/configurl_label', 'woocommerce-finance-gateway'),
+                    'type' => 'text',
+                    'description' => __('backend/configurl_description', 'woocommerce-finance-gateway'),
+                    'default' => $this->get_default_tenant_env($this->api_key),
+                ),
                 'apiKey' => array(
                     'title' => __('backend/configapi_key_label', 'woocommerce-finance-gateway'),
                     'type' => 'text',
@@ -1328,7 +1336,7 @@ function woocommerce_finance_init()
 
                     $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                         new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
-                        \Divido\MerchantSDK\Environment::CONFIGURATION[$env]['base_uri'],
+                        $this->url,
                         $this->api_key
                     );
 
@@ -1385,7 +1393,7 @@ function woocommerce_finance_init()
 
                     $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                         new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
-                        \Divido\MerchantSDK\Environment::CONFIGURATION[$env]['base_uri'],
+                        $this->url,
                         $this->api_key
                     );
 
@@ -1525,7 +1533,7 @@ function woocommerce_finance_init()
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
-                \Divido\MerchantSDK\Environment::CONFIGURATION[$env]['base_uri'],
+                $this->url,
                 $this->api_key
             );
             $sdk = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
@@ -1544,6 +1552,16 @@ function woocommerce_finance_init()
                 return $global;
                 }
             }
+
+        /**
+         * Helper function to get the default tenancy environment
+         * @param $api_key
+         * @return string
+         */
+        function get_default_tenant_env($api_key)
+        {
+            return (!empty($api_key)) ? \Divido\MerchantSDK\Environment::CONFIGURATION[$this->environments($api_key)]['base_uri'] : '';
+        }
 
         /**
          * Enque Admin Styles Updates.
@@ -1766,7 +1784,7 @@ function woocommerce_finance_init()
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
-                \Divido\MerchantSDK\Environment::CONFIGURATION[$env]['base_uri'],
+                $this->url,
                 $this->api_key
             );
             $sdk = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
@@ -1795,7 +1813,7 @@ function woocommerce_finance_init()
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
-                \Divido\MerchantSDK\Environment::CONFIGURATION[$env]['base_uri'],
+                $this->url,
                 $this->api_key
             );
             $sdk = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
@@ -1827,7 +1845,7 @@ function woocommerce_finance_init()
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
-                \Divido\MerchantSDK\Environment::CONFIGURATION[$env]['base_uri'],
+                $this->url,
                 $this->api_key
             );
             $sdk = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
