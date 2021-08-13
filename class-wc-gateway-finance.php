@@ -906,9 +906,9 @@ function woocommerce_finance_init()
             $this->init_settings();
             $this->form_fields = array(
                 'url' => array(
-                    'title' => __('backend/configurl_label', 'woocommerce-finance-gateway'),
+                    'title' => __('backend/configenvironment_url_label', 'woocommerce-finance-gateway'),
                     'type' => 'text',
-                    'description' => __('backend/configurl_description', 'woocommerce-finance-gateway'),
+                    'description' => __('backend/configenvironment_url_description', 'woocommerce-finance-gateway'),
                     'default' => $this->get_default_tenant_env($this->api_key),
                 ),
                 'apiKey' => array(
