@@ -1560,7 +1560,14 @@ function woocommerce_finance_init()
          */
         function get_default_tenant_env($api_key)
         {
-            return (!empty($api_key)) ? \Divido\MerchantSDK\Environment::CONFIGURATION[$this->environments($api_key)]['base_uri'] : '';
+            if (!empty($api_key)) {
+                $env = $this->environments($api_key);
+                $config_object = \Divido\MerchantSDK\Environment::CONFIGURATION;
+                if (array_key_exists($env, $config_object)) {
+                    return $config_object[$env]['base_uri'];
+                }
+            }
+            return '';
         }
 
         /**
