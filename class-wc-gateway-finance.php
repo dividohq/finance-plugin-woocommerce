@@ -1560,13 +1560,19 @@ function woocommerce_finance_init()
          */
         function get_default_tenant_env($api_key)
         {
-            if (!empty($api_key)) {
-                $env = $this->environments($api_key);
-                $config_object = \Divido\MerchantSDK\Environment::CONFIGURATION;
-                if (array_key_exists($env, $config_object)) {
-                    return $config_object[$env]['base_uri'];
-                }
+            // if there is no api key (i.e. a new install), default the tenancy env to an empty string
+            if (empty($api_key)) {
+                return '';
             }
+
+            $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
+            $merchant_sdk_env_config_object = \Divido\MerchantSDK\Environment::CONFIGURATION;
+
+            // only default the tenancy env if the environment is defined in the merchant SDK
+            if (array_key_exists($env, $merchant_sdk_env_config_object)) {
+                return $merchant_sdk_env_config_object[$env]['base_uri'];
+            }
+
             return '';
         }
 
