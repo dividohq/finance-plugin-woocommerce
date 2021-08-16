@@ -210,7 +210,7 @@ function woocommerce_finance_init()
                 return false;
             }
             $finance = $this->get_finance_env($this->api_key);
-            $environment = $this->environments($this->api_key);
+            $environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
             if ($environment == 'production'){
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
             } else {
@@ -267,7 +267,7 @@ function woocommerce_finance_init()
          */
         function get_all_finances($api_key)
         {
-            $env = $this->environments($api_key);
+            $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
@@ -316,7 +316,7 @@ function woocommerce_finance_init()
                 $key = preg_split('/\./', $this->api_key);
                 $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
                 $finance = $this->get_finance_env($this->api_key);
-                $environment = $this->environments($this->api_key);
+                $environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
                 if ($environment == 'production'){
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
                 } else {
@@ -1331,7 +1331,7 @@ function woocommerce_finance_init()
 
                 if (empty(get_post_meta($order_id, "_finance_reference", true))) {
 
-                    $env = $this->environments($this->api_key);
+                    $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
                     $client = new \GuzzleHttp\Client();
 
                     $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
@@ -1388,7 +1388,7 @@ function woocommerce_finance_init()
                     $result_id = $decode->data->id;
                     $result_redirect = $decode->data->urls->application_url;
                 } else {
-                    $env = $this->environments($this->api_key);
+                    $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
                     $client = new \GuzzleHttp\Client();
 
                     $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
@@ -1506,22 +1506,6 @@ function woocommerce_finance_init()
         }
 
         /**
-         * Define environment function
-         *
-         * @since 1.0.0
-         *
-         * @param [string] $key - The Platform API key.
-         */
-        function environments($key)
-        {
-            $array = explode('_', $key);
-            $environment = strtoupper($array[0]);
-            return ('LIVE' == $environment)
-                ? constant("Divido\MerchantSDK\Environment::PRODUCTION")
-                : constant("Divido\MerchantSDK\Environment::$environment");
-        }
-
-        /**
          * Get Finance Platform Environment function
          * @param $api_key
          * @return mixed
@@ -1529,7 +1513,7 @@ function woocommerce_finance_init()
         public function get_finance_env($api_key)
         {
 
-            $env = $this->environments($api_key);
+            $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
@@ -1793,7 +1777,7 @@ function woocommerce_finance_init()
             $applicationCancellation = (new \Divido\MerchantSDK\Models\ApplicationCancellation())
                 ->withOrderItems($items);
 
-            $env = $this->environments($this->api_key);
+            $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
@@ -1822,7 +1806,7 @@ function woocommerce_finance_init()
             $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationRefund())
                 ->withOrderItems($items);
 
-            $env = $this->environments($this->api_key);
+            $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
@@ -1854,7 +1838,7 @@ function woocommerce_finance_init()
                 ->withDeliveryMethod($shipping_method)
                 ->withTrackingNumber($tracking_numbers);
             // Create a new activation for the application.
-            $env = $this->environments($this->api_key);
+            $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
