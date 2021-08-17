@@ -1539,8 +1539,10 @@ function woocommerce_finance_init()
 
         /**
          * Helper function to get the default tenancy environment
-         * @param $api_key
-         * @return string
+         *
+         * @param string $api_key The api key from which to determine the environment
+         *
+         * @return string The environment based on the api key
          */
         function get_default_tenant_env($api_key)
         {
