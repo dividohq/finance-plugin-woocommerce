@@ -2,7 +2,7 @@
     "require": {
         "php": ">=5",
         "divido/merchant-sdk-guzzle-6": "dev-master",
-        "divido/merchant-sdk": "v2.2.0"
+        "divido/merchant-sdk": "v2.2.1"
     },
     "conflict": {
         "symfony/polyfill-intl-idn": ">=1.18",
