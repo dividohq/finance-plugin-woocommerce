@@ -115,7 +115,7 @@ function woocommerce_finance_init()
             $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
             // set the tenancy environment based on the user input "url" field or default it from the api key
-            $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_tenant_env($this->api_key);
+            $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
 
             add_filter( 'woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2 );
 
@@ -909,7 +909,7 @@ function woocommerce_finance_init()
                     'title' => __('backend/configenvironment_url_label', 'woocommerce-finance-gateway'),
                     'type' => 'text',
                     'description' => __('backend/configenvironment_url_description', 'woocommerce-finance-gateway'),
-                    'default' => $this->get_default_tenant_env($this->api_key),
+                    'default' => $this->get_default_merchant_api_pub_url($this->api_key),
                 ),
                 'apiKey' => array(
                     'title' => __('backend/configapi_key_label', 'woocommerce-finance-gateway'),
@@ -1538,13 +1538,13 @@ function woocommerce_finance_init()
             }
 
         /**
-         * Helper function to get the default tenancy environment
+         * Helper function to get the default merchant api url for the environment
          *
-         * @param string $api_key The api key from which to determine the environment
+         * @param string $api_key The api key from which to determine the merchant api url
          *
-         * @return string The environment based on the api key
+         * @return string The merchant api url based on the api key
          */
-        function get_default_tenant_env($api_key)
+        function get_default_merchant_api_pub_url($api_key)
         {
             // if there is no api key (i.e. a new install), default the tenancy env to an empty string
             if (empty($api_key)) {
