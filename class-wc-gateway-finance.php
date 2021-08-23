@@ -176,7 +176,7 @@ function woocommerce_finance_init()
             // set the tenancy environment based on the user input "url" field or default it from the api key
             $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
             // set the environment from the api key
-            $this->environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
+            $this->environment = (!empty($this->api_key) ? \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key) : '');
 
             add_filter( 'woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2 );
 
