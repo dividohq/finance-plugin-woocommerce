@@ -238,10 +238,10 @@ function woocommerce_finance_init()
             if ( $id === 'finance' ) {
                 if (empty($this->api_key)) {
                     return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/divido/logo.png'/>";
-                } else if ($this->get_finance_env($this->api_key) === 'nordea' ){
-                     return "<img style='height:24px;float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env($this->api_key) . "/logo.png'/>";
+                } else if ($this->get_finance_env() === 'nordea' ){
+                     return "<img style='height:24px;float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
                 } else {
-                    return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env($this->api_key) . "/logo.png'/>";
+                    return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
                 }
             } else {
                 return $icon;
@@ -263,7 +263,7 @@ function woocommerce_finance_init()
             if ('yes' !== $this->enabled || '' === $this->api_key) {
                 return false;
             }
-            $finance = $this->get_finance_env($this->api_key);
+            $finance = $this->get_finance_env();
             $environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
             if ($environment == 'production'){
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
@@ -360,7 +360,7 @@ function woocommerce_finance_init()
             if ($this->api_key && is_product() || $this->api_key && is_checkout()) {
                 $key = preg_split('/\./', $this->api_key);
                 $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
-                $finance = $this->get_finance_env($this->api_key);
+                $finance = $this->get_finance_env();
                 $environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
                 if ($environment == 'production'){
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
@@ -401,7 +401,7 @@ function woocommerce_finance_init()
 
                     };
 
-                    var <?php echo($this->get_finance_env($this->api_key))?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>' </script>
+                    var <?php echo($this->get_finance_env())?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>' </script>
                 <script>// <![CDATA[
                     function waitForElementToDisplay(selector, time) {
                         if (document.querySelector(selector) !== null) {
@@ -743,7 +743,7 @@ function woocommerce_finance_init()
         {
             global $product;
             if ($this->is_available($product)) {
-                $environment = $this->get_finance_env($this->api_key);
+                $environment = $this->get_finance_env();
                 $plans = $this->get_product_plans($product);
                 $price = $this->get_price_including_tax($product, '');
                 $language = '';
@@ -768,7 +768,7 @@ function woocommerce_finance_init()
             if ($this->api_key) {
                 $price = $this->get_price_including_tax($product, '');
                 $plans = $this->get_product_plans($product);
-                $environment = $this->get_finance_env($this->api_key);
+                $environment = $this->get_finance_env();
                 if ($this->is_available($product) && $price > ($this->widget_threshold * 100)) {
                     $button_text = '';
                     if (!empty(sanitize_text_field($this->buttonText))) {
@@ -807,7 +807,7 @@ function woocommerce_finance_init()
             if ('yes' !== $this->enabled) {
                 return false;
             }
-            $environment = $this->get_finance_env($this->api_key);
+            $environment = $this->get_finance_env();
             $tab_icon = 'https://s3-eu-west-1.amazonaws.com/content.divido.com/plugins/powered-by-divido/' . $environment . '/woocommerce/images/finance-icon.png';
 
             if (version_compare(WOOCOMMERCE_VERSION, '2.0.0') >= 0) {
@@ -966,7 +966,7 @@ function woocommerce_finance_init()
 
             if (isset($this->api_key) && $this->api_key) {
                 $response = $this->get_all_finances();
-               // $settings = $this->get_finance_env($this->api_key, true);
+               // $settings = $this->get_finance_env();
                 $finance = [];
                 foreach ($response as $finances) {
                     if($finances->active){
@@ -1249,7 +1249,7 @@ function woocommerce_finance_init()
                     return;
                 endif;
                 $amount = WC()->cart->total * 100;
-                $environment = $this->get_finance_env($this->api_key);
+                $environment = $this->get_finance_env();
                 $plans = $this->get_checkout_plans();
                 $footnote = $this->footnote;
                 $language = '';
@@ -1535,10 +1535,9 @@ function woocommerce_finance_init()
 
         /**
          * Get Finance Platform Environment function
-         * @param $api_key
          * @return mixed
          */
-        public function get_finance_env($api_key)
+        public function get_finance_env()
         {
             $sdk = Merchant_SDK::getInstance()->getSDK();
 
