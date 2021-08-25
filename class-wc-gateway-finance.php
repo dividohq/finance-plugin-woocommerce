@@ -154,18 +154,13 @@ function woocommerce_finance_init()
             $this->secret = (!empty($this->settings['secret'])) ? $this->settings['secret'] : '';
             $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
+            // set the tenancy environment based on the user input "url" field or default it from the api key
+            $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
+            // set the environment from the api key
             try {
-                // set the tenancy environment based on the user input "url" field or default it from the api key
-                $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
-                // set the environment from the api key
-                $this->environment = (!empty($this->api_key) ? \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key) : '');
+                $this->environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
             } catch (Exception $e) {
-                ?>
-                <div style="border:1px solid red;color:red;padding:20px;">
-                    <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>
-                    <p><?php esc_html_e('backendcontact_financier_msg', 'woocommerce-finance-gateway'); ?></p>
-                </div>
-                <?php
+                $this->environment = '';
             }
 
             add_filter( 'woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2 );
@@ -315,8 +310,6 @@ function woocommerce_finance_init()
          */
         function get_all_finances()
         {
-            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
-
             $finances = false;
             $transient_name = 'finances';
             $finances = get_transient($transient_name);
@@ -330,6 +323,7 @@ function woocommerce_finance_init()
                     $request_options = (new \Divido\MerchantSDK\Handlers\ApiRequestOptions());
                     // Retrieve all finance plans for the merchant.
                     try {
+                        $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
                         $plans = $sdk->getAllPlans($request_options);
                         $plans = $plans->getResources();
                         set_transient($transient_name, $plans , 60*60*1);
@@ -1560,19 +1554,24 @@ function woocommerce_finance_init()
          */
         function get_default_merchant_api_pub_url($api_key)
         {
-            // if there is no api key (i.e. a new install), default the merchant api url to an empty string
-            if (empty($api_key)) {
+            try {
+                // if there is no api key (i.e. a new install), default the merchant api url to an empty string
+                if (empty($api_key)) {
+                    return '';
+                }
+
+                $merchant_sdk_env_config_object = \Divido\MerchantSDK\Environment::CONFIGURATION;
+
+                // only default the merchant api url if the url is defined in the merchant SDK
+                if (array_key_exists($this->environment, $merchant_sdk_env_config_object)) {
+                    return $merchant_sdk_env_config_object[$this->environment]['base_uri'];
+                }
+
+                return '';
+
+            } catch (Exception $e) {
                 return '';
             }
-
-            $merchant_sdk_env_config_object = \Divido\MerchantSDK\Environment::CONFIGURATION;
-
-            // only default the merchant api url if the url is defined in the merchant SDK
-            if (array_key_exists($this->environment, $merchant_sdk_env_config_object)) {
-                return $merchant_sdk_env_config_object[$this->environment]['base_uri'];
-            }
-
-            return '';
         }
 
         /**
