@@ -1,58 +1,4 @@
 <?php
-
-use GuzzleHttp\Psr7;
-use GuzzleHttp\Exception\RequestException;
-
-function console_log($data)
-{
-    echo '<script>';
-    echo 'console.log(' . json_encode($data) . ')';
-    echo '</script>';
-}
-
-/**
- * Validate the Environment URL
- * 
- * @param string $url The environment URL
- */
-function healthcheck($url)
-{
-    $health_url = "{$url}/healthX";
-    console_log("HEALTH URL: {$health_url}");
-    $client = new \GuzzleHttp\Client();
-
-    // try {
-    //     // If response code is not 200, this will throw an exception
-    //     // $response = $client->get('https://www.divido.com/nosite');
-    //     $response = $client->get("{$url}/health");
-    // } catch (RequestException $e) {
-    //     // echo $e->getRequest() . "\n";
-    //     if ($e->hasResponse()) {
-    //         echo $e->getResponse() . "\n";
-    //     }
-    // }
-    // $client = new Client();
-
-    try {
-        // If response code is not 200, this throws an exception
-        $client->get($health_url);
-    } catch (RequestException $e) {
-        // echo Psr7\Message::toString($e->getRequest());
-        if ($e->hasResponse()) {
-            $response = Psr7\Message::toString($e->getResponse());
-            console_log($response);
-            return $response;
-        }
-        // if ($e->hasResponse()) {
-        // $response = $e->getResponse();
-        // echo $response . "\n";
-        // }
-    }
-
-    return;
-}
-
-
 defined('ABSPATH') or die('Denied');
 /**
  *  Finance Gateway for Woocommerce
@@ -131,8 +77,7 @@ function woocommerce_finance_init()
          */
         public static function getInstance($url, $api_key)
         {
-            if (self::$class_instance === null)
-            {
+            if (self::$class_instance === null) {
                 self::$class_instance = new Merchant_SDK($url, $api_key);
             }
 
@@ -300,8 +245,8 @@ function woocommerce_finance_init()
             if ($id === 'finance') {
                 if (empty($this->api_key)) {
                     return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/divido/logo.png'/>";
-                } else if ($this->get_finance_env() === 'nordea' ){
-                     return "<img style='height:24px;float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
+                } else if ($this->get_finance_env() === 'nordea') {
+                    return "<img style='height:24px;float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
                 } else {
                     return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
                 }
@@ -326,7 +271,7 @@ function woocommerce_finance_init()
                 return false;
             }
             $finance = $this->get_finance_env();
-            if ($this->environment === 'production'){
+            if ($this->environment === 'production') {
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
             } else {
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
@@ -421,7 +366,7 @@ function woocommerce_finance_init()
                 $key = preg_split('/\./', $this->api_key);
                 $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
                 $finance = $this->get_finance_env();
-                if ($this->environment === 'production'){
+                if ($this->environment === 'production') {
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
                 } else {
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
@@ -459,7 +404,7 @@ window.__widgetConfig = {
 
 };
 
-var <?php echo($this->get_finance_env())?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>'
+var <?php echo ($this->get_finance_env()) ?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>'
 </script>
 <script>
 // <![CDATA[
@@ -1030,7 +975,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
 
             if (isset($this->api_key) && $this->api_key) {
                 $response = $this->get_all_finances();
-               // $settings = $this->get_finance_env();
+                // $settings = $this->get_finance_env();
                 $finance = [];
                 foreach ($response as $finances) {
                     if ($finances->active) {
@@ -1241,38 +1186,24 @@ jQuery("input[name=_tab_finance_active]").change(function() {
     <h3 style="border-bottom:1px solid">
         <?php esc_html_e('backend/configgeneral_settings_header', 'woocommerce-finance-gateway'); ?></h3>
     <?php
+
+                $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
+
+                $response = $sdk->healthcheck()->checkHealth($this->url);
+
+                $status_code = $response['status_code'];
+                ?>
+    <div style="border:1px solid blue;color:blue;padding:20px;">
+        <b>RESPONSE: <?php esc_html_e($status_code); ?></b>
+    </div>
+    <?php
                 if (isset($this->api_key) && $this->api_key) {
                     $response = $this->get_all_finances();
                     $options = array();
-                    // console_log($response);
-                    // console_log(healthcheck($this->url));
-                    // console_log("ENVIRONMENT URL {$this->url}");
-
-                    $healthcheck_msg = healthcheck($this->url);
-
-                    if ($healthcheck_msg) {
-
-                        /**  POEditor keys:
-                         * 
-                         *  backend/errorenvironment_url_error: 
-                         *  "Incorrect or invalid Environment URL"
-                         * 
-                         *  backend/errorenvironment_url_error_msg_start:
-                         *  "Environment URL unreachable:"
-                         * 
-                         *  backend/errorenvironment_url_error_msg_end:
-                         *  "Error:"
-                         */
+                    if ([] === print_r($response)) {
                 ?>
-    <div style="border:1px solid red;color:red;padding:20px;">
-        <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
-        <p><?php esc_html_e($healthcheck_msg, 'woocommerce-finance-gateway'); ?></p>
-    </div>
-    <?php
-                    }
 
-                    if ([] === $response) {
-                    ?>
+
     <div style="border:1px solid red;color:red;padding:20px;">
         <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>
         <p><?php esc_html_e('backendcontact_financier_msg', 'woocommerce-finance-gateway'); ?></p>
