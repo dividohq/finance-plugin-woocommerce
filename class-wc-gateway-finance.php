@@ -58,6 +58,7 @@ function woocommerce_finance_init()
          */
         private function __construct($url, $api_key)
         {
+
             $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
@@ -1193,7 +1194,8 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                 $this->init_settings();
                 ?>
     <h3 style="border-bottom:1px solid">
-        <?php esc_html_e('backend/config general_settings_header', 'woocommerce-finance-gateway'); ?></h3>
+        <?php esc_html_e('backend/config general_settings_header', 'woocommerce-finance-gateway'); ?>
+    </h3>
     <?php
 
                 $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
