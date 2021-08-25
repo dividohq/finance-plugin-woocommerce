@@ -1,13 +1,6 @@
 <?php
 defined('ABSPATH') or die('Denied');
 
-function console_log($data)
-{
-    echo '<script>';
-    echo 'console.log(' . json_encode($data) . ')';
-    echo '</script>';
-}
-
 /**
  *  Finance Gateway for Woocommerce
  *
