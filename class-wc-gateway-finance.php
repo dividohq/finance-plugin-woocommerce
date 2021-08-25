@@ -38,25 +38,23 @@ function woocommerce_finance_init()
     include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/vendor/autoload.php';
 
     /**
-     * Merchant SDK Singleton class
+     * Merchant SDK class
      *
-     * Constructs one instance of the merchant sdk to be used
+     * Constructs an instance of the merchant sdk to be used
      **/
     class Merchant_SDK
     {
-        private static $class_instance = null;
-
         private $merchant_sdk;
 
         /**
          * Merchant SDK Constructor
          *
-         * Initialises the merchant sdk and stores it in the $merchant_sdk class variable
+         * Initialises a merchant sdk and stores it in the $merchant_sdk class variable
          *
          * @param string The merchant api url
          * @param string The api key for the environment
          */
-        private function __construct($url, $api_key)
+        public function __construct($url, $api_key)
         {
 
             $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
@@ -67,23 +65,6 @@ function woocommerce_finance_init()
                 $api_key
             );
             $this->merchant_sdk = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
-        }
-
-        /**
-         * Returns the singleton class instance
-         *
-         * @param string The merchant api url
-         * @param string The api key for the environment
-         *
-         * @return Merchant_SDK The single instance of the Merchant SDK class
-         */
-        public static function getInstance($url, $api_key)
-        {
-            if (self::$class_instance === null) {
-                self::$class_instance = new Merchant_SDK($url, $api_key);
-            }
-
-            return self::$class_instance;
         }
 
         /**
@@ -175,10 +156,14 @@ function woocommerce_finance_init()
             $this->secret = (!empty($this->settings['secret'])) ? $this->settings['secret'] : '';
             $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
+            // set the environment from the api key
+            try {
+                $this->environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
+            } catch (Exception $e) {
+                $this->environment = '';
+            }
             // set the tenancy environment based on the user input "url" field or default it from the api key
             $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
-            // set the environment from the api key
-            $this->environment = (!empty($this->api_key) ? \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key) : '');
 
             add_filter('woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2);
 
@@ -328,8 +313,6 @@ function woocommerce_finance_init()
          */
         function get_all_finances()
         {
-            $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
-
             $finances = false;
             $transient_name = 'finances';
             $finances = get_transient($transient_name);
@@ -340,13 +323,21 @@ function woocommerce_finance_init()
             // OR finances transient is not set
             if ($apiKey !== $this->api_key || empty($apiKey) || empty($finances)) {
 
-                $request_options = (new \Divido\MerchantSDK\Handlers\ApiRequestOptions());
-                // Retrieve all finance plans for the merchant.
-                try {
-                    $plans = $sdk->getAllPlans($request_options);
-                    $plans = $plans->getResources();
-                    set_transient($transient_name, $plans, 60 * 60 * 1);
-                    set_transient("api_key", $this->api_key);
+                    $request_options = (new \Divido\MerchantSDK\Handlers\ApiRequestOptions());
+                    // Retrieve all finance plans for the merchant.
+                    try {
+                        $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+                        $plans = $sdk->getAllPlans($request_options);
+                        $plans = $plans->getResources();
+                        set_transient($transient_name, $plans , 60*60*1);
+                        set_transient("api_key", $this->api_key);
+                        return $plans;
+                    } catch (Exception $e) {
+                        return [];
+                    }
+                } else {
+                    return $finances;
+                }
 
                     return $plans;
                 } catch (Exception $e) {
@@ -1434,7 +1425,7 @@ jQuery(document).ready(function($) {
 
                 if (empty(get_post_meta($order_id, "_finance_reference", true))) {
 
-                    $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
+                    $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
 
                     $application = (new \Divido\MerchantSDK\Models\Application())
                         ->withCountryId($order->get_billing_country())
@@ -1483,7 +1474,7 @@ jQuery(document).ready(function($) {
                     $result_redirect = $decode->data->urls->application_url;
                 } else {
 
-                    $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
+                    $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
                     $applicationId = get_post_meta($order_id, "_finance_reference", true);
 
                     $application = (new \Divido\MerchantSDK\Models\Application())
@@ -1597,7 +1588,7 @@ jQuery(document).ready(function($) {
          */
         public function get_finance_env()
         {
-            $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
+            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
 
             $transient = 'environment';
             $setting = get_transient($transient);
@@ -1624,19 +1615,24 @@ jQuery(document).ready(function($) {
          */
         function get_default_merchant_api_pub_url($api_key)
         {
-            // if there is no api key (i.e. a new install), default the merchant api url to an empty string
-            if (empty($api_key)) {
+            try {
+                // if there is no api key (i.e. a new install), default the merchant api url to an empty string
+                if (empty($api_key)) {
+                    return '';
+                }
+
+                $merchant_sdk_env_config_object = \Divido\MerchantSDK\Environment::CONFIGURATION;
+
+                // only default the merchant api url if the url is defined in the merchant SDK
+                if (array_key_exists($this->environment, $merchant_sdk_env_config_object)) {
+                    return $merchant_sdk_env_config_object[$this->environment]['base_uri'];
+                }
+
+                return '';
+
+            } catch (Exception $e) {
                 return '';
             }
-
-            $merchant_sdk_env_config_object = \Divido\MerchantSDK\Environment::CONFIGURATION;
-
-            // only default the merchant api url if the url is defined in the merchant SDK
-            if (array_key_exists($this->environment, $merchant_sdk_env_config_object)) {
-                return $merchant_sdk_env_config_object[$this->environment]['base_uri'];
-            }
-
-            return '';
         }
 
         /**
@@ -1857,7 +1853,7 @@ jQuery(document).ready(function($) {
             $applicationCancellation = (new \Divido\MerchantSDK\Models\ApplicationCancellation())
                 ->withOrderItems($items);
 
-            $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
+            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
             $response = $sdk->applicationCancellations()->createApplicationCancellation($application, $applicationCancellation);
             $refundResponseBody = $response->getBody()->getContents();
         }
@@ -1878,7 +1874,7 @@ jQuery(document).ready(function($) {
             $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationRefund())
                 ->withOrderItems($items);
 
-            $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
+            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
             $response = $sdk->applicationRefunds()->createApplicationRefund($application, $applicationRefund);
             $refundResponseBody = $response->getBody()->getContents();
         }
@@ -1901,7 +1897,7 @@ jQuery(document).ready(function($) {
                 ->withDeliveryMethod($shipping_method)
                 ->withTrackingNumber($tracking_numbers);
             // Create a new activation for the application.
-            $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
+            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
             $response = $sdk->applicationActivations()->createApplicationActivation($application, $application_activation);
             $activation_response_body = $response->getBody()->getContents();
         }
