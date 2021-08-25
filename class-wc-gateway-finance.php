@@ -1180,7 +1180,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
     </h3>
     <?php
 
-                $sdk = Merchant_SDK::getInstance($this->url, $this->api_key)->getSDK();
+                $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
 
                 $response = $sdk->healthcheck()->checkHealth($this->url);
 
