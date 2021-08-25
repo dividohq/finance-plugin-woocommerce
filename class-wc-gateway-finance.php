@@ -1,6 +1,5 @@
 <?php
 defined('ABSPATH') or die('Denied');
-
 /**
  *  Finance Gateway for Woocommerce
  *
@@ -56,7 +55,6 @@ function woocommerce_finance_init()
          */
         public function __construct($url, $api_key)
         {
-
             $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
@@ -323,21 +321,14 @@ function woocommerce_finance_init()
             // OR finances transient is not set
             if ($apiKey !== $this->api_key || empty($apiKey) || empty($finances)) {
 
-                    $request_options = (new \Divido\MerchantSDK\Handlers\ApiRequestOptions());
-                    // Retrieve all finance plans for the merchant.
-                    try {
-                        $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
-                        $plans = $sdk->getAllPlans($request_options);
-                        $plans = $plans->getResources();
-                        set_transient($transient_name, $plans , 60*60*1);
-                        set_transient("api_key", $this->api_key);
-                        return $plans;
-                    } catch (Exception $e) {
-                        return [];
-                    }
-                } else {
-                    return $finances;
-                }
+                $request_options = (new \Divido\MerchantSDK\Handlers\ApiRequestOptions());
+                // Retrieve all finance plans for the merchant.
+                try {
+                    $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+                    $plans = $sdk->getAllPlans($request_options);
+                    $plans = $plans->getResources();
+                    set_transient($transient_name, $plans, 60 * 60 * 1);
+                    set_transient("api_key", $this->api_key);
 
                     return $plans;
                 } catch (Exception $e) {
@@ -1225,7 +1216,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                     $options = array();
                     if ([] === $response) {
                     ?>
-    <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
+    <div style="border:1px solid red;color:red;padding:20px;">
         <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>
         <p><?php esc_html_e('backendcontact_financier_msg', 'woocommerce-finance-gateway'); ?></p>
     </div>
@@ -1629,7 +1620,6 @@ jQuery(document).ready(function($) {
                 }
 
                 return '';
-
             } catch (Exception $e) {
                 return '';
             }
