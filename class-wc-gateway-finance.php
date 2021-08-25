@@ -154,14 +154,14 @@ function woocommerce_finance_init()
             $this->secret = (!empty($this->settings['secret'])) ? $this->settings['secret'] : '';
             $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
-            // set the tenancy environment based on the user input "url" field or default it from the api key
-            $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
             // set the environment from the api key
             try {
                 $this->environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
             } catch (Exception $e) {
                 $this->environment = '';
             }
+            // set the tenancy environment based on the user input "url" field or default it from the api key
+            $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
 
             add_filter( 'woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2 );
 
