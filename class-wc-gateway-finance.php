@@ -1200,8 +1200,6 @@ jQuery("input[name=_tab_finance_active]").change(function() {
 
                 $response = $sdk->healthcheck()->checkHealth($this->url);
 
-                console_log($response);
-
                 if (!$response["isHealthy"]) {
                     $status_code = $response["status_code"] ?? null;
 
