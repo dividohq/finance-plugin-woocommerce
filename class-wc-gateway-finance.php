@@ -45,9 +45,7 @@ function woocommerce_finance_init()
     class Merchant_SDK
     {
         /**
-         * Merchant SDK Constructor
-         *
-         * Initialises a merchant sdk and stores it in the $merchant_sdk class variable
+         * Creates and returns a merchant sdk instance
          *
          * @param string The merchant api url
          * @param string The api key for the environment
