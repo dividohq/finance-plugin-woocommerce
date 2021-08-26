@@ -44,8 +44,6 @@ function woocommerce_finance_init()
      **/
     class Merchant_SDK
     {
-        private $merchant_sdk;
-
         /**
          * Merchant SDK Constructor
          *
@@ -53,8 +51,10 @@ function woocommerce_finance_init()
          *
          * @param string The merchant api url
          * @param string The api key for the environment
+         *
+         * @return Divido\MerchantSDK\Client The Merchant SDK client instance
          */
-        public function __construct($url, $api_key)
+        public static function getSDK($url, $api_key)
         {
             $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
             $client = new \GuzzleHttp\Client();
@@ -63,17 +63,7 @@ function woocommerce_finance_init()
                 $url,
                 $api_key
             );
-            $this->merchant_sdk = new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
-        }
-
-        /**
-         * Returns the instance of the Merchant SDK client
-         *
-         * @return Divido\MerchantSDK\Client The Merchant SDK client instance
-         */
-        public function getSDK()
-        {
-            return $this->merchant_sdk;
+            return new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
         }
     }
 
@@ -323,7 +313,7 @@ function woocommerce_finance_init()
                     $request_options = (new \Divido\MerchantSDK\Handlers\ApiRequestOptions());
                     // Retrieve all finance plans for the merchant.
                     try {
-                        $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+                        $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
                         $plans = $sdk->getAllPlans($request_options);
                         $plans = $plans->getResources();
                         set_transient($transient_name, $plans , 60*60*1);
@@ -1365,7 +1355,7 @@ function woocommerce_finance_init()
 
                 if (empty(get_post_meta($order_id, "_finance_reference", true))) {
 
-                    $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+                    $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
                     $application = (new \Divido\MerchantSDK\Models\Application())
                         ->withCountryId($order->get_billing_country())
@@ -1414,7 +1404,7 @@ function woocommerce_finance_init()
                     $result_redirect = $decode->data->urls->application_url;
                 } else {
 
-                    $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+                    $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
                     $applicationId = get_post_meta($order_id, "_finance_reference", true);
 
                     $application = (new \Divido\MerchantSDK\Models\Application())
@@ -1528,7 +1518,7 @@ function woocommerce_finance_init()
          */
         public function get_finance_env()
         {
-            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
             $transient = 'environment';
             $setting = get_transient($transient);
@@ -1791,7 +1781,7 @@ function woocommerce_finance_init()
             $applicationCancellation = (new \Divido\MerchantSDK\Models\ApplicationCancellation())
                 ->withOrderItems($items);
 
-            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationCancellations()->createApplicationCancellation($application, $applicationCancellation);
             $refundResponseBody = $response->getBody()->getContents();
 
@@ -1813,7 +1803,7 @@ function woocommerce_finance_init()
             $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationRefund())
                 ->withOrderItems($items);
 
-            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationRefunds()->createApplicationRefund($application, $applicationRefund);
             $refundResponseBody = $response->getBody()->getContents();
 
@@ -1838,7 +1828,7 @@ function woocommerce_finance_init()
                 ->withDeliveryMethod($shipping_method)
                 ->withTrackingNumber($tracking_numbers);
             // Create a new activation for the application.
-            $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationActivations()->createApplicationActivation($application, $application_activation);
             $activation_response_body = $response->getBody()->getContents();
         }
