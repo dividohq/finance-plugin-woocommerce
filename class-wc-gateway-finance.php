@@ -1162,11 +1162,11 @@ function woocommerce_finance_init()
     </h3>
     <?php
 
-                $sdk = (new Merchant_SDK($this->url, $this->api_key))->getSDK();
+                $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
-                $response = $sdk->healthcheck()->checkHealth($this->url);
+                $response = $sdk->health()->checkHealth($this->url);
 
-                if (!$response["isHealthy"]) {
+                if (!$response["healthy"]) {
                     $status_code = $response["status_code"] ?? null;
 
                     if (!$status_code) {
