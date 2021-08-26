@@ -5,3 +5,4 @@ vendor/divido/.DS_Store
 wpcs/
 vendor/
 composer.lock
+.php_cs.cache
