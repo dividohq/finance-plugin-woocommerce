@@ -1150,7 +1150,7 @@ function woocommerce_finance_init()
         function admin_options()
         {
 
-        ?>
+            ?>
             <h3><?php esc_html_e('globalplugin_title', 'woocommerce-finance-gateway'); ?></h3>
             <p><?php esc_html_e('globalplugin_description', 'woocommerce-finance-gateway'); ?></p>
             <table class="form-table">
@@ -1158,9 +1158,9 @@ function woocommerce_finance_init()
                 $this->init_settings();
                 ?>
                 <h3 style="border-bottom:1px solid">
-                    <?php esc_html_e('backend/config general_settings_header', 'woocommerce-finance-gateway'); ?>
-                </h3>
-                <?php
+        <?php esc_html_e('backend/configgeneral_settings_header', 'woocommerce-finance-gateway'); ?>
+    </h3>
+    <?php
 
                 $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
@@ -1175,21 +1175,23 @@ function woocommerce_finance_init()
                         // environment_url_error: Incorrect or invalid environment URL
                         // environment_url_error_msg: Environment URL is unreachable: {$this->url}
                 ?>
-                        <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
-                            <b><?php esc_html_e('backend/error environment_url_error', 'woocommerce-finance-gateway'); ?></b>
-                            <p><?php esc_html_e("backend/errorenvironment_url_error_msg $this->url", 'woocommerce-finance-gateway'); ?>
-                            </p>
-                        </div>
-                    <?php
+    <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
+        <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
+        <p><?php esc_html_e('backend/errorenvironment_url_error_msg', 'woocommerce-finance-gateway'); 
+            esc_html_e(" {$this->url}", 'woocommerce-finance-gateway'); ?>
+        </p>
+    </div>
+    <?php
                     } elseif ($status_code !== 200) {
                         // Host is good but environment is not healthy
                     ?>
-                        <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
-                            <b><?php esc_html_e('backend/error environment_url_error', 'woocommerce-finance-gateway'); ?></b>
-                            <p><?php esc_html_e("backend/errorenvironment_unhealthy_error_msg $status_code", 'woocommerce-finance-gateway'); ?>
-                            </p>
-                        </div>
-                    <?php
+    <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
+        <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
+        <p><?php esc_html_e('backend/errorenvironment_unhealthy_error_msg', 'woocommerce-finance-gateway'); ?>
+        <?php esc_html_e(" {$status_code}", 'woocommerce-finance-gateway'); ?>
+        </p>
+    </div>
+    <?php
                     }
                 }
 
@@ -1202,15 +1204,14 @@ function woocommerce_finance_init()
                             <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>
                             <p><?php esc_html_e('backendcontact_financier_msg', 'woocommerce-finance-gateway'); ?></p>
                         </div>
-                <?php
+                        <?php
                     }
                 }
 
                 $this->generate_settings_html();
                 ?>
-            </table>
-            <!--/.form-table-->
-            
+            </table><!--/.form-table-->
+
             <script type="text/javascript">
                 jQuery(document).ready(function ($) {
                     function checkFinanceSettings() {
