@@ -1148,15 +1148,11 @@ function woocommerce_finance_init()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->health()->checkHealth($this->url);
-
             $healthy = $response["healthy"];
 
             $status_code = $response["status_code"] ?? null;
-
             $not_200 = $status_code !== 200;
-
             $bad_host = !$status_code;
-            // $unhealthy = $status_code !== 200;
 
         ?>
             <h3>
@@ -1205,7 +1201,6 @@ function woocommerce_finance_init()
                     }
                 }
 
-                // If environment URL is invalid, API key validation will always fail
                 if (isset($this->api_key) && $this->api_key) {
                     $response = $this->get_all_finances();
                     $options = array();
