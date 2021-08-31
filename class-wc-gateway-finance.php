@@ -1148,12 +1148,10 @@ function woocommerce_finance_init()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->health()->checkHealth($this->url);
-            $healthy = $response["healthy"];
 
             $status_code = $response["status_code"] ?? null;
-            $not_200 = $status_code !== 200;
             $bad_host = !$status_code;
-
+            $not_200 = $status_code !== 200;
         ?>
             <h3>
                 <?php esc_html_e('globalplugin_title', 'woocommerce-finance-gateway'); ?>
@@ -1170,7 +1168,6 @@ function woocommerce_finance_init()
                 </h3>
                 <?php
 
-                if (!$healthy) {
                     // We can differentiate between bad host and bad URL/health
                     if ($bad_host) {
                         // First catch the case where could not resolve host: {$this->url}
@@ -1189,6 +1186,9 @@ function woocommerce_finance_init()
 
                     } elseif ($not_200) {
                         // Host is good but environment is not healthy
+                        //
+                        // environment_url_error: Incorrect or invalid environment URL
+                        // environment_unhealthy_error_msg: Something may be wrong with the environment. It returned: {$status_code}
 
                     ?>
                         <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
@@ -1199,7 +1199,6 @@ function woocommerce_finance_init()
                         </div>
                     <?php
                     }
-                }
 
                 if (isset($this->api_key) && $this->api_key) {
                     $response = $this->get_all_finances();
