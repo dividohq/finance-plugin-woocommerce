@@ -1147,7 +1147,7 @@ function woocommerce_finance_init()
         function admin_options()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-            $response = $sdk->health()->checkHealth($this->url);
+            $response = $sdk->health()->checkHealth();
 
             $status_code = $response["status_code"] ?? null;
             $bad_host = !$status_code;
