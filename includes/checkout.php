@@ -19,4 +19,4 @@
         </script>
 <div class="clear"></div>
 </fieldset>
-<?php wp_nonce_field( 'submit-payment-form','submit-payment-form-nonce' ); ?>
+<?php wp_nonce_field( 'submit-payment-form', 'submit-payment-form-nonce' ); ?>
