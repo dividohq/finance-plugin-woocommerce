@@ -1146,7 +1146,13 @@ function woocommerce_finance_init()
          */
         function admin_options()
         {
+            // Sole purpose of this specific instance of the Merchant SDK is to access
+            // checkHealth() which doesn't require API key.
+            // Eliminating risk of accidental API key leakage here by not including it.
+            // Reason is that checkHealth() uses sends a request via HttpClientWrapper which: 
+            // "Adds the base URL and Merchant API Key to the request before sending."
             $sdk = Merchant_SDK::getSDK($this->url, 'sandbox_dummy_api.key');
+
             $response = $sdk->health()->checkHealth();
 
             $status_code = $response["status_code"] ?? null;
