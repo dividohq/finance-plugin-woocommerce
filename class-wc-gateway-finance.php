@@ -1146,7 +1146,7 @@ function woocommerce_finance_init()
          */
         function admin_options()
         {
-            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
+            $sdk = Merchant_SDK::getSDK($this->url, 'sandbox_dummy_api.key');
             $response = $sdk->health()->checkHealth();
 
             $status_code = $response["status_code"] ?? null;
