@@ -22,5 +22,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Psalm – Security Scanner for PHP
+    - name: Run Psalm for Security Analysis
       uses: psalm/psalm-github-security-scan@1.2.1
+
+    - name: Upload Security Analysis results to GitHub
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: results.sarif
