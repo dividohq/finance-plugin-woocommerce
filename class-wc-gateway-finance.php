@@ -1570,6 +1570,7 @@ function woocommerce_finance_init()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
+            // ensure that the url is used as a part of the cache key so the right env is returned from the cache
             $transient = 'environment' . md5($this->url);
             $setting = get_transient($transient);
 
