@@ -1570,7 +1570,7 @@ function woocommerce_finance_init()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
-            $transient = 'environment';
+            $transient = 'environment'. md5($this->url);
             $setting = get_transient($transient);
 
             if (!empty($setting)) {
