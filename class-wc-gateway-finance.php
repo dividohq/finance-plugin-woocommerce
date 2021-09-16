@@ -1430,6 +1430,7 @@ function woocommerce_finance_init()
 
                 if (empty(get_post_meta($order_id, "_finance_reference", true))) {
 
+                    // Todo: Should check if SDK is not null.
                     $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
                     $application = (new \Divido\MerchantSDK\Models\Application())
@@ -1479,6 +1480,7 @@ function woocommerce_finance_init()
                     $result_redirect = $decode->data->urls->application_url;
                 } else {
 
+                    // Todo: Should check if SDK is not null.
                     $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
                     $applicationId = get_post_meta($order_id, "_finance_reference", true);
 
@@ -1594,6 +1596,11 @@ function woocommerce_finance_init()
         public function get_finance_env()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
+
+            //Todo: Perhaps show the user some error message? This will break a bunch of stuff.
+            if($sdk === null) {
+                return '';
+            }
 
             // ensure that the url is used as a part of the cache key so the right env is returned from the cache
             $transient = 'environment' . md5($this->url);
@@ -1858,6 +1865,7 @@ function woocommerce_finance_init()
             $applicationCancellation = (new \Divido\MerchantSDK\Models\ApplicationCancellation())
                 ->withOrderItems($items);
 
+            //Todo: Check if SDK is null
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationCancellations()->createApplicationCancellation($application, $applicationCancellation);
             $refundResponseBody = $response->getBody()->getContents();
@@ -1879,6 +1887,7 @@ function woocommerce_finance_init()
             $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationRefund())
                 ->withOrderItems($items);
 
+            //Todo: Check if SDK is null
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationRefunds()->createApplicationRefund($application, $applicationRefund);
             $refundResponseBody = $response->getBody()->getContents();
@@ -1902,6 +1911,7 @@ function woocommerce_finance_init()
                 ->withDeliveryMethod($shipping_method)
                 ->withTrackingNumber($tracking_numbers);
             // Create a new activation for the application.
+            //Todo: Check if SDK is null
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationActivations()->createApplicationActivation($application, $application_activation);
             $activation_response_body = $response->getBody()->getContents();
