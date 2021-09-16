@@ -1,4 +1,8 @@
 <?php
+
+use Divido\MerchantSDK\Exceptions\InvalidApiKeyFormatException;
+use Divido\MerchantSDK\Exceptions\InvalidEnvironmentException;
+
 defined('ABSPATH') or die('Denied');
 /**
  *  Finance Gateway for Woocommerce
@@ -50,11 +54,18 @@ function woocommerce_finance_init()
          * @param string The merchant api url
          * @param string The api key for the environment
          *
-         * @return Divido\MerchantSDK\Client The Merchant SDK client instance
+         * @return Divido\MerchantSDK\Client|null The Merchant SDK client instance
          */
         public static function getSDK($url, $api_key)
         {
-            $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
+            try{
+                $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
+            }catch (InvalidApiKeyFormatException $e){
+                return null;
+            }catch (InvalidEnvironmentException $e){
+                return null;
+            }
+
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
@@ -1147,9 +1158,18 @@ function woocommerce_finance_init()
         function admin_options()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-            $response = $sdk->health()->checkHealth();
 
-            $status_code = $response["status_code"] ?? null;
+            $status_code = null;
+
+            if($sdk !== null){
+                $response = $sdk->health()->checkHealth();
+                $status_code = null;
+
+                if(array_key_exists('status_code', $response) && !empty($response['status_code'])){
+                    $status_code = $response['status_code'];
+                }
+            }
+
             $bad_host = !$status_code;
             $not_200 = $status_code !== 200;
         ?>
