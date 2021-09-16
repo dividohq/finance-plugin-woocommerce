@@ -1,4 +1,8 @@
 <?php
+
+use Divido\MerchantSDK\Exceptions\InvalidApiKeyFormatException;
+use Divido\MerchantSDK\Exceptions\InvalidEnvironmentException;
+
 defined('ABSPATH') or die('Denied');
 /**
  *  Finance Gateway for Woocommerce
@@ -11,7 +15,7 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.3.0
+ * Version: 2.3.1
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
@@ -50,11 +54,18 @@ function woocommerce_finance_init()
          * @param string The merchant api url
          * @param string The api key for the environment
          *
-         * @return Divido\MerchantSDK\Client The Merchant SDK client instance
+         * @return Divido\MerchantSDK\Client|null The Merchant SDK client instance
          */
         public static function getSDK($url, $api_key)
         {
-            $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
+            try{
+                $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
+            }catch (InvalidApiKeyFormatException $e){
+                return null;
+            }catch (InvalidEnvironmentException $e){
+                return null;
+            }
+
             $client = new \GuzzleHttp\Client();
             $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
                 new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
@@ -117,7 +128,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.3.0';
+            $this->plugin_version = '2.3.1';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';
@@ -315,6 +326,11 @@ function woocommerce_finance_init()
                 // Retrieve all finance plans for the merchant.
                 try {
                     $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
+
+                    if($sdk === null){
+                        return [];
+                    }
+
                     $plans = $sdk->getAllPlans($request_options);
                     $plans = $plans->getResources();
                     set_transient($transient_name, $plans, 60 * 60 * 1);
@@ -1147,9 +1163,18 @@ function woocommerce_finance_init()
         function admin_options()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-            $response = $sdk->health()->checkHealth();
 
-            $status_code = $response["status_code"] ?? null;
+            $status_code = null;
+
+            if($sdk !== null){
+                $response = $sdk->health()->checkHealth();
+                $status_code = null;
+
+                if(array_key_exists('status_code', $response) && !empty($response['status_code'])){
+                    $status_code = $response['status_code'];
+                }
+            }
+
             $bad_host = !$status_code;
             $not_200 = $status_code !== 200;
         ?>
@@ -1405,6 +1430,7 @@ function woocommerce_finance_init()
 
                 if (empty(get_post_meta($order_id, "_finance_reference", true))) {
 
+                    // Todo: Should check if SDK is not null.
                     $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
                     $application = (new \Divido\MerchantSDK\Models\Application())
@@ -1454,6 +1480,7 @@ function woocommerce_finance_init()
                     $result_redirect = $decode->data->urls->application_url;
                 } else {
 
+                    // Todo: Should check if SDK is not null.
                     $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
                     $applicationId = get_post_meta($order_id, "_finance_reference", true);
 
@@ -1569,6 +1596,11 @@ function woocommerce_finance_init()
         public function get_finance_env()
         {
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
+
+            //Todo: Perhaps show the user some error message? This will break a bunch of stuff.
+            if($sdk === null) {
+                return '';
+            }
 
             // ensure that the url is used as a part of the cache key so the right env is returned from the cache
             $transient = 'environment' . md5($this->url);
@@ -1833,6 +1865,7 @@ function woocommerce_finance_init()
             $applicationCancellation = (new \Divido\MerchantSDK\Models\ApplicationCancellation())
                 ->withOrderItems($items);
 
+            //Todo: Check if SDK is null
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationCancellations()->createApplicationCancellation($application, $applicationCancellation);
             $refundResponseBody = $response->getBody()->getContents();
@@ -1854,6 +1887,7 @@ function woocommerce_finance_init()
             $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationRefund())
                 ->withOrderItems($items);
 
+            //Todo: Check if SDK is null
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationRefunds()->createApplicationRefund($application, $applicationRefund);
             $refundResponseBody = $response->getBody()->getContents();
@@ -1877,6 +1911,7 @@ function woocommerce_finance_init()
                 ->withDeliveryMethod($shipping_method)
                 ->withTrackingNumber($tracking_numbers);
             // Create a new activation for the application.
+            //Todo: Check if SDK is null
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
             $response = $sdk->applicationActivations()->createApplicationActivation($application, $application_activation);
             $activation_response_body = $response->getBody()->getContents();
