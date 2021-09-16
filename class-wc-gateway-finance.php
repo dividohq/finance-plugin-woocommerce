@@ -326,6 +326,11 @@ function woocommerce_finance_init()
                 // Retrieve all finance plans for the merchant.
                 try {
                     $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
+
+                    if($sdk === null){
+                        return [];
+                    }
+
                     $plans = $sdk->getAllPlans($request_options);
                     $plans = $plans->getResources();
                     set_transient($transient_name, $plans, 60 * 60 * 1);
