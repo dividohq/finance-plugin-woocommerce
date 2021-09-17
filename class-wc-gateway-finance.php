@@ -2,6 +2,7 @@
 
 use Divido\MerchantSDK\Exceptions\InvalidApiKeyFormatException;
 use Divido\MerchantSDK\Exceptions\InvalidEnvironmentException;
+use Divido\MerchantSDK\Environment;
 
 defined('ABSPATH') or die('Denied');
 /**
@@ -59,7 +60,7 @@ function woocommerce_finance_init()
         public static function getSDK($url, $api_key)
         {
             try{
-                $env = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($api_key);
+                $env = Environment::getEnvironmentFromAPIKey($api_key);
             }catch (InvalidApiKeyFormatException $e){
                 return null;
             }catch (InvalidEnvironmentException $e){
@@ -157,7 +158,7 @@ function woocommerce_finance_init()
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
             // set the environment from the api key
             try {
-                $this->environment = \Divido\MerchantSDK\Environment::getEnvironmentFromAPIKey($this->api_key);
+                $this->environment = Environment::getEnvironmentFromAPIKey($this->api_key);
             } catch (Exception $e) {
                 $this->environment = '';
             }
@@ -390,35 +391,35 @@ function woocommerce_finance_init()
                 $key = preg_split('/\./', $this->api_key);
 
 ?>
-                <script type='text/javascript'>
-                    window.__widgetConfig = {
-                        apiKey: '<?php echo esc_attr(strtolower($key[0])); ?>'
+<script type='text/javascript'>
+window.__widgetConfig = {
+    apiKey: '<?php echo esc_attr(strtolower($key[0])); ?>'
 
-                    };
+};
 
-                    var <?php echo ($this->get_finance_env()) ?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>'
-                </script>
-                <script>
-                    // <![CDATA[
-                    function waitForElementToDisplay(selector, time) {
-                        if (document.querySelector(selector) !== null) {
-                            __widgetInstance.init()
-                            return;
-                        } else {
-                            setTimeout(function() {
-                                waitForElementToDisplay(selector, time);
-                            }, time);
-                        }
-                    }
+var <?php echo ($this->get_finance_env()) ?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>'
+</script>
+<script>
+// <![CDATA[
+function waitForElementToDisplay(selector, time) {
+    if (document.querySelector(selector) !== null) {
+        __widgetInstance.init()
+        return;
+    } else {
+        setTimeout(function() {
+            waitForElementToDisplay(selector, time);
+        }, time);
+    }
+}
 
-                    jQuery(document).ready(function() {
-                        waitForElementToDisplay('#financeWidget', 1000);
-                    });
+jQuery(document).ready(function() {
+    waitForElementToDisplay('#financeWidget', 1000);
+});
 
-                    // ]]>
-                </script>
+// ]]>
+</script>
 
-            <?php
+<?php
             }
         }
 
@@ -819,18 +820,20 @@ function woocommerce_finance_init()
                 $active_style = '#woocommerce-product-data ul.product_data_tabs li.my_plugin_tab.active a { border-bottom: 1px solid #F8F8F8; }';
             }
             ?>
-            <style type="text/css">
-                #woocommerce-product-data ul.product_data_tabs li.finance_tab a {
-                    <?php echo esc_attr($style); ?>
-                }
+<style type="text/css">
+#woocommerce-product-data ul.product_data_tabs li.finance_tab a {
+    <?php echo esc_attr($style);
+    ?>
+}
 
-                #woocommerce-product-data ul.product_data_tabs li.finance_tab a:before {
-                    content: '' !important;
-                }
+#woocommerce-product-data ul.product_data_tabs li.finance_tab a:before {
+    content: '' !important;
+}
 
-                <?php echo esc_attr($active_style); ?>
-            </style>
-        <?php
+<?php echo esc_attr($active_style);
+?>
+</style>
+<?php
 
             echo '<li class="finance_tab"><a href="#finance_tab"><span>' . esc_attr(__('globalplugin_title', 'woocommerce-finance-gateway')) . '</span></a></li>';
         }
@@ -862,44 +865,53 @@ function woocommerce_finance_init()
             $finances = $this->get_finances();
 
         ?>
-            <div id="finance_tab" class="panel woocommerce_options_panel">
-                <p class="form-field _hide_title_field ">
-                    <label for="_available"><?php esc_html_e('frontend/productavailable_on_finance_label', 'woocommerce-finance-gateway'); ?></label>
+<div id="finance_tab" class="panel woocommerce_options_panel">
+    <p class="form-field _hide_title_field ">
+        <label
+            for="_available"><?php esc_html_e('frontend/productavailable_on_finance_label', 'woocommerce-finance-gateway'); ?></label>
 
-                    <input type="radio" class="checkbox" name="_tab_finance_active" id="finance_active_default" value="default" <?php print ('default' === $tab_data[0]['active']) ? 'checked' : ''; ?>> <?php esc_html_e('frontend/productdefault_settings_label', 'woocommerce-finance-gateway'); ?>
-                    <br style="clear:both;" />
-                    <input type="radio" class="checkbox" name="_tab_finance_active" id="finance_active_selected" value="selected" <?php print ('selected' === $tab_data[0]['active']) ? 'checked' : ''; ?>> <?php esc_html_e('frontend/productselected_plans_label', 'woocommerce-finance-gateway'); ?>
-                    <br style="clear:both;" />
-                </p>
-                <p class="form-field _hide_title_field" id="selectedFinance" style="display:none;">
-                    <label for="_hide_title"><?php esc_html_e('frontend/productselected_plans_label', 'woocommerce-finance-gateway'); ?></label>
+        <input type="radio" class="checkbox" name="_tab_finance_active" id="finance_active_default" value="default"
+            <?php print ('default' === $tab_data[0]['active']) ? 'checked' : ''; ?>>
+        <?php esc_html_e('frontend/productdefault_settings_label', 'woocommerce-finance-gateway'); ?>
+        <br style="clear:both;" />
+        <input type="radio" class="checkbox" name="_tab_finance_active" id="finance_active_selected" value="selected"
+            <?php print ('selected' === $tab_data[0]['active']) ? 'checked' : ''; ?>>
+        <?php esc_html_e('frontend/productselected_plans_label', 'woocommerce-finance-gateway'); ?>
+        <br style="clear:both;" />
+    </p>
+    <p class="form-field _hide_title_field" id="selectedFinance" style="display:none;">
+        <label
+            for="_hide_title"><?php esc_html_e('frontend/productselected_plans_label', 'woocommerce-finance-gateway'); ?></label>
 
-                    <?php
+        <?php
 
                     foreach ($finances as $finance => $value) {
 
                     ?>
-                        <input type="checkbox" class="checkbox" name="_tab_finances[]" id="finances_<?php print esc_attr($finance); ?>" value="<?php print esc_attr($finance); ?>" <?php print (in_array($finance, $tab_data[0]['finances'], true)) ? 'checked' : ''; ?>> &nbsp;<?php print esc_attr($value['description']); ?>
-                        <br style="clear:both;" />
-                    <?php } ?>
-                </p>
-            </div>
-            <script type="text/javascript">
-                function checkActive() {
-                    jQuery("#selectedFinance").hide();
-                    if (jQuery("input[name=_tab_finance_active]:checked").val() === 'selected') {
-                        jQuery("#selectedFinance").show();
-                    }
-                }
+        <input type="checkbox" class="checkbox" name="_tab_finances[]" id="finances_<?php print esc_attr($finance); ?>"
+            value="<?php print esc_attr($finance); ?>"
+            <?php print (in_array($finance, $tab_data[0]['finances'], true)) ? 'checked' : ''; ?>>
+        &nbsp;<?php print esc_attr($value['description']); ?>
+        <br style="clear:both;" />
+        <?php } ?>
+    </p>
+</div>
+<script type="text/javascript">
+function checkActive() {
+    jQuery("#selectedFinance").hide();
+    if (jQuery("input[name=_tab_finance_active]:checked").val() === 'selected') {
+        jQuery("#selectedFinance").show();
+    }
+}
 
-                jQuery(document).ready(function() {
-                    checkActive();
-                });
-                jQuery("input[name=_tab_finance_active]").change(function() {
-                    checkActive();
-                });
-            </script>
-        <?php
+jQuery(document).ready(function() {
+    checkActive();
+});
+jQuery("input[name=_tab_finance_active]").change(function() {
+    checkActive();
+});
+</script>
+<?php
         }
 
         /**
@@ -1178,20 +1190,20 @@ function woocommerce_finance_init()
             $bad_host = !$status_code;
             $not_200 = $status_code !== 200;
         ?>
-            <h3>
-                <?php esc_html_e('globalplugin_title', 'woocommerce-finance-gateway'); ?>
-            </h3>
-            <p>
-                <?php esc_html_e('globalplugin_description', 'woocommerce-finance-gateway'); ?>
-            </p>
-            <table class="form-table">
-                <?php
+<h3>
+    <?php esc_html_e('globalplugin_title', 'woocommerce-finance-gateway'); ?>
+</h3>
+<p>
+    <?php esc_html_e('globalplugin_description', 'woocommerce-finance-gateway'); ?>
+</p>
+<table class="form-table">
+    <?php
                 $this->init_settings();
                 ?>
-                <h3 style="border-bottom:1px solid">
-                    <?php esc_html_e('backend/configgeneral_settings_header', 'woocommerce-finance-gateway'); ?>
-                </h3>
-                <?php
+    <h3 style="border-bottom:1px solid">
+        <?php esc_html_e('backend/configgeneral_settings_header', 'woocommerce-finance-gateway'); ?>
+    </h3>
+    <?php
 
                     // We can differentiate between bad host and bad URL/health
                     if ($bad_host) {
@@ -1201,13 +1213,13 @@ function woocommerce_finance_init()
                         // environment_url_error_msg: Environment URL is unreachable: {$this->url}
 
                 ?>
-                        <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
-                            <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
-                            <p><?php esc_html_e('backend/errorenvironment_url_error_msg', 'woocommerce-finance-gateway');
+    <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
+        <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
+        <p><?php esc_html_e('backend/errorenvironment_url_error_msg', 'woocommerce-finance-gateway');
                                 esc_html_e(" {$this->url}", 'woocommerce-finance-gateway'); ?>
-                            </p>
-                        </div>
-                    <?php
+        </p>
+    </div>
+    <?php
 
                     } elseif ($not_200) {
                         // Host is good but environment is not healthy
@@ -1216,13 +1228,13 @@ function woocommerce_finance_init()
                         // environment_unhealthy_error_msg: Something may be wrong with the environment. It returned: {$status_code}
 
                     ?>
-                        <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
-                            <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
-                            <p><?php esc_html_e('backend/errorenvironment_unhealthy_error_msg', 'woocommerce-finance-gateway'); ?>
-                                <?php esc_html_e(" {$status_code}", 'woocommerce-finance-gateway'); ?>
-                            </p>
-                        </div>
-                    <?php
+    <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
+        <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
+        <p><?php esc_html_e('backend/errorenvironment_unhealthy_error_msg', 'woocommerce-finance-gateway'); ?>
+            <?php esc_html_e(" {$status_code}", 'woocommerce-finance-gateway'); ?>
+        </p>
+    </div>
+    <?php
                     }
 
                 if (isset($this->api_key) && $this->api_key) {
@@ -1230,38 +1242,38 @@ function woocommerce_finance_init()
                     $options = array();
                     if ([] === $response) {
                     ?>
-                        <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
-                            <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>
-                            <p><?php esc_html_e('backendcontact_financier_msg', 'woocommerce-finance-gateway'); ?></p>
-                        </div>
-                <?php
+    <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
+        <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>
+        <p><?php esc_html_e('backendcontact_financier_msg', 'woocommerce-finance-gateway'); ?></p>
+    </div>
+    <?php
                     }
                 }
 
                 $this->generate_settings_html();
                 ?>
-            </table>
-            <!--/.form-table-->
+</table>
+<!--/.form-table-->
 
-            <script type="text/javascript">
-                jQuery(document).ready(function($) {
-                    function checkFinanceSettings() {
-                        $("#woocommerce_finance_priceSelection").parent().parent().parent().hide();
-                        if ($("#woocommerce_finance_productSelect").val() === 'price') {
-                            $("#woocommerce_finance_priceSelection").parent().parent().parent().show();
-                        }
-                        $("#woocommerce_finance_showFinanceOptionSelection").parent().parent().parent().hide();
-                        if ($("#woocommerce_finance_showFinanceOptions").val() === 'selection') {
-                            $("#woocommerce_finance_showFinanceOptionSelection").parent().parent().parent().show();
-                        }
-                    }
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    function checkFinanceSettings() {
+        $("#woocommerce_finance_priceSelection").parent().parent().parent().hide();
+        if ($("#woocommerce_finance_productSelect").val() === 'price') {
+            $("#woocommerce_finance_priceSelection").parent().parent().parent().show();
+        }
+        $("#woocommerce_finance_showFinanceOptionSelection").parent().parent().parent().hide();
+        if ($("#woocommerce_finance_showFinanceOptions").val() === 'selection') {
+            $("#woocommerce_finance_showFinanceOptionSelection").parent().parent().parent().show();
+        }
+    }
 
-                    $("#woocommerce_finance_productSelect,#woocommerce_finance_showFinanceOptions").on('change', function() {
-                        checkFinanceSettings();
-                    });
-                    checkFinanceSettings();
-                });
-            </script>
+    $("#woocommerce_finance_productSelect,#woocommerce_finance_showFinanceOptions").on('change', function() {
+        checkFinanceSettings();
+    });
+    checkFinanceSettings();
+});
+</script>
 <?php
         }
 
@@ -1634,7 +1646,7 @@ function woocommerce_finance_init()
                     return '';
                 }
 
-                $merchant_sdk_env_config_object = \Divido\MerchantSDK\Environment::CONFIGURATION;
+                $merchant_sdk_env_config_object = Environment::CONFIGURATION;
 
                 // only default the merchant api url if the url is defined in the merchant SDK
                 if (array_key_exists($this->environment, $merchant_sdk_env_config_object)) {
