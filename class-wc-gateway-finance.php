@@ -1180,7 +1180,6 @@ jQuery("input[name=_tab_finance_active]").change(function() {
 
             if($sdk !== null){
                 $response = $sdk->health()->checkHealth();
-                $status_code = null;
 
                 if(array_key_exists('status_code', $response) && !empty($response['status_code'])){
                     $status_code = $response['status_code'];
