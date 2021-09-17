@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      5.7.2
-Stable tag:        2.3.0
-Version:           2.3.0
+Stable tag:        2.3.1
+Version:           2.3.1
 
 License: GPLv2 or later
 
@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.3.1
+Fix: Suppress errors for empty API keys in admin panel
+
 Version 2.3.0
 Feat: New field in plugin options to accept user input Environment URL
 
