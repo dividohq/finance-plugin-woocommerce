@@ -44,7 +44,7 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
-Version 2.3.0
+Version 2.3.1
 Fix: Suppress errors for empty API keys in admin panel
 
 Version 2.3.0
