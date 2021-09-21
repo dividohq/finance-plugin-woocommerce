@@ -572,7 +572,10 @@ jQuery(document).ready(function() {
                 $priceIncludingTax = floatval($priceIncludingTax);
             }
 
-            return $priceIncludingTax * 100;
+            // Multiply by 100 to get the pence/cents value
+            $priceIncludingTax = $priceIncludingTax * 100;
+
+            return $priceIncludingTax;
         }
 
         /**
