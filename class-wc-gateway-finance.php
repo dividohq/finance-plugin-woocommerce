@@ -1,8 +1,8 @@
 <?php
 
+use Divido\MerchantSDK\Environment;
 use Divido\MerchantSDK\Exceptions\InvalidApiKeyFormatException;
 use Divido\MerchantSDK\Exceptions\InvalidEnvironmentException;
-use Divido\MerchantSDK\Environment;
 
 defined('ABSPATH') or die('Denied');
 /**
@@ -543,6 +543,8 @@ jQuery(document).ready(function() {
          * gets deprecated in 2.7, and wc_get_price_including_tax gets introduced in
          * 2.7.
          *
+         * Returns a float representing the price of this product in pence/pennies
+         *
          * @since  1.0.0
          * @param  WC_Product $product Product instance.
          * @param  array $args Args array.
@@ -559,10 +561,18 @@ jQuery(document).ready(function() {
                     )
                 );
 
-                return $product->get_price_including_tax($args['qty'], $args['price']) * 100;
+                $priceIncludingTax = $product->get_price_including_tax($args['qty'], $args['price']);
             } else {
-                return wc_get_price_including_tax($product, $args) * 100;
+                $priceIncludingTax = wc_get_price_including_tax($product, $args);
             }
+
+            // $priceIncludingTax could be a float or string
+            // Before we do math on this we need to convert the value to a float
+            if (!is_float($priceIncludingTax)) {
+                $priceIncludingTax = floatval($priceIncludingTax);
+            }
+
+            return $priceIncludingTax * 100;
         }
 
         /**
