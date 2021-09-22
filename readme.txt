@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      5.7.2
-Stable tag:        2.3.1
-Version:           2.3.1
+Stable tag:        2.3.2
+Version:           2.3.2
 
 License: GPLv2 or later
 
@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.3.2
+Fix: convert product prices passed as strings to floating point variables for math operations in widget inclusion.
+
 Version 2.3.1
 Fix: Suppress errors for empty API keys in admin panel
 
