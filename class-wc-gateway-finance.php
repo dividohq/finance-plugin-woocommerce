@@ -129,7 +129,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.3.2';
+            $this->plugin_version = '2.3.3';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';
