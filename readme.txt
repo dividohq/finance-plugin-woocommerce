@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.3.3
+Fix: Fixed widget not displaying correctly. Fixed automatic config overide on widget_threshold.
+
 Version 2.3.2
 Fix: convert product prices passed as strings to floating point variables for math operations in widget inclusion.
 
