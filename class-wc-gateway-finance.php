@@ -787,7 +787,6 @@ jQuery(document).ready(function() {
                 $price = $this->get_price_including_tax($product, '');
                 $plans = $this->get_product_plans($product);
                 $environment = $this->get_finance_env();
-                // var_dump((int)$this->widget_threshold ?? 0 * 100);var_dump($this->widget_threshold);exit;
                 if ($this->is_available($product) && $price >= (((int)$this->widget_threshold ?? 0) * 100)) {
                     $button_text = '';
                     if (!empty(sanitize_text_field($this->buttonText))) {
