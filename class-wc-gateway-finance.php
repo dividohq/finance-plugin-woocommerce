@@ -129,7 +129,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.3.2';
+            $this->plugin_version = '2.3.4';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';
@@ -152,7 +152,7 @@ function woocommerce_finance_init()
             $this->auto_fulfillment = (!empty($this->settings['autoFulfillment'])) ? $this->settings['autoFulfillment'] : "yes";
             $this->auto_refund = (!empty($this->settings['autoRefund'])) ? $this->settings['autoRefund'] : "yes";
             $this->auto_cancel = (!empty($this->settings['autoCancel'])) ? $this->settings['autoCancel'] : "yes";
-            $this->widget_threshold = (!empty($this->settings['widgetThreshold'])) ? $this->settings['widgetThreshold'] : 250;
+            $this->widget_threshold = ($this->settings['widgetThreshold'] === 0 || trim($this->settings['widgetThreshold']) !== '') ? $this->settings['widgetThreshold'] : 250;
             $this->secret = (!empty($this->settings['secret'])) ? $this->settings['secret'] : '';
             $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
@@ -787,7 +787,7 @@ jQuery(document).ready(function() {
                 $price = $this->get_price_including_tax($product, '');
                 $plans = $this->get_product_plans($product);
                 $environment = $this->get_finance_env();
-                if ($this->is_available($product) && $price > ($this->widget_threshold * 100)) {
+                if ($this->is_available($product) && $price > (((int)$this->widget_threshold ?? 0) * 100)) {
                     $button_text = '';
                     if (!empty(sanitize_text_field($this->buttonText))) {
                         $button_text = 'data-button-text="' . sanitize_text_field($this->buttonText) . '" ';
@@ -1217,53 +1217,52 @@ jQuery("input[name=_tab_finance_active]").change(function() {
     </h3>
     <?php
 
-                    // We can differentiate between bad host and bad URL/health
-                    if ($bad_host) {
-                        // First catch the case where could not resolve host: {$this->url}
-                        // 
-                        // environment_url_error: Incorrect or invalid environment URL
-                        // environment_url_error_msg: Environment URL is unreachable: {$this->url}
+      // We can differentiate between bad host and bad URL/health
+      if ($bad_host) {
+      // First catch the case where could not resolve host: {$this->url}
+      // environment_url_error: Incorrect or invalid environment URL
+      // environment_url_error_msg: Environment URL is unreachable: {$this->url}
 
-                ?>
+    ?>
     <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
-        <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
-        <p><?php esc_html_e('backend/errorenvironment_url_error_msg', 'woocommerce-finance-gateway');
-                                esc_html_e(" {$this->url}", 'woocommerce-finance-gateway'); ?>
-        </p>
+      <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
+      <p><?php esc_html_e('backend/errorenvironment_url_error_msg', 'woocommerce-finance-gateway');
+        esc_html_e(" {$this->url}", 'woocommerce-finance-gateway'); ?>
+      </p>
     </div>
     <?php
 
-                    } elseif ($not_200) {
-                        // Host is good but environment is not healthy
-                        //
-                        // environment_url_error: Incorrect or invalid environment URL
-                        // environment_unhealthy_error_msg: Something may be wrong with the environment. It returned: {$status_code}
+      } elseif ($not_200) {
+        // Host is good but environment is not healthy
+        //
+        // environment_url_error: Incorrect or invalid environment URL
+        // environment_unhealthy_error_msg: Something may be wrong with the environment. It returned: {$status_code}
 
-                    ?>
+    ?>
     <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
-        <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
-        <p><?php esc_html_e('backend/errorenvironment_unhealthy_error_msg', 'woocommerce-finance-gateway'); ?>
-            <?php esc_html_e(" {$status_code}", 'woocommerce-finance-gateway'); ?>
-        </p>
+      <b><?php esc_html_e('backend/errorenvironment_url_error', 'woocommerce-finance-gateway'); ?></b>
+      <p><?php esc_html_e('backend/errorenvironment_unhealthy_error_msg', 'woocommerce-finance-gateway'); ?>
+        <?php esc_html_e(" {$status_code}", 'woocommerce-finance-gateway'); ?>
+      </p>
     </div>
     <?php
-                    }
+      }
 
-                if (isset($this->api_key) && $this->api_key) {
-                    $response = $this->get_all_finances();
-                    $options = array();
-                    if ([] === $response) {
-                    ?>
+      if (isset($this->api_key) && $this->api_key) {
+        $response = $this->get_all_finances();
+        $options = array();
+        if ([] === $response) {
+    ?>
     <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
-        <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>
-        <p><?php esc_html_e('backendcontact_financier_msg', 'woocommerce-finance-gateway'); ?></p>
+      <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>
+      <p><?php esc_html_e('backendcontact_financier_msg', 'woocommerce-finance-gateway'); ?></p>
     </div>
     <?php
-                    }
-                }
+        }
+      }
 
-                $this->generate_settings_html();
-                ?>
+      $this->generate_settings_html();
+    ?>
 </table>
 <!--/.form-table-->
 
@@ -1372,78 +1371,86 @@ jQuery(document).ready(function($) {
                 $products = array();
                 $order_total = 0;
                 foreach ($woocommerce->cart->get_cart() as $item) {
-                    if (version_compare($this->get_woo_version(), '3.0.0') >= 0) {
-                        $_product = wc_get_product($item['data']->get_id());
-                        $name = $_product->get_title();
-                    } else {
-                        $_product = $item['data']->post;
-                        $name = $_product->post_title;
-                    }
-                    $quantity = $item['quantity'];
-                    $price = $item['line_subtotal'] / $quantity * 100;
-                    $order_total += $item['line_subtotal'];
-                    $products[] = array(
-                        'name' => $name,
-                        'quantity' => (int) $quantity,
-                        'price' => round($price)
-                    );
+                  if (version_compare($this->get_woo_version(), '3.0.0') >= 0) {
+                    $_product = wc_get_product($item['data']->get_id());
+                    $name = $_product->get_title();
+                  } else {
+                    $_product = $item['data']->post;
+                    $name = $_product->post_title;
+                  }
+                  $quantity = $item['quantity'];
+                  $price = $item['line_subtotal'] / $quantity * 100;
+                  $order_total += $item['line_subtotal'];
+                  $products[] = array(
+                    'name' => $name,
+                    'quantity' => (int) $quantity,
+                    'price' => round($price),
+                    'sku' => $item['data']->get_sku() ?? $item['data']->get_id()
+                  );
                 }
+                print_r($products);exit;
                 $deposit = (isset($_POST['divido_deposit']) && round($_POST['divido_deposit']) > 0) ? sanitize_text_field(wp_unslash($_POST['divido_deposit'])) : $min_deposit; // Input var okay.
                 if ($woocommerce->cart->needs_shipping()) {
-                    $shipping = $order->get_total_shipping();
-                    $shipping = (float) $shipping;
+                  $shipping = $order->get_total_shipping();
+                  $shipping = (float) $shipping;
 
-                    $products[] = array(
-                        'name' =>  __('global/ordershipping_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round($shipping * 100),
+                  $products[] = array(
+                    'name' =>  __('global/ordershipping_label', 'woocommerce-finance-gateway'),
+                      'quantity' => 1,
+                      'price' => round($shipping * 100),
+                      'sku' => 'SHPNG'
                     );
                     // Add shipping to order total.
                     $order_total += $shipping;
                 }
                 foreach ($woocommerce->cart->get_taxes() as $tax) {
-                    $products[] = array(
-                        'name' =>  __('global/ordertaxes_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round($tax * 100),
-                    );
-                    // Add tax to ordertotal.
-                    $order_total += $tax;
+                  $products[] = array(
+                    'name' =>  __('global/ordertaxes_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => round($tax * 100),
+                    'sku' => 'TAX'
+                  );
+                  // Add tax to ordertotal.
+                  $order_total += $tax;
                 }
                 foreach ($woocommerce->cart->get_fees() as $fee) {
+                  $products[] = array(
+                    'name' =>  __('global/orderfees_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => round($fee->amount * 100),
+                    'sku' => 'FEES'
+                  );
+                  if ($fee->taxable) {
                     $products[] = array(
-                        'name' =>  __('global/orderfees_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round($fee->amount * 100),
+                      'name' =>  __('global/orderfee_tax_label', 'woocommerce-finance-gateway'),
+                      'quantity' => 1,
+                      'price' => round($fee->tax * 100),
+                      'sku' => 'FEE_TAX'
                     );
-                    if ($fee->taxable) {
-                        $products[] = array(
-                            'name' =>  __('global/orderfee_tax_label', 'woocommerce-finance-gateway'),
-                            'quantity' => 1,
-                            'price' => round($fee->tax * 100),
-                        );
-                        $order_total += $fee->tax;
-                    }
-                    // Add Fee to order total.
-                    $order_total += $fee->amount;
+                    $order_total += $fee->tax;
+                  }
+                  // Add Fee to order total.
+                  $order_total += $fee->amount;
                 }
                 // Gets the total discount amount(including coupons) - both Taxed and untaxed.
                 if ($woocommerce->cart->get_cart_discount_total()) {
-                    $products[] = array(
-                        'name' =>  __('global/orderdiscount_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round(-$woocommerce->cart->get_cart_discount_total() * 100),
-                    );
-                    // Deduct total discount.
-                    $order_total -= $woocommerce->cart->get_cart_discount_total();
+                  $products[] = array(
+                    'name' =>  __('global/orderdiscount_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => round(-$woocommerce->cart->get_cart_discount_total() * 100),
+                    'sku' => 'DSCNT'
+                  );
+                  // Deduct total discount.
+                  $order_total -= $woocommerce->cart->get_cart_discount_total();
                 }
                 $other = $order->get_total() - $order_total;
                 if (0 !== $other) {
-                    $products[] = array(
-                        'name' =>  __('global/orderother_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round($other),
-                    );
+                  $products[] = array(
+                    'name' =>  __('global/orderother_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => round($other),
+                    'sku' => 'OTHER'
+                  );
                 }
 
                 if (isset($_SERVER['HTTP_RAW_POST_DATA']) && wp_unslash($_SERVER['HTTP_RAW_POST_DATA'])) { // Input var okay.

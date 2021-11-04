@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.3.4
+Fix: Adding SKU to the products array.
+
 Version 2.3.2
 Fix: convert product prices passed as strings to floating point variables for math operations in widget inclusion.
 
@@ -189,8 +192,3 @@ Added the ability to Cancel and Refund applications through WooCommerce
 Added Transient (caching values) on WooCommerce to prevent unnecessary API calls
 
 Version 1.0.0 Initial Release
-
-
-
-
-
