@@ -1388,7 +1388,6 @@ jQuery(document).ready(function($) {
                     'sku' => $item['data']->get_sku() ?? $item['data']->get_id()
                   );
                 }
-                print_r($products);exit;
                 $deposit = (isset($_POST['divido_deposit']) && round($_POST['divido_deposit']) > 0) ? sanitize_text_field(wp_unslash($_POST['divido_deposit'])) : $min_deposit; // Input var okay.
                 if ($woocommerce->cart->needs_shipping()) {
                   $shipping = $order->get_total_shipping();
