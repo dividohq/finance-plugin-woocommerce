@@ -152,7 +152,7 @@ function woocommerce_finance_init()
             $this->auto_fulfillment = (!empty($this->settings['autoFulfillment'])) ? $this->settings['autoFulfillment'] : "yes";
             $this->auto_refund = (!empty($this->settings['autoRefund'])) ? $this->settings['autoRefund'] : "yes";
             $this->auto_cancel = (!empty($this->settings['autoCancel'])) ? $this->settings['autoCancel'] : "yes";
-            $this->widget_threshold = ($this->settings['widgetThreshold'] === 0 || trim($this->settings['widgetThreshold']) !== '') ? $this->settings['widgetThreshold'] : 250;
+            $this->widget_threshold = isset($this->settings['widgetThreshold']) && $this->settings['widgetThreshold'] !== '' ? $this->settings['widgetThreshold'] : 250;
             $this->secret = (!empty($this->settings['secret'])) ? $this->settings['secret'] : '';
             $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
@@ -1216,7 +1216,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
         <?php esc_html_e('backend/configgeneral_settings_header', 'woocommerce-finance-gateway'); ?>
     </h3>
     <?php
-
+          
       // We can differentiate between bad host and bad URL/health
       if ($bad_host) {
       // First catch the case where could not resolve host: {$this->url}
