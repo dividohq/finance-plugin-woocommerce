@@ -129,7 +129,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.3.2';
+            $this->plugin_version = '2.3.3';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';
@@ -152,7 +152,7 @@ function woocommerce_finance_init()
             $this->auto_fulfillment = (!empty($this->settings['autoFulfillment'])) ? $this->settings['autoFulfillment'] : "yes";
             $this->auto_refund = (!empty($this->settings['autoRefund'])) ? $this->settings['autoRefund'] : "yes";
             $this->auto_cancel = (!empty($this->settings['autoCancel'])) ? $this->settings['autoCancel'] : "yes";
-            $this->widget_threshold = (!empty($this->settings['widgetThreshold'])) ? $this->settings['widgetThreshold'] : 250;
+            $this->widget_threshold = isset($this->settings['widgetThreshold']) && $this->settings['widgetThreshold'] !== '' ? $this->settings['widgetThreshold'] : 250;
             $this->secret = (!empty($this->settings['secret'])) ? $this->settings['secret'] : '';
             $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
             $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
@@ -787,7 +787,7 @@ jQuery(document).ready(function() {
                 $price = $this->get_price_including_tax($product, '');
                 $plans = $this->get_product_plans($product);
                 $environment = $this->get_finance_env();
-                if ($this->is_available($product) && $price > ($this->widget_threshold * 100)) {
+                if ($this->is_available($product) && $price > (((int)$this->widget_threshold ?? 0) * 100)) {
                     $button_text = '';
                     if (!empty(sanitize_text_field($this->buttonText))) {
                         $button_text = 'data-button-text="' . sanitize_text_field($this->buttonText) . '" ';
@@ -1220,7 +1220,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                     // We can differentiate between bad host and bad URL/health
                     if ($bad_host) {
                         // First catch the case where could not resolve host: {$this->url}
-                        // 
+                        //
                         // environment_url_error: Incorrect or invalid environment URL
                         // environment_url_error_msg: Environment URL is unreachable: {$this->url}
 
