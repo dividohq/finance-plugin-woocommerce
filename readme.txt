@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.3.5
+Fix: Adjusted the way we set values to the plugin config fields.
+
 Version 2.3.4
 Fix: Adding SKU to the products array.
 
