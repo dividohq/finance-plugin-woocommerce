@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      5.7.2
-Stable tag:        2.3.3
-Version:           2.3.3
+Stable tag:        2.3.4
+Version:           2.3.4
 
 License: GPLv2 or later
 
@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.3.4
+Fix: Adding SKU to the products array.
+
 Version 2.3.3
 Fix: Fixed widget not displaying correctly. Fixed automatic config overide on widget_threshold.
 

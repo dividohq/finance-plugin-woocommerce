@@ -16,7 +16,7 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.3.2
+ * Version: 2.3.4
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
@@ -129,7 +129,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.3.3';
+            $this->plugin_version = '2.3.4';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';
@@ -1385,7 +1385,8 @@ jQuery(document).ready(function($) {
                     $products[] = array(
                         'name' => $name,
                         'quantity' => (int) $quantity,
-                        'price' => round($price)
+                        'price' => round($price),
+                        'sku' => $item['data']->get_sku() ?? $item['data']->get_id()
                     );
                 }
                 $deposit = (isset($_POST['divido_deposit']) && round($_POST['divido_deposit']) > 0) ? sanitize_text_field(wp_unslash($_POST['divido_deposit'])) : $min_deposit; // Input var okay.
@@ -1397,6 +1398,7 @@ jQuery(document).ready(function($) {
                         'name' =>  __('global/ordershipping_label', 'woocommerce-finance-gateway'),
                         'quantity' => 1,
                         'price' => round($shipping * 100),
+                        'sku' => 'SHPNG'
                     );
                     // Add shipping to order total.
                     $order_total += $shipping;
@@ -1406,6 +1408,7 @@ jQuery(document).ready(function($) {
                         'name' =>  __('global/ordertaxes_label', 'woocommerce-finance-gateway'),
                         'quantity' => 1,
                         'price' => round($tax * 100),
+                        'sku' => 'TAX'
                     );
                     // Add tax to ordertotal.
                     $order_total += $tax;
@@ -1415,12 +1418,14 @@ jQuery(document).ready(function($) {
                         'name' =>  __('global/orderfees_label', 'woocommerce-finance-gateway'),
                         'quantity' => 1,
                         'price' => round($fee->amount * 100),
+                        'sku' => 'FEES'
                     );
                     if ($fee->taxable) {
                         $products[] = array(
                             'name' =>  __('global/orderfee_tax_label', 'woocommerce-finance-gateway'),
                             'quantity' => 1,
                             'price' => round($fee->tax * 100),
+                            'sku' => 'FEE_TAX'
                         );
                         $order_total += $fee->tax;
                     }
@@ -1433,6 +1438,7 @@ jQuery(document).ready(function($) {
                         'name' =>  __('global/orderdiscount_label', 'woocommerce-finance-gateway'),
                         'quantity' => 1,
                         'price' => round(-$woocommerce->cart->get_cart_discount_total() * 100),
+                        'sku' => 'DSCNT'
                     );
                     // Deduct total discount.
                     $order_total -= $woocommerce->cart->get_cart_discount_total();
@@ -1443,6 +1449,7 @@ jQuery(document).ready(function($) {
                         'name' =>  __('global/orderother_label', 'woocommerce-finance-gateway'),
                         'quantity' => 1,
                         'price' => round($other),
+                        'sku' => 'OTHER'
                     );
                 }
 
