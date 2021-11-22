@@ -141,8 +141,8 @@ function woocommerce_finance_init()
             // Get setting values.
             $this->title = isset($this->settings['title']) && $this->settings['title'] !== '' ? $this->settings['title'] : __('frontend/checkoutcheckout_title_default', 'woocommerce-finance-gateway');
             $this->description = isset($this->settings['description']) && $this->settings['description'] !== '' ? $this->settings['description'] : __('frontend/checkoutcheckout_description_default', 'woocommerce-finance-gateway');
-            $this->calculator_theme = isset($this->settings['calculatorTheme']) && $this->settings['calculator'] !== '' ? $this->settings['calculatorTheme'] : 'enabled';
-            $this->show_widget = isset($this->settings['showWidget']) && $this->setings['showWidget'] !== '' ? $this->settings['showWidget'] : true;
+            $this->calculator_theme = isset($this->settings['calculatorTheme']) && $this->settings['calculatorTheme'] !== '' ? $this->settings['calculatorTheme'] : 'enabled';
+            $this->show_widget = isset($this->settings['showWidget']) && $this->settings['showWidget'] !== '' ? $this->settings['showWidget'] : true;
             $this->enabled = isset($this->settings['enabled']) && $this->settings['enabled'] !== '' ? $this->settings['enabled'] : false;
             $this->api_key = $this->settings['apiKey'] ?? '';
             $this->footnote = $this->settings['footnote'] ?? '';
