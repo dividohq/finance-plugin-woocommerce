@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      5.7.2
-Stable tag:        2.3.5
-Version:           2.3.5
+Stable tag:        2.3.6
+Version:           2.3.6
 
 License: GPLv2 or later
 
@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.3.6
+Fix: Product price threshold had a typo in a mathematical operator and a missing conversion from pence/pennies.
+
 Version 2.3.5
 Fix: Adjusted the way we set values to the plugin config fields.
 
