@@ -620,7 +620,7 @@ jQuery(document).ready(function() {
                     }
                 } elseif ('price' === $this->settings['productSelect']) {
                     $limit = $this->settings['priceSelection'];
-                    if ($this->get_price_including_tax($product, '') <= $limit * 100) {
+                    if ($this->get_price_including_tax($product, '') >= $limit * 100) {
                         return true;
                     } else {
                         return false;
