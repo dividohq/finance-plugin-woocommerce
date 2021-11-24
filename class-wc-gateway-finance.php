@@ -139,23 +139,24 @@ function woocommerce_finance_init()
             // Load the settings.
             $this->init_settings();
             // Get setting values.
-            $this->title = isset($this->settings['title']) && $this->settings['title'] !== '' ? $this->settings['title'] : __('frontend/checkoutcheckout_title_default', 'woocommerce-finance-gateway');
-            $this->description = isset($this->settings['description']) && $this->settings['description'] !== '' ? $this->settings['description'] : __('frontend/checkoutcheckout_description_default', 'woocommerce-finance-gateway');
-            $this->calculator_theme = isset($this->settings['calculatorTheme']) && $this->settings['calculatorTheme'] !== '' ? $this->settings['calculatorTheme'] : 'enabled';
-            $this->show_widget = isset($this->settings['showWidget']) && $this->settings['showWidget'] !== '' ? $this->settings['showWidget'] : true;
-            $this->enabled = isset($this->settings['enabled']) && $this->settings['enabled'] !== '' ? $this->settings['enabled'] : false;
+            $this->title = isset($this->settings['title']) ? $this->settings['title'] : __('frontend/checkoutcheckout_title_default', 'woocommerce-finance-gateway');
+            $this->description = isset($this->settings['description']) ? $this->settings['description'] : __('frontend/checkoutcheckout_description_default', 'woocommerce-finance-gateway');
+            $this->calculator_theme = isset($this->settings['calculatorTheme']) ? $this->settings['calculatorTheme'] : 'enabled';
+            $this->show_widget = isset($this->settings['showWidget']) ? $this->settings['showWidget'] : true;
+            $this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : false;
             $this->api_key = $this->settings['apiKey'] ?? '';
             $this->footnote = $this->settings['footnote'] ?? '';
             $this->buttonText = $this->settings['buttonText'] ?? '';
-            $this->cart_threshold = isset($this->settings['cartThreshold']) && $this->settings['cartThreshold'] !== '' ? $this->settings['cartThreshold'] : 250;
-            $this->max_loan_amount = isset($this->settings['maxLoanAmount']) && $this->settings['maxLoanAmount'] !== '' ? $this->settings['maxLoanAmount'] : 25000;
-            $this->auto_fulfillment = isset($this->settings['autoFulfillment']) && $this->settings['autoFulfillment'] !== '' ? $this->settings['autoFulfillment'] : "yes";
-            $this->auto_refund = isset($this->settings['autoRefund']) && $this->settings['autoRefund'] !== '' ? $this->settings['autoRefund'] : "yes";
-            $this->auto_cancel = isset($this->settings['autoCancel']) && $this->settings['autoCancel'] !== '' ? $this->settings['autoCancel'] : "yes";
-            $this->widget_threshold = isset($this->settings['widgetThreshold']) && $this->settings['widgetThreshold'] !== '' ? $this->settings['widgetThreshold'] : 250;
+            $this->cart_threshold = isset($this->settings['cartThreshold']) ? intval($this->settings['cartThreshold']) : 250;
+            $this->max_loan_amount = isset($this->settings['maxLoanAmount']) ? intval($this->settings['maxLoanAmount']) : 25000;
+            $this->auto_fulfillment = isset($this->settings['autoFulfillment']) ? $this->settings['autoFulfillment'] : "yes";
+            $this->auto_refund = isset($this->settings['autoRefund']) ? $this->settings['autoRefund'] : "yes";
+            $this->auto_cancel = isset($this->settings['autoCancel']) ? $this->settings['autoCancel'] : "yes";
+            $this->widget_threshold = isset($this->settings['widgetThreshold']) ? intval($this->settings['widgetThreshold']) : 250;
             $this->secret = $this->settings['secret'] ?? '';
             $this->product_select = $this->settings['productSelect'] ?? '';
             $this->useStoreLanguage = $this->settings['useStoreLanguage'] ?? '';
+            echo '<pre>';var_dump($this->widget_threshold);exit;
             // set the environment from the api key
             try {
                 $this->environment = Environment::getEnvironmentFromAPIKey($this->api_key);
