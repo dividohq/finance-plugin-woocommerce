@@ -156,7 +156,6 @@ function woocommerce_finance_init()
             $this->secret = $this->settings['secret'] ?? '';
             $this->product_select = $this->settings['productSelect'] ?? '';
             $this->useStoreLanguage = $this->settings['useStoreLanguage'] ?? '';
-            echo '<pre>';var_dump($this->widget_threshold);exit;
             // set the environment from the api key
             try {
                 $this->environment = Environment::getEnvironmentFromAPIKey($this->api_key);
