@@ -16,7 +16,7 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.3.4
+ * Version: 2.3.5
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
@@ -129,7 +129,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.3.4';
+            $this->plugin_version = '2.3.5';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';
@@ -139,23 +139,29 @@ function woocommerce_finance_init()
             // Load the settings.
             $this->init_settings();
             // Get setting values.
-            $this->title = (!empty($this->settings['title'])) ? $this->settings['title'] : __('frontend/checkoutcheckout_title_default', 'woocommerce-finance-gateway');
-            $this->description = (!empty($this->settings['description'])) ? $this->settings['description'] : __('frontend/checkoutcheckout_description_default', 'woocommerce-finance-gateway');
-            $this->calculator_theme = (!empty($this->settings['calculatorTheme'])) ? $this->settings['calculatorTheme'] : 'enabled';
-            $this->show_widget = (!empty($this->settings['showWidget'])) ? $this->settings['showWidget'] : true;
-            $this->enabled = (!empty($this->settings['enabled'])) ? $this->settings['enabled'] : false;
-            $this->api_key = (!empty($this->settings['apiKey'])) ? $this->settings['apiKey'] : '';
-            $this->footnote = (!empty($this->settings['footnote'])) ? $this->settings['footnote'] : ' ';
-            $this->buttonText = (!empty($this->settings['buttonText'])) ? $this->settings['buttonText'] : ' ';
-            $this->cart_threshold = (!empty($this->settings['cartThreshold'])) ? $this->settings['cartThreshold'] : 250;
-            $this->max_loan_amount = (!empty($this->settings['maxLoanAmount'])) ? $this->settings['maxLoanAmount'] : 25000;
-            $this->auto_fulfillment = (!empty($this->settings['autoFulfillment'])) ? $this->settings['autoFulfillment'] : "yes";
-            $this->auto_refund = (!empty($this->settings['autoRefund'])) ? $this->settings['autoRefund'] : "yes";
-            $this->auto_cancel = (!empty($this->settings['autoCancel'])) ? $this->settings['autoCancel'] : "yes";
-            $this->widget_threshold = isset($this->settings['widgetThreshold']) && $this->settings['widgetThreshold'] !== '' ? $this->settings['widgetThreshold'] : 250;
-            $this->secret = (!empty($this->settings['secret'])) ? $this->settings['secret'] : '';
-            $this->product_select = (!empty($this->settings['productSelect'])) ? $this->settings['productSelect'] : '';
-            $this->useStoreLanguage = (!empty($this->settings['useStoreLanguage'])) ? $this->settings['useStoreLanguage'] : '';
+            $this->title = isset($this->settings['title']) ? $this->settings['title'] : __('frontend/checkoutcheckout_title_default', 'woocommerce-finance-gateway');
+            $this->description = isset($this->settings['description']) ? $this->settings['description'] : __('frontend/checkoutcheckout_description_default', 'woocommerce-finance-gateway');
+            $this->calculator_theme = isset($this->settings['calculatorTheme']) ? $this->settings['calculatorTheme'] : 'enabled';
+            $this->show_widget = isset($this->settings['showWidget']) ? $this->settings['showWidget'] : true;
+            $this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : false;
+            $this->api_key = $this->settings['apiKey'] ?? '';
+            $this->footnote = $this->settings['footnote'] ?? '';
+            $this->buttonText = $this->settings['buttonText'] ?? '';
+            if (!isset($this->settings['maxLoanAmount'])) {
+                $this->max_loan_amount = 25000; // A default value when env is spun up for the firts time
+            } elseif ($this->settings['maxLoanAmount'] === '') {
+                $this->max_loan_amount = false;
+            } else {
+                $this->max_loan_amount = intval($this->settings['maxLoanAmount']);
+            }
+            $this->cart_threshold = isset($this->settings['cartThreshold']) ? intval($this->settings['cartThreshold']) : 250;
+            $this->auto_fulfillment = isset($this->settings['autoFulfillment']) ? $this->settings['autoFulfillment'] : "yes";
+            $this->auto_refund = isset($this->settings['autoRefund']) ? $this->settings['autoRefund'] : "yes";
+            $this->auto_cancel = isset($this->settings['autoCancel']) ? $this->settings['autoCancel'] : "yes";
+            $this->widget_threshold = isset($this->settings['widgetThreshold']) ? intval($this->settings['widgetThreshold']) : 250;
+            $this->secret = $this->settings['secret'] ?? '';
+            $this->product_select = $this->settings['productSelect'] ?? '';
+            $this->useStoreLanguage = $this->settings['useStoreLanguage'] ?? '';
             // set the environment from the api key
             try {
                 $this->environment = Environment::getEnvironmentFromAPIKey($this->api_key);
@@ -639,7 +645,7 @@ jQuery(document).ready(function() {
             if ($threshold > $cart->total) {
                 return false;
             }
-            if ($upperLimit < $cart->total) {
+            if ($upperLimit && $upperLimit < $cart->total) {
                 return false;
             }
             if ('all' === $settings['productSelect']) {
