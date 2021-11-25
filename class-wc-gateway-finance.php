@@ -147,8 +147,14 @@ function woocommerce_finance_init()
             $this->api_key = $this->settings['apiKey'] ?? '';
             $this->footnote = $this->settings['footnote'] ?? '';
             $this->buttonText = $this->settings['buttonText'] ?? '';
+            if (!isset($this->settings['maxLoanAmount'])) {
+                $this->max_loan_amount = 25000; // A default value when env is spun up for the firts time
+            } elseif ($this->settings['maxLoanAmount'] === '') {
+                $this->max_loan_amount = false;
+            } else {
+                $this->max_loan_amount = intval($this->settings['maxLoanAmount']);
+            }
             $this->cart_threshold = isset($this->settings['cartThreshold']) ? intval($this->settings['cartThreshold']) : 250;
-            $this->max_loan_amount = isset($this->settings['maxLoanAmount']) ? intval($this->settings['maxLoanAmount']) : 25000;
             $this->auto_fulfillment = isset($this->settings['autoFulfillment']) ? $this->settings['autoFulfillment'] : "yes";
             $this->auto_refund = isset($this->settings['autoRefund']) ? $this->settings['autoRefund'] : "yes";
             $this->auto_cancel = isset($this->settings['autoCancel']) ? $this->settings['autoCancel'] : "yes";
@@ -639,7 +645,7 @@ jQuery(document).ready(function() {
             if ($threshold > $cart->total) {
                 return false;
             }
-            if ($upperLimit < $cart->total) {
+            if ($upperLimit && $upperLimit < $cart->total) {
                 return false;
             }
             if ('all' === $settings['productSelect']) {
