@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.3.7
+Chore: Adjusted the settings layout.
+
 Version 2.3.6
 Fix: Product price threshold had a typo in a mathematical operator and a missing conversion from pence/pennies.
 
