@@ -1016,6 +1016,11 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'description' => __('backend/configshared_secret_description', 'woocommerce-finance-gateway'),
                                 'default' => '',
                             ),
+                            'Checkout Settings' => array(
+                                'title' => __('backend/configcheckout_settings_header', 'woocommerce-finance-gateway'),
+                                'type' => 'title',
+                                'class' => 'border',
+                            ),
                             'enabled' => array(
                                 'title' => __('backend/configplugin_active_label', 'woocommerce-finance-gateway'),
                                 'label' => __('backend/pluginenabled_option', 'woocommerce-finance-gateway'),
@@ -1035,8 +1040,8 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'description' => __('backend/configcheckout_description_description', 'woocommerce-finance-gateway'),
                                 'default' => __('frontend/checkoutcheckout_description_default', 'woocommerce-finance-gateway'),
                             ),
-                            'General Settings' => array(
-                                'title' => __('backend/configgeneral_settings_header', 'woocommerce-finance-gateway'),
+                            'Conditions Settings' => array(
+                                'title' => __('backend/configconditions_settings_header', 'woocommerce-finance-gateway'),
                                 'type' => 'title',
                                 'class' => 'border',
                             ),
@@ -1142,8 +1147,8 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'description' => __('backend/configuse_store_language_description', 'woocommerce-finance-gateway'),
                                 'default' => 'no'
                             ),
-                            'Order Settings' => array(
-                                'title' => __('backend/configorder_settings_header', 'woocommerce-finance-gateway'),
+                            'Notifications Settings' => array(
+                                'title' => __('backend/confignotifications_settings_header', 'woocommerce-finance-gateway'),
                                 'type' => 'title',
                                 'class' => 'border',
                             ),
