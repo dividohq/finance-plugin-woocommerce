@@ -16,7 +16,7 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.3.6
+ * Version: 2.3.7
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
@@ -129,7 +129,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.3.6';
+            $this->plugin_version = '2.3.7';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';
@@ -1016,6 +1016,11 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'description' => __('backend/configshared_secret_description', 'woocommerce-finance-gateway'),
                                 'default' => '',
                             ),
+                            'Checkout Settings' => array(
+                                'title' => __('backend/configcheckout_settings_header', 'woocommerce-finance-gateway'),
+                                'type' => 'title',
+                                'class' => 'border',
+                            ),
                             'enabled' => array(
                                 'title' => __('backend/configplugin_active_label', 'woocommerce-finance-gateway'),
                                 'label' => __('backend/pluginenabled_option', 'woocommerce-finance-gateway'),
@@ -1035,8 +1040,8 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'description' => __('backend/configcheckout_description_description', 'woocommerce-finance-gateway'),
                                 'default' => __('frontend/checkoutcheckout_description_default', 'woocommerce-finance-gateway'),
                             ),
-                            'General Settings' => array(
-                                'title' => __('backend/configgeneral_settings_header', 'woocommerce-finance-gateway'),
+                            'Conditions Settings' => array(
+                                'title' => __('backend/configconditions_settings_header', 'woocommerce-finance-gateway'),
                                 'type' => 'title',
                                 'class' => 'border',
                             ),
@@ -1142,8 +1147,8 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'description' => __('backend/configuse_store_language_description', 'woocommerce-finance-gateway'),
                                 'default' => 'no'
                             ),
-                            'Order Settings' => array(
-                                'title' => __('backend/configorder_settings_header', 'woocommerce-finance-gateway'),
+                            'Notifications Settings' => array(
+                                'title' => __('backend/confignotifications_settings_header', 'woocommerce-finance-gateway'),
                                 'type' => 'title',
                                 'class' => 'border',
                             ),
