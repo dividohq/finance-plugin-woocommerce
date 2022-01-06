@@ -44,6 +44,7 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+
 Version 2.3.8
 Chore: Added a new icon for finance payment plugin.
 
