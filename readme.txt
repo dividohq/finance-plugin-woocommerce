@@ -1,5 +1,5 @@
-=== Plugin Name ===
-Contributors:      Divido Financial Services Ltd
+=== Finance Gateway for WooCommerce ===
+Contributors:      integrations
 Plugin Name:       Finance Gateway for WooCommerce
 Plugin URI:        integrations.divido.com/woocommerce
 Tags:              woothemes,woocommerce,payment gateway,payment,module,ecommerce,online payments,
