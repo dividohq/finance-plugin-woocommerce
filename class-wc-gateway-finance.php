@@ -1191,6 +1191,68 @@ jQuery("input[name=_tab_finance_active]").change(function() {
         }
 
         /**
+         * Helper method to get errors if value format is not OK when we are expecting integer
+         *
+         * @param string $settingsFieldName
+         * @param string $errorHeading
+         * @param string $errorMessage
+         * @return array
+         */
+        private function getIntegerValueFormattedValidationErrors(
+            $settingsFieldName,
+            $errorHeading,
+            $errorMessage
+        ) {
+            $errors = [];
+
+            // Value from the settings array
+            $settingsValue = $this->settings[$settingsFieldName];
+
+            // Check that the value is numeric first as a baseline
+            // Since we use the 'intval' functon when we assign the value in the construct of this class we want to
+            // make sure that we get the expected value back.
+            //
+            // This validates using PHP soft equals that the number the user puts in is the same
+            // For instance 20.0 pence is OK, this will be the same amount (20 == 20.0)
+            // but 20.1 will not be ok, we do not deal with fractions of pence.
+            if(!is_numeric($settingsValue) || !intval($settingsValue) == $settingsValue){
+                $errors[] = [
+                    'field' => $settingsFieldName,
+                    'value' => $settingsValue,
+                    'code' => 'not_acceptable_number',
+                    'heading' => $errorHeading,
+                    'message' => $errorMessage,
+                ];
+            }
+
+            return $errors;
+        }
+
+        /**
+         * Returns a list of validation errors
+         *
+         * Each item in the array contains the folowing keys:
+         * 'field'      Settings Field Key
+         * 'value'      Value of the settings field, 'raw' input, is probably stripped from whitespace
+         * 'code'       Error code for why the validation failed
+         * 'heading'    Message key for validation error heading, not the actual heading but the message key
+         * 'messaage'   Message key for validation error message, not the actual heading but the message key
+         *
+         * @return array
+         */
+        private function getSettingsValidationErrors()
+        {
+            return array_merge(
+                // Widget Minimum / Widget Threshold
+                $this->getIntegerValueFormattedValidationErrors(
+                    'widgetThreshold',
+                    'backend/errorwidget_threshhold_not_valid_error',
+                    'backend/errorwidget_threshhold_not_valid_error_msg'
+                )
+            );
+        }
+
+        /**
          * Admin Panel Options
          * - Payment options
          * @since 1.0.0
@@ -1198,6 +1260,12 @@ jQuery("input[name=_tab_finance_active]").change(function() {
          */
         function admin_options()
         {
+            /**
+             * Does a check against the healthcheck endpoint of the SDK
+             *
+             * If the check works but gives a bad status code: there is something wrong with the environment
+             * If the check fails, thus there is no 'status_code' in the response the host is probably missconfigured
+            */
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
             $status_code = null;
@@ -1226,6 +1294,22 @@ jQuery("input[name=_tab_finance_active]").change(function() {
     <h3 style="border-bottom:1px solid">
         <?php esc_html_e('backend/configgeneral_settings_header', 'woocommerce-finance-gateway'); ?>
     </h3>
+
+    <?php
+    /**
+     *  Check for validation errors on settings
+     */
+    $validation_errors = $this->getSettingsValidationErrors();
+    foreach ($validation_errors as $validation_error):
+        ?>
+        <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
+            <b><?php esc_html_e($validation_error['heading'], 'woocommerce-finance-gateway') ?></b>
+            <p><?php esc_html_e($validation_error['message'], 'woocommerce-finance-gateway') ?></p>
+        </div>
+    <?php
+    endforeach;
+    ?>
+
     <?php
 
                     // We can differentiate between bad host and bad URL/health
