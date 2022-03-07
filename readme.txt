@@ -8,7 +8,7 @@ Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      5.7.2
 Stable tag:        2.3.8
-Version:           2.3.8
+Version:           2.4.0
 
 License: GPLv2 or later
 
@@ -44,6 +44,8 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+Version 2.4.0
+Feature: Added validation for widget minimum threshold input.
 
 Version 2.3.8
 Chore: Added a new icon for finance payment plugin.
