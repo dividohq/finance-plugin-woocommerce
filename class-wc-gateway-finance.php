@@ -1236,7 +1236,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
          * 'value'      Value of the settings field, 'raw' input, is probably stripped from whitespace
          * 'code'       Error code for why the validation failed
          * 'heading'    Message key for validation error heading, not the actual heading but the message key
-         * 'messaage'   Message key for validation error message, not the actual heading but the message key
+         * 'message'   Message key for validation error message, not the actual heading but the message key
          *
          * @return array
          */
@@ -1264,7 +1264,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
              * Does a check against the healthcheck endpoint of the SDK
              *
              * If the check works but gives a bad status code: there is something wrong with the environment
-             * If the check fails, thus there is no 'status_code' in the response the host is probably missconfigured
+             * If the check fails, thus there is no 'status_code' in the response the host is probably misconfigure
             */
             $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
