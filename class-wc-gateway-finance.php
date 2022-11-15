@@ -1649,7 +1649,7 @@ jQuery(document).ready(function($) {
                 $response = $sdk->platformEnvironments()->getPlatformEnvironment();
                 $finance_env = $response->getBody()->getContents();
                 $decoded = json_decode($finance_env);
-                $global = $decoded->data->environment;
+                $global = $decoded->data->environment ?? null;
                 set_transient($transient, $global, 60 * 5);
 
                 return $global;
