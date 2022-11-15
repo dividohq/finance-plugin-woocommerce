@@ -234,19 +234,14 @@ function woocommerce_finance_init()
          * @param $id
          * @return string
          */
-        public function custom_gateway_icon($icon, $id)
+        public function custom_gateway_icon()
         {
-            if ($id === 'finance') {
-                if (empty($this->api_key)) {
-                    return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/divido/logo.png'/>";
-                } else if ($this->get_finance_env() === 'nordea') {
-                    return "<img style='height:24px;float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
-                } else {
-                    return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
-                }
-            } else {
-                return $icon;
-            }
+            $plans = $this->get_all_finances();
+            $logoUrl = $plans[0]->lender->branding->logo ?? null;
+
+            return ($logoUrl === null)
+                ? null
+                : "<img style='float:right; max-height: 24px' src='{$logoUrl}' />";
         }
 
         /**
