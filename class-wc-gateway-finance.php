@@ -16,13 +16,13 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.3.8
+ * Version: 2.4.0
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
  * Text Domain: woocommerce-finance-gateway
  * Domain Path: /i18n/languages/
- * WC tested up to: 4.7.1
+ * WC tested up to: 6.0.2
  */
 
 /**
