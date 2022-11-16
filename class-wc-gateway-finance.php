@@ -237,7 +237,7 @@ function woocommerce_finance_init()
         public function custom_gateway_icon()
         {
             $plans = $this->get_all_finances();
-            $logoUrl = $plans[0]->lender->branding->logo ?? null;
+            $logoUrl = $plans[0]->lender->branding->logoUrl ?? null;
 
             return ($logoUrl === null)
                 ? null
