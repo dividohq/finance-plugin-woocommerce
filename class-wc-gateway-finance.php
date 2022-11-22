@@ -236,9 +236,13 @@ function woocommerce_finance_init()
          */
         public function custom_gateway_icon()
         {
-            $plans = $this->get_all_finances();
-            $logoUrl = $plans[0]->lender->branding->logoUrl ?? null;
-
+            $logoUrl = null;
+            foreach($this->get_all_finances() as $plan){
+                if(!empty($plan->lender->branding->logoUrl)){
+                    $logoUrl = $plan->lender->branding->logoUrl;
+                    break;
+                }
+            }
             return ($logoUrl === null)
                 ? null
                 : "<img style='float:right; max-height: 24px' src='{$logoUrl}' />";
