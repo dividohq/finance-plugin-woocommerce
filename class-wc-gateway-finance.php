@@ -238,8 +238,8 @@ function woocommerce_finance_init()
         {
             $logoUrl = null;
             foreach($this->get_all_finances() as $plan){
-                if(!empty($plan->lender->branding->logoUrl)){
-                    $logoUrl = $plan->lender->branding->logoUrl;
+                if(!empty($plan->lender->branding->logo_url)){
+                    $logoUrl = $plan->lender->branding->logo_url;
                     break;
                 }
             }
