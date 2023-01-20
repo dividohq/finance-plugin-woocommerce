@@ -234,19 +234,23 @@ function woocommerce_finance_init()
          * @param $id
          * @return string
          */
-        public function custom_gateway_icon()
+        public function custom_gateway_icon($icon, $id)
         {
-            $logoUrl = null;
-            set_transient("finances", ""); 
-            foreach($this->get_all_finances() as $plan){
-                if(!empty($plan->lender->branding->logo_url)){
-                    $logoUrl = $plan->lender->branding->logo_url;
-                    break;
+            if($id === 'finance'){
+                $logoUrl = null;
+                set_transient("finances", ""); 
+                foreach($this->get_all_finances() as $plan){
+                    if(!empty($plan->lender->branding->logo_url)){
+                        $logoUrl = $plan->lender->branding->logo_url;
+                        break;
+                    }
                 }
+                return ($logoUrl === null)
+                    ? null
+                    : "<img style='float:right; max-height: 24px' src='{$logoUrl}' />";
+            } else {
+                return $icon;
             }
-            return ($logoUrl === null)
-                ? null
-                : "<img style='float:right; max-height: 24px' src='{$logoUrl}' />";
         }
 
         /**
