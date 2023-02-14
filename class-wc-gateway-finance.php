@@ -16,13 +16,13 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.3.8
+ * Version: 2.4.0
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
  * Text Domain: woocommerce-finance-gateway
  * Domain Path: /i18n/languages/
- * WC tested up to: 4.7.1
+ * WC tested up to: 7.3.0
  */
 
 /**
@@ -236,14 +236,18 @@ function woocommerce_finance_init()
          */
         public function custom_gateway_icon($icon, $id)
         {
-            if ($id === 'finance') {
-                if (empty($this->api_key)) {
-                    return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/divido/logo.png'/>";
-                } else if ($this->get_finance_env() === 'nordea') {
-                    return "<img style='height:24px;float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
-                } else {
-                    return "<img style='float:right;' src='https://cdn.divido.com/widget/themes/" . $this->get_finance_env() . "/logo.png'/>";
+            if($id === 'finance'){
+                $logoUrl = null;
+                set_transient("finances", ""); 
+                foreach($this->get_all_finances() as $plan){
+                    if(!empty($plan->lender->branding->logo_url)){
+                        $logoUrl = $plan->lender->branding->logo_url;
+                        break;
+                    }
                 }
+                return ($logoUrl === null)
+                    ? null
+                    : "<img style='float:right; max-height: 24px' src='{$logoUrl}' />";
             } else {
                 return $icon;
             }
@@ -1654,7 +1658,7 @@ jQuery(document).ready(function($) {
                 $response = $sdk->platformEnvironments()->getPlatformEnvironment();
                 $finance_env = $response->getBody()->getContents();
                 $decoded = json_decode($finance_env);
-                $global = $decoded->data->environment;
+                $global = $decoded->data->environment ?? null;
                 set_transient($transient, $global, 60 * 5);
 
                 return $global;
