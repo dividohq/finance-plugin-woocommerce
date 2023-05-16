@@ -407,7 +407,6 @@ window.__widgetConfig = {
 
 };
 
-var <?php echo ($this->get_finance_env()) ?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>'
 </script>
 <script>
 // <![CDATA[
