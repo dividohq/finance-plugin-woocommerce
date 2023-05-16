@@ -906,11 +906,7 @@ jQuery(document).ready(function() {
         <label
             for="_hide_title"><?php esc_html_e('frontend/productselected_plans_label', 'woocommerce-finance-gateway'); ?></label>
 
-        <?php
-
-                    foreach ($finances as $finance => $value) {
-
-                    ?>
+        <?php foreach ($finances as $finance => $value) { ?>
         <input type="checkbox" class="checkbox" name="_tab_finances[]" id="finances_<?php print esc_attr($finance); ?>"
             value="<?php print esc_attr($finance); ?>"
             <?php print (in_array($finance, $tab_data[0]['finances'], true)) ? 'checked' : ''; ?>>
@@ -994,6 +990,12 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                     'description' => __('backend/configapi_key_description', 'woocommerce-finance-gateway'),
                     'default' => '',
                 ),
+                'calcConfApiUrl' => array(
+                    'title' => __('backend/configcalc_conf_api_url_label', 'woocommerce-finance-gateway'),
+                    'type' => 'text',
+                    'description' => __('backend/configcalc_conf_api_url_description', 'woocommerce-finance-gateway'),
+                    'default' => '',
+                )
             );
 
             if (isset($this->api_key) && $this->api_key) {
