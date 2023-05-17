@@ -97,6 +97,8 @@ function woocommerce_finance_init()
          */
         public $api_key;
 
+        const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
+
         function wpdocs_load_textdomain()
         {
             if (!load_plugin_textdomain(
@@ -145,6 +147,7 @@ function woocommerce_finance_init()
             $this->show_widget = isset($this->settings['showWidget']) ? $this->settings['showWidget'] : true;
             $this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : false;
             $this->api_key = $this->settings['apiKey'] ?? '';
+            $this->calculator_config_api_url = $this->settings['calcConfApiUrl'] ?? '';
             $this->footnote = $this->settings['footnote'] ?? '';
             $this->buttonText = $this->settings['buttonText'] ?? '';
             if (!isset($this->settings['maxLoanAmount'])) {
@@ -269,7 +272,9 @@ function woocommerce_finance_init()
                 return false;
             }
             $finance = $this->get_finance_env();
-            if ($this->environment === 'production') {
+            if (!empty($this->calculator_config_api_url)){
+                wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
+            } elseif ($this->environment === 'production') {
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
             } else {
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
@@ -369,7 +374,10 @@ function woocommerce_finance_init()
                 $key = preg_split('/\./', $this->api_key);
                 $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
                 $finance = $this->get_finance_env();
-                if ($this->environment === 'production') {
+
+                if (!empty($this->calculator_config_api_url)){
+                    wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
+                } elseif ($this->environment === 'production') {
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
                 } else {
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
@@ -796,6 +804,7 @@ jQuery(document).ready(function() {
                 $price = $this->get_price_including_tax($product, '');
                 $plans = $this->get_product_plans($product);
                 $environment = $this->get_finance_env();
+                $shortApiKey = explode('.',$this->api_key)[0];
                 if ($this->is_available($product) && $price > (((int)$this->widget_threshold ?? 0) * 100)) {
                     $button_text = '';
                     if (!empty(sanitize_text_field($this->buttonText))) {
@@ -813,6 +822,8 @@ jQuery(document).ready(function() {
                     if ($this->useStoreLanguage === "yes") {
                         $language = 'data-language="' . $this->get_language() . '" ';
                     }
+
+                    $calcConfApiUrl = $this->calculator_config_api_url;
 
                     include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/widget.php';
                 }

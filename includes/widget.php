@@ -11,3 +11,11 @@
  >
 </div>
 
+<?php if(!empty($calcConfApiUrl)){ ?>
+<script type='text/javascript'>
+    window.__calculatorConfig = {
+        apiKey: '<?= $shortApiKey ?>',
+        calculatorApiPubUrl: '<?= $calcConfApiUrl ?>'
+    };
+</script>
+<?php } ?>
