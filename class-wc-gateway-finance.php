@@ -420,7 +420,7 @@ window.__widgetConfig = {
 // <![CDATA[
 function waitForElementToDisplay(selector, time) {
     if (document.querySelector(selector) !== null) {
-        __widgetInstance.init()
+        <?= (empty($this->calculator_config_api_url)) ? '__widgetInstance' : '__calculator'; ?>.init()
         return;
     } else {
         setTimeout(function() {
@@ -1362,6 +1362,8 @@ jQuery(document).ready(function($) {
                 if ($this->useStoreLanguage === "yes") {
                     $language = 'data-language="' . $this->get_language() . '" ';
                 }
+                $shortApiKey = explode('.',$this->api_key)[0];
+                $calcConfApiUrl = $this->calculator_config_api_url;
                 include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/checkout.php';
             }
         }
