@@ -19,7 +19,7 @@
                 var new_price = variation.display_price;
                 var widget = jQuery("[data-calculator-widget]");
                 widget.attr("data-amount", Math.round(new_price * 100));
-                <?= (empty($this->calculator_config_api_url)) ? '__widgetInstance' : '__calculator'; ?>.init();
+                <?= (empty($calcConfApiUrl)) ? '__widgetInstance' : '__calculator'; ?>.init();
             });
         });
     });

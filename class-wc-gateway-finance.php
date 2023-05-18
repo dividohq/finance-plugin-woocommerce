@@ -272,7 +272,7 @@ function woocommerce_finance_init()
                 return false;
             }
             $finance = $this->get_finance_env();
-            if (!empty($this->calculator_config_api_url)){
+            if ($this->isV4()){
                 wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
             } elseif ($this->environment === 'production') {
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
@@ -375,7 +375,7 @@ function woocommerce_finance_init()
                 $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
                 $finance = $this->get_finance_env();
 
-                if (!empty($this->calculator_config_api_url)){
+                if ($this->isV4()){
                     wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
                 } elseif ($this->environment === 'production') {
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
@@ -419,7 +419,7 @@ window.__widgetConfig = {
 // <![CDATA[
 function waitForElementToDisplay(selector, time) {
     if (document.querySelector(selector) !== null) {
-        <?= (empty($this->calculator_config_api_url)) ? '__widgetInstance' : '__calculator'; ?>.init()
+        <?= ($this->isV4()) ? '__calculator' : '__widgetInstance'; ?>.init()
         return;
     } else {
         setTimeout(function() {
@@ -1993,6 +1993,18 @@ jQuery(document).ready(function($) {
             $links[] = $_link;
 
             return $links;
+        }
+
+        /**
+         * Function to confirm whether the settings supplied are v4 calculator
+         * compatible
+         *
+         * @return boolean
+         */
+        private function isV4(){
+            if(empty($this->calculator_config_api_url)){
+                return false;
+            } else return true;
         }
     }
 
