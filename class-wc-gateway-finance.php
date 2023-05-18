@@ -998,12 +998,6 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                     'type' => 'text',
                     'description' => __('backend/configapi_key_description', 'woocommerce-finance-gateway'),
                     'default' => '',
-                ),
-                'calcConfApiUrl' => array(
-                    'title' => __('backend/configcalc_conf_api_url_label', 'woocommerce-finance-gateway'),
-                    'type' => 'text',
-                    'description' => __('backend/configcalc_conf_api_url_description', 'woocommerce-finance-gateway'),
-                    'default' => '',
                 )
             );
 
@@ -1116,6 +1110,12 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'title' => __('backend/configwidget_settings_header', 'woocommerce-finance-gateway'),
                                 'type' => 'title',
                                 'class' => 'border',
+                            ),
+                            'calcConfApiUrl' => array(
+                                'title' => __('backend/configcalc_conf_api_url_label', 'woocommerce-finance-gateway'),
+                                'type' => 'text',
+                                'description' => __('backend/configcalc_conf_api_url_description', 'woocommerce-finance-gateway'),
+                                'default' => '',
                             ),
                             'showWidget' => array(
                                 'title' => __('backend/configshow_widget_label', 'woocommerce-finance-gateway'),
