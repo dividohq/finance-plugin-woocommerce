@@ -807,7 +807,7 @@ jQuery(document).ready(function() {
                 if ($this->is_available($product) && $price > (((int)$this->widget_threshold ?? 0) * 100)) {
                     $button_text = '';
                     if (!empty(sanitize_text_field($this->buttonText))) {
-                        $button_text = 'data-button-text="' . sanitize_text_field($this->buttonText) . '" ';
+                        $button_text = sanitize_text_field($this->buttonText);
                     }
 
                     $footnote = '';
