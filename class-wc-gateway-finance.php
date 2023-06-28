@@ -16,13 +16,13 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.4.0
+ * Version: 2.5.0
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
  * Text Domain: woocommerce-finance-gateway
  * Domain Path: /i18n/languages/
- * WC tested up to: 7.3.0
+ * WC tested up to: 7.8
  */
 
 /**
@@ -97,6 +97,8 @@ function woocommerce_finance_init()
          */
         public $api_key;
 
+        const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
+
         function wpdocs_load_textdomain()
         {
             if (!load_plugin_textdomain(
@@ -145,6 +147,7 @@ function woocommerce_finance_init()
             $this->show_widget = isset($this->settings['showWidget']) ? $this->settings['showWidget'] : true;
             $this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : false;
             $this->api_key = $this->settings['apiKey'] ?? '';
+            $this->calculator_config_api_url = $this->settings['calcConfApiUrl'] ?? '';
             $this->footnote = $this->settings['footnote'] ?? '';
             $this->buttonText = $this->settings['buttonText'] ?? '';
             if (!isset($this->settings['maxLoanAmount'])) {
@@ -269,7 +272,9 @@ function woocommerce_finance_init()
                 return false;
             }
             $finance = $this->get_finance_env();
-            if ($this->environment === 'production') {
+            if ($this->isV4()){
+                wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
+            } elseif ($this->environment === 'production') {
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
             } else {
                 wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
@@ -369,12 +374,14 @@ function woocommerce_finance_init()
                 $key = preg_split('/\./', $this->api_key);
                 $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
                 $finance = $this->get_finance_env();
-                if ($this->environment === 'production') {
+
+                if ($this->isV4()){
+                    wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
+                } elseif ($this->environment === 'production') {
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
                 } else {
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
                 }
-                wp_register_script('woocoomerce-finance-gateway-calculator_price_update', plugins_url('', __FILE__) . '/js/widget_price_update.js', false, 1.0, true);
                 wp_register_style('woocommerce-finance-gateway-style', plugins_url('', __FILE__) . '/css/style.css', false, 1.0);
                 $array = array(
                     'environment' => __($finance)
@@ -407,13 +414,12 @@ window.__widgetConfig = {
 
 };
 
-var <?php echo ($this->get_finance_env()) ?>Key = '<?php echo esc_attr(strtolower($key[0])); ?>'
 </script>
 <script>
 // <![CDATA[
 function waitForElementToDisplay(selector, time) {
     if (document.querySelector(selector) !== null) {
-        __widgetInstance.init()
+        <?= ($this->isV4()) ? '__calculator' : '__widgetInstance'; ?>.init()
         return;
     } else {
         setTimeout(function() {
@@ -797,10 +803,11 @@ jQuery(document).ready(function() {
                 $price = $this->get_price_including_tax($product, '');
                 $plans = $this->get_product_plans($product);
                 $environment = $this->get_finance_env();
+                $shortApiKey = explode('.',$this->api_key)[0];
                 if ($this->is_available($product) && $price > (((int)$this->widget_threshold ?? 0) * 100)) {
                     $button_text = '';
                     if (!empty(sanitize_text_field($this->buttonText))) {
-                        $button_text = 'data-button-text="' . sanitize_text_field($this->buttonText) . '" ';
+                        $button_text = sanitize_text_field($this->buttonText);
                     }
 
                     $footnote = '';
@@ -814,6 +821,8 @@ jQuery(document).ready(function() {
                     if ($this->useStoreLanguage === "yes") {
                         $language = 'data-language="' . $this->get_language() . '" ';
                     }
+
+                    $calcConfApiUrl = $this->calculator_config_api_url;
 
                     include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/widget.php';
                 }
@@ -906,11 +915,7 @@ jQuery(document).ready(function() {
         <label
             for="_hide_title"><?php esc_html_e('frontend/productselected_plans_label', 'woocommerce-finance-gateway'); ?></label>
 
-        <?php
-
-                    foreach ($finances as $finance => $value) {
-
-                    ?>
+        <?php foreach ($finances as $finance => $value) { ?>
         <input type="checkbox" class="checkbox" name="_tab_finances[]" id="finances_<?php print esc_attr($finance); ?>"
             value="<?php print esc_attr($finance); ?>"
             <?php print (in_array($finance, $tab_data[0]['finances'], true)) ? 'checked' : ''; ?>>
@@ -993,7 +998,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                     'type' => 'text',
                     'description' => __('backend/configapi_key_description', 'woocommerce-finance-gateway'),
                     'default' => '',
-                ),
+                )
             );
 
             if (isset($this->api_key) && $this->api_key) {
@@ -1105,6 +1110,12 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'title' => __('backend/configwidget_settings_header', 'woocommerce-finance-gateway'),
                                 'type' => 'title',
                                 'class' => 'border',
+                            ),
+                            'calcConfApiUrl' => array(
+                                'title' => __('backend/configcalc_conf_api_url_label', 'woocommerce-finance-gateway'),
+                                'type' => 'text',
+                                'description' => __('backend/configcalc_conf_api_url_description', 'woocommerce-finance-gateway'),
+                                'default' => '',
                             ),
                             'showWidget' => array(
                                 'title' => __('backend/configshow_widget_label', 'woocommerce-finance-gateway'),
@@ -1350,6 +1361,8 @@ jQuery(document).ready(function($) {
                 if ($this->useStoreLanguage === "yes") {
                     $language = 'data-language="' . $this->get_language() . '" ';
                 }
+                $shortApiKey = explode('.',$this->api_key)[0];
+                $calcConfApiUrl = $this->calculator_config_api_url;
                 include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/checkout.php';
             }
         }
@@ -1980,6 +1993,18 @@ jQuery(document).ready(function($) {
             $links[] = $_link;
 
             return $links;
+        }
+
+        /**
+         * Function to confirm whether the settings supplied are v4 calculator
+         * compatible
+         *
+         * @return boolean
+         */
+        private function isV4(){
+            if(empty($this->calculator_config_api_url)){
+                return false;
+            } else return true;
         }
     }
 
