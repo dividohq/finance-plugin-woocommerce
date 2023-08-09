@@ -1481,12 +1481,6 @@ jQuery(document).ready(function($) {
                     );
                 }
 
-                if (isset($_SERVER['HTTP_RAW_POST_DATA']) && wp_unslash($_SERVER['HTTP_RAW_POST_DATA'])) { // Input var okay.
-                    $data = file_get_contents(wp_unslash($_SERVER['HTTP_RAW_POST_DATA'])); // Input var okay.
-                } else {
-                    $data = file_get_contents('php://input');
-                }
-
                 // Todo: Should check if SDK is not null.
                 $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
