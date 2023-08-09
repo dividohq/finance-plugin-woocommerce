@@ -1487,108 +1487,63 @@ jQuery(document).ready(function($) {
                     $data = file_get_contents('php://input');
                 }
 
-                if (empty(get_post_meta($order_id, "_finance_reference", true))) {
+                // Todo: Should check if SDK is not null.
+                $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
 
-                    // Todo: Should check if SDK is not null.
-                    $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-
-                    $application = (new \Divido\MerchantSDK\Models\Application())
-                        ->withCountryId($order->get_billing_country())
-                        ->withFinancePlanId($finance)
-                        ->withApplicants(
+                $application = (new \Divido\MerchantSDK\Models\Application())
+                    ->withCountryId($order->get_billing_country())
+                    ->withFinancePlanId($finance)
+                    ->withApplicants(
+                        [
                             [
-                                [
-                                    'firstName' => $order->get_billing_first_name(),
-                                    'lastName' => $order->get_billing_last_name(),
-                                    'phoneNumber' => str_replace(' ', '', $order->get_billing_phone()),
-                                    'email' => $order->get_billing_email(),
-                                    'addresses' => array([
-                                        'postcode' => $order->get_billing_postcode(),
-                                        'text' => $order->get_billing_postcode() . ' ' . $order->get_billing_address_1() . ' ' . $order->get_billing_city()
-                                    ]),
-                                ],
-                            ]
-                        )
-                        ->withOrderItems($products)
-                        ->withDepositAmount(round($deposit))
-                        ->withFinalisationRequired(false)
-                        ->withMerchantReference(strval($order_id))
-                        ->withUrls([
-                            'merchant_redirect_url' => $order->get_checkout_order_received_url(),
-                            'merchant_checkout_url' => wc_get_checkout_url(),
-                            'merchant_response_url' => admin_url('admin-ajax.php') . '?action=woocommerce_finance_callback',
-                        ])
-                        ->withMetadata([
-                            'order_number' => $order_id,
-                            'ecom_platform'         => 'woocommerce',
-                            'ecom_platform_version' => WC_VERSION,
-                            'ecom_base_url'         => wc_get_checkout_url(),
-                            'plugin_version'        => $this->plugin_version,
-                            'merchant_reference'    => strval($order_id)
-                        ]);
-                    if ('' !== $this->secret) {
-                        $secret = $this->create_signature(json_encode($application->getPayload()), $this->secret);
-                        $response = $sdk->applications()->createApplication($application, [], ['Content-Type' => 'application/json', 'X-Divido-Hmac-Sha256' => $secret]);
-                    } else {
-                        $response = $sdk->applications()->createApplication($application, [], ['Content-Type' => 'application/json']);
-                    }
-                    $application_response_body = $response->getBody()->getContents();
-                    $decode = json_decode($application_response_body);
+                                'firstName' => $order->get_billing_first_name(),
+                                'lastName' => $order->get_billing_last_name(),
+                                'phoneNumber' => str_replace(' ', '', $order->get_billing_phone()),
+                                'email' => $order->get_billing_email(),
+                                'addresses' => array([
+                                    'postcode' => $order->get_billing_postcode(),
+                                    'text' => $order->get_billing_postcode() . ' ' . $order->get_billing_address_1() . ' ' . $order->get_billing_city()
+                                ]),
+                            ],
+                        ]
+                    )
+                    ->withOrderItems($products)
+                    ->withDepositAmount(round($deposit))
+                    ->withFinalisationRequired(false)
+                    ->withMerchantReference(strval($order_id))
+                    ->withUrls([
+                        'merchant_redirect_url' => $order->get_checkout_order_received_url(),
+                        'merchant_checkout_url' => wc_get_checkout_url(),
+                        'merchant_response_url' => admin_url('admin-ajax.php') . '?action=woocommerce_finance_callback',
+                    ])
+                    ->withMetadata([
+                        'order_number' => $order_id,
+                        'ecom_platform'         => 'woocommerce',
+                        'ecom_platform_version' => WC_VERSION,
+                        'ecom_base_url'         => wc_get_checkout_url(),
+                        'plugin_version'        => $this->plugin_version,
+                        'merchant_reference'    => strval($order_id)
+                    ]);
 
-                    $result_id = $decode->data->id;
-                    $result_redirect = $decode->data->urls->application_url;
-                } else {
-
-                    // Todo: Should check if SDK is not null.
-                    $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-                    $applicationId = get_post_meta($order_id, "_finance_reference", true);
-
-                    $application = (new \Divido\MerchantSDK\Models\Application())
-                        ->withId($applicationId)
-                        ->withCountryId($order->get_billing_country())
-                        ->withFinancePlanId($finance)
-                        ->withApplicants(
-                            [
-                                [
-                                    'firstName' => $order->get_billing_first_name(),
-                                    'lastName' => $order->get_billing_last_name(),
-                                    'phoneNumber' => str_replace(' ', '', $order->get_billing_phone()),
-                                    'email' => $order->get_billing_email(),
-                                    'addresses' => array([
-                                        'postcode' => $order->get_billing_postcode(),
-                                        'text' => $order->get_billing_postcode() . ' ' . $order->get_billing_address_1() . ' ' . $order->get_billing_city()
-                                    ]),
-                                ],
-                            ]
-                        )
-                        ->withOrderItems($products)
-                        ->withDepositAmount(round(($deposit)))
-                        ->withFinalisationRequired(false)
-                        ->withMerchantReference(strval($order_id))
-                        ->withUrls([
-                            'merchant_redirect_url' => $order->get_checkout_order_received_url(),
-                            'merchant_checkout_url' => wc_get_checkout_url(),
-                            'merchant_response_url' => admin_url('admin-ajax.php') . '?action=woocommerce_finance_callback',
-                        ])
-                        ->withMetadata([
-                            'order_number' => $order_id,
-                            'ecom_platform'         => 'woocommerce',
-                            'ecom_platform_version' => WC_VERSION,
-                            'ecom_base_url'         => wc_get_checkout_url(),
-                            'plugin_version'        => $this->plugin_version,
-                            'merchant_reference'    => strval($order_id)
-                        ]);
-                    if ('' !== $this->secret) {
-                        $secret = $this->create_signature(json_encode($application->getPayload()), $this->secret);
-                        $response = $sdk->applications()->updateApplication($application, [], ['Content-Type' => 'application/json', 'X-Divido-Hmac-Sha256' => $secret]);
-                    } else {
-                        $response = $sdk->applications()->updateApplication($application, [], ['Content-Type' => 'application/json']);
-                    }
-                    $application_response_body = $response->getBody()->getContents();
-                    $decode = json_decode($application_response_body);
-                    $result_id = $decode->data->id;
-                    $result_redirect = $decode->data->urls->application_url;
+                $headers = ['Content-Type' => 'application/json'];
+                if ('' !== $this->secret) {
+                    $secret = $this->create_signature(json_encode($application->getPayload()), $this->secret);
+                    $headers['X-Divido-Hmac-Sha256'] = $secret;
                 }
+                
+                if (empty(get_post_meta($order_id, "_finance_reference", true))) {
+                    $response = $sdk->applications()->createApplication($application, [], $headers);
+                } else {
+                    $applicationId = get_post_meta($order_id, "_finance_reference", true);
+                    $application = $application->withId($applicationId);
+                    $response = $sdk->applications()->updateApplication($application, [], $headers);
+                }
+                $application_response_body = $response->getBody()->getContents();
+                $decode = json_decode($application_response_body);
+
+                $result_id = $decode->data->id;
+                $result_redirect = $decode->data->urls->application_url;
+                
             }
 
             try {
