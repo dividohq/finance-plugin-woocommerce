@@ -15,7 +15,7 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.5.0
+ * Version: 2.6.0
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
@@ -457,7 +457,7 @@ jQuery(document).ready(function() {
             if (is_object($data_json)) {
                 if ($data_json->metadata->order_number) {
                     $finance_reference = get_post_meta($data_json->metadata->order_number, '_finance_reference');
-                    if (isset($finance_reference[0]) && $finance_reference[0] === $data_json->proposal) {
+                    if (isset($finance_reference[0]) && $finance_reference[0] === $data_json->application) {
                         $order = new WC_Order($data_json->metadata->order_number);
                         $finance_amount = get_post_meta($data_json->metadata->order_number, '_finance_amount');
                         // Check if the requested amount matched order amount.
