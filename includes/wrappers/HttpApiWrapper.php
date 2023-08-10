@@ -78,9 +78,18 @@ class HttpApiWrapper{
     }
 
     private function validateResponse($response, $method, $path){
-        if(!is_array($response) && get_class($response) === 'WP_Error'){
+        if(is_object($response) && get_class($response) === 'WP_Error'){
             throw new ResponseException(
                 sprintf("Error in response: %s", $response->get_error_message()),
+                500,
+                $method,
+                $path
+            );
+        }
+
+        if(!is_array($response)){
+            throw new ResponseException(
+                "Unexpected Response - expected array",
                 500,
                 $method,
                 $path
