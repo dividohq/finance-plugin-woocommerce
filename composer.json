@@ -11,5 +11,15 @@
         "allow-plugins": {
             "php-http/discovery": true
         }
+    },
+    "autoload": {
+        "psr-4": {
+          
+        },
+        "files": [
+            "includes/proxies/MerchantApiPubProxy.php",
+            "includes/wrappers/HttpApiWrapper.php",
+            "includes/exceptions/ResponseException.php"
+        ]
     }
 }
