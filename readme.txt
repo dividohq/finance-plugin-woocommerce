@@ -45,6 +45,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
  == Changelog ==
 
+Version 2.6.0
+Feat: Removes Guzzle dependancy
+
 Version 2.5.0
 Feat: Adds compatibility to the latest version of our Finance Calculator.
 
