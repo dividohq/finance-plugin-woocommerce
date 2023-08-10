@@ -10,6 +10,9 @@ use Divido\MerchantSDK\Models\ApplicationRefund;
 use Divido\Woocommerce\FinanceGateway\Exceptions\ResponseException;
 use Divido\Woocommerce\FinanceGateway\Wrappers\HttpApiWrapper;
 
+/**
+ * A proxy between the Merchant API Pub and the HttpApiWrapper
+ */
 class MerchantApiPubProxy{
 
     const PATHS = [
