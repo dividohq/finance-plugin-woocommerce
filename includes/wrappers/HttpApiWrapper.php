@@ -3,6 +3,11 @@
 namespace Divido\Woocommerce\FinanceGateway\Wrappers;
 use Divido\Woocommerce\FinanceGateway\Exceptions\ResponseException;
 
+/**
+ * A Wrapper for the Wordpress HTTP API functions
+ * https://developer.wordpress.org/plugins/http-api/
+ * 
+ */
 class HttpApiWrapper{
 
     private string $baseUri;
@@ -77,7 +82,16 @@ class HttpApiWrapper{
         return $response;
     }
 
-    private function validateResponse($response, $method, $path){
+    /**
+     * Ensures we're actually receiving an array, as expected from the wp_remote_ functions
+     * https://developer.wordpress.org/reference/functions/wp_remote_post/
+     *
+     * @param array|WP_Error $response
+     * @param string $method
+     * @param string $path
+     * @return void
+     */
+    private function validateResponse($response, string $method, string $path){
         if(is_object($response) && get_class($response) === 'WP_Error'){
             throw new ResponseException(
                 sprintf("Error in response: %s", $response->get_error_message()),
