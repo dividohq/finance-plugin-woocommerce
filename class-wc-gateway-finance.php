@@ -1,8 +1,7 @@
 <?php
 
 use Divido\MerchantSDK\Environment;
-use Divido\MerchantSDK\Exceptions\InvalidApiKeyFormatException;
-use Divido\MerchantSDK\Exceptions\InvalidEnvironmentException;
+use Divido\Woocommerce\FinanceGateway\Proxies\MerchantApiPubProxy;
 
 defined('ABSPATH') or die('Denied');
 /**
@@ -41,42 +40,6 @@ function woocommerce_finance_init()
         return;
     }
     include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/vendor/autoload.php';
-
-    /**
-     * Merchant SDK class
-     *
-     * Constructs an instance of the merchant sdk to be used
-     **/
-    class Merchant_SDK
-    {
-        /**
-         * Creates and returns a merchant sdk instance
-         *
-         * @param string The merchant api url
-         * @param string The api key for the environment
-         *
-         * @return Divido\MerchantSDK\Client|null The Merchant SDK client instance
-         */
-        public static function getSDK($url, $api_key)
-        {
-            try{
-                $env = Environment::getEnvironmentFromAPIKey($api_key);
-            }catch (InvalidApiKeyFormatException $e){
-                return null;
-            }catch (InvalidEnvironmentException $e){
-                return null;
-            }
-
-            $client = new \GuzzleHttp\Client();
-            $httpClientWrapper = new \Divido\MerchantSDK\HttpClient\HttpClientWrapper(
-                new \Divido\MerchantSDKGuzzle6\GuzzleAdapter($client),
-                $url,
-                $api_key
-            );
-
-            return new \Divido\MerchantSDK\Client($httpClientWrapper, $env);
-        }
-    }
 
     /**
      * Finance Payment Gateway class
@@ -338,17 +301,13 @@ function woocommerce_finance_init()
             // OR finances transient is not set
             if ($apiKey !== $this->api_key || empty($apiKey) || empty($finances)) {
 
-                $request_options = (new \Divido\MerchantSDK\Handlers\ApiRequestOptions());
                 // Retrieve all finance plans for the merchant.
                 try {
-                    $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
+                    $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
 
-                    if($sdk === null){
-                        return [];
-                    }
+                    $response = $proxy->getFinancePlans();
+                    $plans = $response->data;
 
-                    $plans = $sdk->getAllPlans($request_options);
-                    $plans = $plans->getResources();
                     set_transient($transient_name, $plans, 60 * 60 * 1);
                     set_transient("api_key", $this->api_key);
 
@@ -1212,18 +1171,17 @@ jQuery("input[name=_tab_finance_active]").change(function() {
          *
          */
         function admin_options()
-        {
-            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
+        {   
+            $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
 
-            $status_code = null;
+            $status_code = 200;
 
-            if($sdk !== null){
-                $response = $sdk->health()->checkHealth();
-
-                if(array_key_exists('status_code', $response) && !empty($response['status_code'])){
-                    $status_code = $response['status_code'];
-                }
+            try{
+                $response = $proxy->getHealth();
+            }catch (\Exception $e){
+                $status_code = $e->getCode();
             }
+        
 
             $bad_host = !$status_code;
             $not_200 = $status_code !== 200;
@@ -1481,8 +1439,7 @@ jQuery(document).ready(function($) {
                     );
                 }
 
-                // Todo: Should check if SDK is not null.
-                $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
+                $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
 
                 $application = (new \Divido\MerchantSDK\Models\Application())
                     ->withCountryId($order->get_billing_country())
@@ -1519,24 +1476,21 @@ jQuery(document).ready(function($) {
                         'merchant_reference'    => strval($order_id)
                     ]);
 
-                $headers = ['Content-Type' => 'application/json'];
                 if ('' !== $this->secret) {
                     $secret = $this->create_signature(json_encode($application->getPayload()), $this->secret);
-                    $headers['X-Divido-Hmac-Sha256'] = $secret;
+                    $proxy->addSecretHeader($secret);
                 }
                 
                 if (empty(get_post_meta($order_id, "_finance_reference", true))) {
-                    $response = $sdk->applications()->createApplication($application, [], $headers);
+                    $response = $proxy->postApplication($application);
                 } else {
                     $applicationId = get_post_meta($order_id, "_finance_reference", true);
                     $application = $application->withId($applicationId);
-                    $response = $sdk->applications()->updateApplication($application, [], $headers);
+                    $response = $proxy->updateApplication($application);
                 }
-                $application_response_body = $response->getBody()->getContents();
-                $decode = json_decode($application_response_body);
 
-                $result_id = $decode->data->id;
-                $result_redirect = $decode->data->urls->application_url;
+                $result_id = $response->data->id;
+                $result_redirect = $response->data->urls->application_url;
                 
             }
 
@@ -1603,12 +1557,7 @@ jQuery(document).ready(function($) {
          */
         public function get_finance_env()
         {
-            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-
-            //Todo: Perhaps show the user some error message? This will break a bunch of stuff.
-            if($sdk === null) {
-                return '';
-            }
+            $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
 
             // ensure that the url is used as a part of the cache key so the right env is returned from the cache
             $transient = 'environment' . md5($this->url);
@@ -1617,10 +1566,8 @@ jQuery(document).ready(function($) {
             if (!empty($setting)) {
                 return $setting;
             } else {
-                $response = $sdk->platformEnvironments()->getPlatformEnvironment();
-                $finance_env = $response->getBody()->getContents();
-                $decoded = json_decode($finance_env);
-                $global = $decoded->data->environment ?? null;
+                $response = $proxy->getEnvironment();
+                $global = $response->data->environment ?? null;
                 set_transient($transient, $global, 60 * 5);
 
                 return $global;
@@ -1859,9 +1806,6 @@ jQuery(document).ready(function($) {
          */
         function set_cancelled($application_id, $order_total, $order_id)
         {
-            // First get the application you wish to refund.
-            $application = (new \Divido\MerchantSDK\Models\Application())
-                ->withId($application_id);
             $items = [
                 [
                     'name' => __('globalorder_id_label', 'woocommerce-finance-gateway') . ": $order_id",
@@ -1874,16 +1818,12 @@ jQuery(document).ready(function($) {
                 ->withOrderItems($items);
 
             //Todo: Check if SDK is null
-            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-            $response = $sdk->applicationCancellations()->createApplicationCancellation($application, $applicationCancellation);
-            $refundResponseBody = $response->getBody()->getContents();
+            $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
+            $proxy->postCancellation($application_id, $applicationCancellation);
         }
 
         function set_refund($application_id, $order_total, $order_id)
         {
-            // First get the application you wish to refund.
-            $application = (new \Divido\MerchantSDK\Models\Application())
-                ->withId($application_id);
             $items = [
                 [
                     'name' => __('globalorder_id_label', 'woocommerce-finance-gateway') . ": $order_id",
@@ -1896,16 +1836,12 @@ jQuery(document).ready(function($) {
                 ->withOrderItems($items);
 
             //Todo: Check if SDK is null
-            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-            $response = $sdk->applicationRefunds()->createApplicationRefund($application, $applicationRefund);
-            $refundResponseBody = $response->getBody()->getContents();
+            $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
+            $proxy->postRefund($application_id, $applicationRefund);
         }
 
         function set_fulfilled($application_id, $order_total, $order_id, $shipping_method = null, $tracking_numbers = null)
         {
-            // First get the application you wish to create an activation for.
-            $application = (new \Divido\MerchantSDK\Models\Application())
-                ->withId($application_id);
             $items = [
                 [
                     'name' => __('globalorder_id_label', 'woocommerce-finance-gateway') . ": $order_id",
@@ -1920,9 +1856,8 @@ jQuery(document).ready(function($) {
                 ->withTrackingNumber($tracking_numbers);
             // Create a new activation for the application.
             //Todo: Check if SDK is null
-            $sdk = Merchant_SDK::getSDK($this->url, $this->api_key);
-            $response = $sdk->applicationActivations()->createApplicationActivation($application, $application_activation);
-            $activation_response_body = $response->getBody()->getContents();
+            $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
+            $proxy->postActivation($application_id, $application_activation);
         }
 
         /**
