@@ -267,6 +267,11 @@ class MerchantApiPubProxy{
             );
         }
         $statusCode = wp_remote_retrieve_response_code($response);
+        if(!is_int($statusCode)){
+            throw new ResponseException(
+                "There was an unexpected problem with the response received from the request", 500, $action, $method
+            );
+        }
         if($statusCode !== self::EXPECTED_RESPONSE_CODES[$method][$action]){
             throw new ResponseException(
                 "An unexpected error occurred when contacting the Merchant API Pub", $statusCode, $action, $method
