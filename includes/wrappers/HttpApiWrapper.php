@@ -21,7 +21,7 @@ class HttpApiWrapper{
         $this->baseUri = $baseUri;
     }
 
-    public function addHeader(string $key, string $value){
+    public function setHeader(string $key, string $value){
         $this->defaultArgs['headers'][$key] = $value;
     }
 
