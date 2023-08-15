@@ -10,23 +10,26 @@ use Divido\Woocommerce\FinanceGateway\Exceptions\ResponseException;
  */
 class HttpApiWrapper{
 
+    const TIMEOUT = '30';
     private string $baseUri;
-    private array $headers = [];
+    private array $defaultArgs = [
+        'timeout' => self::TIMEOUT,
+        'headers' => []
+    ];
 
     public function __construct(string $baseUri){
         $this->baseUri = $baseUri;
     }
 
     public function addHeader(string $key, string $value){
-        $this->headers[$key] = $value;
+        $this->defaultArgs['headers'][$key] = $value;
     }
 
     public function get(string $path, ?array $params = null):array{
 
-        $args = [
-            'method' => 'GET',
-            'headers' => $this->headers
-        ];
+        $args = array_merge($this->defaultArgs, [
+            'method' => 'GET'
+        ]);
 
         $url = sprintf("%s%s", $this->baseUri, $path);
         if($params){
@@ -45,11 +48,10 @@ class HttpApiWrapper{
     }
 
     public function post(string $path, mixed $body): array{
-        $args = [
+        $args = array_merge($this->defaultArgs, [
             'method' => 'POST',
-            'headers' => $this->headers,
             'body' => $body
-        ];
+        ]);
 
         $url = sprintf("%s%s", $this->baseUri, $path);
 
@@ -64,11 +66,10 @@ class HttpApiWrapper{
     }
 
     public function patch(string $path, mixed $body):array{
-        $args = [
+        $args = array_merge($this->defaultArgs, [
             'method' => 'PATCH',
-            'headers' => $this->headers,
             'body' => $body
-        ];
+        ]);
 
         $url = sprintf("%s%s?%s", $this->baseUri, $path);
 
