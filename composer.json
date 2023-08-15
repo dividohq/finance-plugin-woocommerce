@@ -1,11 +1,25 @@
 {
     "require": {
         "php": ">=5",
-        "divido/merchant-sdk-guzzle-6": "dev-master",
-        "divido/merchant-sdk": "v2.5.0"
+        "divido/merchant-sdk": "^3.1"
     },
     "conflict": {
         "symfony/polyfill-intl-idn": ">=1.18",
         "symfony/polyfill-mbstring": ">=1.22.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "autoload": {
+        "psr-4": {
+          
+        },
+        "files": [
+            "includes/proxies/MerchantApiPubProxy.php",
+            "includes/wrappers/HttpApiWrapper.php",
+            "includes/exceptions/ResponseException.php"
+        ]
     }
 }
