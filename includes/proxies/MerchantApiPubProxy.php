@@ -58,9 +58,9 @@ class MerchantApiPubProxy{
 
     public function __construct(string $baseUri, string $apiKey){
         $this->wrapper = new HttpApiWrapper($baseUri);
-        $this->wrapper->addHeader('Accept', 'application/json');
-        $this->wrapper->addHeader('Content-Type', 'application/json');
-        $this->wrapper->addHeader(self::HEADER_KEYS['API_KEY'], $apiKey);
+        $this->wrapper->setHeader('Accept', 'application/json');
+        $this->wrapper->setHeader('Content-Type', 'application/json');
+        $this->wrapper->setHeader(self::HEADER_KEYS['API_KEY'], $apiKey);
     }
 
     /**
@@ -70,7 +70,7 @@ class MerchantApiPubProxy{
      * @return void
      */
     public function addSecretHeader(string $secret){
-        $this->wrapper->addHeader(self::HEADER_KEYS['SHARED_SECRET'], $secret);
+        $this->wrapper->setHeader(self::HEADER_KEYS['SHARED_SECRET'], $secret);
     }
 
     /**
