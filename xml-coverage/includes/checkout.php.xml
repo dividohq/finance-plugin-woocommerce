@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="checkout.php" path="/includes">
+    <totals>
+      <lines total="23" comments="0" code="23" executable="21" executed="0" percent="0.00"/>
+      <methods count="0" tested="0" percent="0"/>
+      <functions count="0" tested="0" percent="0"/>
+      <classes count="0" tested="0" percent="0"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php </token>
+        <token name="T_STRING">defined</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'ABSPATH'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LOGICAL_OR">or</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EXIT">die</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'Denied'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+      </line>
+      <line no="2">
+        <token name="T_INLINE_HTML">&lt;p id="finance-payment-description"&gt;</token>
+      </line>
+      <line no="3">
+        <token name="T_INLINE_HTML">   </token>
+        <token name="T_OPEN_TAG">&lt;?php </token>
+        <token name="T_PRINT">print</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_ISSET">isset</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">settings</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'description'</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$this</token>
+        <token name="T_OBJECT_OPERATOR">-&gt;</token>
+        <token name="T_STRING">settings</token>
+        <token name="T_OPEN_SQUARE">[</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'description'</token>
+        <token name="T_CLOSE_SQUARE">]</token>
+        <token name="T_COLON">:</token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">""</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+      </line>
+      <line no="4">
+        <token name="T_INLINE_HTML">&lt;/p&gt;</token>
+      </line>
+      <line no="5">
+        <token name="T_INLINE_HTML">&lt;div id="financeWidget"</token>
+      </line>
+      <line no="6">
+        <token name="T_INLINE_HTML">    data-calculator-widget</token>
+      </line>
+      <line no="7">
+        <token name="T_INLINE_HTML">    data-mode="calculator"</token>
+      </line>
+      <line no="8">
+        <token name="T_INLINE_HTML">    data-plans="</token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$plansStr</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+        <token name="T_INLINE_HTML">"</token>
+      </line>
+      <line no="9">
+        <token name="T_INLINE_HTML">    data-amount="</token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$amount</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+        <token name="T_INLINE_HTML">"</token>
+      </line>
+      <line no="10">
+        <token name="T_INLINE_HTML">    data-footnote="</token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$footnote</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+        <token name="T_INLINE_HTML">"</token>
+      </line>
+      <line no="11">
+        <token name="T_INLINE_HTML">    </token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$language</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+      </line>
+      <line no="12">
+        <token name="T_INLINE_HTML">&gt;</token>
+      </line>
+      <line no="13">
+        <token name="T_INLINE_HTML">&lt;/div&gt;</token>
+      </line>
+      <line no="14"/>
+      <line no="15">
+        <token name="T_INLINE_HTML">&lt;script type="text/javascript"&gt;</token>
+      </line>
+      <line no="16">
+        <token name="T_INLINE_HTML">   jQuery(document).ready(function($) {</token>
+      </line>
+      <line no="17">
+        <token name="T_INLINE_HTML">      waitForElementToDisplay('#financeWidget', 1000);</token>
+      </line>
+      <line no="18">
+        <token name="T_INLINE_HTML">   });</token>
+      </line>
+      <line no="19">
+        <token name="T_INLINE_HTML">&lt;/script&gt;</token>
+      </line>
+      <line no="20">
+        <token name="T_INLINE_HTML">&lt;div class="clear"&gt;&lt;/div&gt;</token>
+      </line>
+      <line no="21">
+        <token name="T_INLINE_HTML">&lt;/fieldset&gt;</token>
+      </line>
+      <line no="22">
+        <token name="T_OPEN_TAG">&lt;?php </token>
+        <token name="T_STRING">wp_nonce_field</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'submit-payment-form'</token>
+        <token name="T_COMMA">,</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'submit-payment-form-nonce'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+      </line>
+      <line no="23"/>
+    </source>
+  </file>
+</phpunit>

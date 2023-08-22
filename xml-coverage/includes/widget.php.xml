@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="widget.php" path="/includes">
+    <totals>
+      <lines total="27" comments="0" code="27" executable="20" executed="0" percent="0.00"/>
+      <methods count="0" tested="0" percent="0"/>
+      <functions count="0" tested="0" percent="0"/>
+      <classes count="0" tested="0" percent="0"/>
+      <traits count="0" tested="0" percent="0"/>
+    </totals>
+    <source>
+      <line no="1">
+        <token name="T_OPEN_TAG">&lt;?php </token>
+        <token name="T_STRING">defined</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'ABSPATH'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_LOGICAL_OR">or</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_EXIT">die</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'Denied'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+      </line>
+      <line no="2"/>
+      <line no="3">
+        <token name="T_INLINE_HTML">&lt;div</token>
+      </line>
+      <line no="4">
+        <token name="T_INLINE_HTML">    data-calculator-widget</token>
+      </line>
+      <line no="5">
+        <token name="T_INLINE_HTML">    data-mode="</token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$mode</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+        <token name="T_INLINE_HTML">"</token>
+      </line>
+      <line no="6">
+        <token name="T_INLINE_HTML">    data-plans="</token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$plansStr</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+        <token name="T_INLINE_HTML">"</token>
+      </line>
+      <line no="7">
+        <token name="T_INLINE_HTML">    data-amount="</token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$price</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+        <token name="T_INLINE_HTML">"</token>
+      </line>
+      <line no="8">
+        <token name="T_INLINE_HTML">    </token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$language</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+      </line>
+      <line no="9">
+        <token name="T_INLINE_HTML">    </token>
+        <token name="T_OPEN_TAG">&lt;?php </token>
+        <token name="T_IF">if</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EXCLAMATION_MARK">!</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$button_text</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_ECHO">echo</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_DOUBLE_QUOTES">"</token>
+        <token name="T_ENCAPSED_AND_WHITESPACE">data-button-text=\"</token>
+        <token name="T_CURLY_OPEN">{</token>
+        <token name="T_VARIABLE">$button_text</token>
+        <token name="T_CLOSE_CURLY">}</token>
+        <token name="T_ENCAPSED_AND_WHITESPACE">\"</token>
+        <token name="T_DOUBLE_QUOTES">"</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+      </line>
+      <line no="10">
+        <token name="T_INLINE_HTML">    </token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_VARIABLE">$footnote</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+      </line>
+      <line no="11">
+        <token name="T_INLINE_HTML"> &gt;</token>
+      </line>
+      <line no="12">
+        <token name="T_INLINE_HTML">&lt;/div&gt;</token>
+      </line>
+      <line no="13"/>
+      <line no="14">
+        <token name="T_INLINE_HTML">&lt;script type='text/javascript'&gt;</token>
+      </line>
+      <line no="15">
+        <token name="T_INLINE_HTML">    jQuery(document).on('woocommerce_variation_select_change', function() {</token>
+      </line>
+      <line no="16">
+        <token name="T_INLINE_HTML">        jQuery('.variations_form').each(function() {</token>
+      </line>
+      <line no="17">
+        <token name="T_INLINE_HTML">            // When variation is found, grab the display price and update Divido_widget</token>
+      </line>
+      <line no="18">
+        <token name="T_INLINE_HTML">            jQuery(this).on('found_variation', function(event, variation) {</token>
+      </line>
+      <line no="19">
+        <token name="T_INLINE_HTML">                var new_price = variation.display_price;</token>
+      </line>
+      <line no="20">
+        <token name="T_INLINE_HTML">                var widget = jQuery("[data-calculator-widget]");</token>
+      </line>
+      <line no="21">
+        <token name="T_INLINE_HTML">                widget.attr("data-amount", Math.round(new_price * 100));</token>
+      </line>
+      <line no="22">
+        <token name="T_INLINE_HTML">                </token>
+        <token name="T_OPEN_TAG_WITH_ECHO">&lt;?=</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_EMPTY">empty</token>
+        <token name="T_OPEN_BRACKET">(</token>
+        <token name="T_VARIABLE">$calcConfApiUrl</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_CLOSE_BRACKET">)</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_QUESTION_MARK">?</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'__widgetInstance'</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_COLON">:</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CONSTANT_ENCAPSED_STRING">'__calculator'</token>
+        <token name="T_SEMICOLON">;</token>
+        <token name="T_WHITESPACE"> </token>
+        <token name="T_CLOSE_TAG">?&gt;</token>
+        <token name="T_INLINE_HTML">.init();</token>
+      </line>
+      <line no="23">
+        <token name="T_INLINE_HTML">            });</token>
+      </line>
+      <line no="24">
+        <token name="T_INLINE_HTML">        });</token>
+      </line>
+      <line no="25">
+        <token name="T_INLINE_HTML">    });</token>
+      </line>
+      <line no="26">
+        <token name="T_INLINE_HTML">&lt;/script&gt;</token>
+      </line>
+      <line no="27"/>
+    </source>
+  </file>
+</phpunit>

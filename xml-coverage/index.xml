@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Tue Sep 26 10:17:23 UTC 2023" phpunit="10.3.3" coverage="10.1.5">
+    <runtime name="PHP" version="8.1.23" url="https://www.php.net/"/>
+    <driver name="pcov" version="1.0.11"/>
+  </build>
+  <project source="/var/www/html/wp-content/plugins/woocommerce-finance-gateway">
+    <tests>
+      <test name="GatewayTest::testExample" size="unknown" status="success"/>
+      <test name="GatewayTest::testConstruct" size="unknown" status="success"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="2620" comments="551" code="2069" executable="1221" executed="42" percent="3.44"/>
+        <methods count="27" tested="0" percent="0.00"/>
+        <functions count="1" tested="0" percent="0.00"/>
+        <classes count="4" tested="0" percent="0.00"/>
+        <traits count="0" tested="0" percent="0"/>
+      </totals>
+      <directory name="includes">
+        <totals>
+          <lines total="558" comments="107" code="451" executable="200" executed="0" percent="0.00"/>
+          <methods count="27" tested="0" percent="0.00"/>
+          <functions count="0" tested="0" percent="0"/>
+          <classes count="4" tested="0" percent="0.00"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+        <directory name="exceptions">
+          <totals>
+            <lines total="26" comments="0" code="26" executable="5" executed="0" percent="0.00"/>
+            <methods count="3" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+          <file name="ResponseException.php" href="includes/exceptions/ResponseException.php.xml">
+            <totals>
+              <lines total="26" comments="0" code="26" executable="5" executed="0" percent="0.00"/>
+              <methods count="3" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+        </directory>
+        <directory name="models">
+          <totals>
+            <lines total="70" comments="15" code="55" executable="10" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+          <file name="ShortPlan.php" href="includes/models/ShortPlan.php.xml">
+            <totals>
+              <lines total="70" comments="15" code="55" executable="10" executed="0" percent="0.00"/>
+              <methods count="6" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+        </directory>
+        <directory name="proxies">
+          <totals>
+            <lines total="297" comments="78" code="219" executable="93" executed="0" percent="0.00"/>
+            <methods count="12" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+          <file name="MerchantApiPubProxy.php" href="includes/proxies/MerchantApiPubProxy.php.xml">
+            <totals>
+              <lines total="297" comments="78" code="219" executable="93" executed="0" percent="0.00"/>
+              <methods count="12" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+        </directory>
+        <directory name="wrappers">
+          <totals>
+            <lines total="115" comments="14" code="101" executable="51" executed="0" percent="0.00"/>
+            <methods count="6" tested="0" percent="0.00"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="1" tested="0" percent="0.00"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+          <file name="HttpApiWrapper.php" href="includes/wrappers/HttpApiWrapper.php.xml">
+            <totals>
+              <lines total="115" comments="14" code="101" executable="51" executed="0" percent="0.00"/>
+              <methods count="6" tested="0" percent="0.00"/>
+              <functions count="0" tested="0" percent="0"/>
+              <classes count="1" tested="0" percent="0.00"/>
+              <traits count="0" tested="0" percent="0"/>
+            </totals>
+          </file>
+        </directory>
+        <file name="checkout.php" href="includes/checkout.php.xml">
+          <totals>
+            <lines total="23" comments="0" code="23" executable="21" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+        <file name="widget.php" href="includes/widget.php.xml">
+          <totals>
+            <lines total="27" comments="0" code="27" executable="20" executed="0" percent="0.00"/>
+            <methods count="0" tested="0" percent="0"/>
+            <functions count="0" tested="0" percent="0"/>
+            <classes count="0" tested="0" percent="0"/>
+            <traits count="0" tested="0" percent="0"/>
+          </totals>
+        </file>
+      </directory>
+      <file name="class-wc-gateway-finance.php" href="class-wc-gateway-finance.php.xml">
+        <totals>
+          <lines total="2062" comments="444" code="1618" executable="1021" executed="42" percent="4.11"/>
+          <methods count="0" tested="0" percent="0"/>
+          <functions count="1" tested="0" percent="0.00"/>
+          <classes count="0" tested="0" percent="0"/>
+          <traits count="0" tested="0" percent="0"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

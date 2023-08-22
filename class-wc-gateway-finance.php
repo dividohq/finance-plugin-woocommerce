@@ -66,6 +66,10 @@ function woocommerce_finance_init()
 
         private ?float $widget_threshold;
 
+        private string $auto_refund;
+
+        private string $auto_cancel;
+
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
 
@@ -194,7 +198,6 @@ function woocommerce_finance_init()
                     }
                 }
                 // order admin page (making sure it only adds once).
-            
                 add_action('woocommerce_admin_order_data_after_order_details', array($this, 'display_order_data_in_admin'));
             
                 // checkout.
@@ -473,10 +476,24 @@ jQuery(document).ready(function() {
             $ref_and_finance = $this->get_ref_finance($order);
             if ($ref_and_finance['ref']) {
                 echo '<p class="form-field form-field-wide"><strong>' . esc_attr(__('backend/orderfinance_reference_number_label', 'woocommerce-finance-gateway')) . ':</strong><br />' . esc_html($ref_and_finance['ref']) . '</p>';
+                echo(sprintf('<input type=\'hidden\' id=\'financeId\' value=\'%s\'>', esc_html($ref_and_finance['ref'])));
+                echo('<div id=\'financeStatusModal\'><div class=\'contents\'>Hello</div></div>');
             }
             if ($ref_and_finance['finance']) {
                 echo '<p class="form-field form-field-wide"><strong>' . esc_attr(__('backend/orderfinance_plan_id_label', 'woocommerce-finance-gateway')) . ':</strong><br />' . esc_html($ref_and_finance['finance']) . '</p>';
             }
+        }
+
+        public function setConfig(){
+            echo('<script language=\'javascript\'>');
+                echo(sprintf(
+                    'const statusCheckPath = \'%s\'', 
+                    sprintf(
+                        '%s',
+                         str_replace(get_site_url(null, '', 'admin'), '', admin_url('admin-ajax.php')))
+                )
+            );
+            echo('</script>');
         }
 
         /**
@@ -549,6 +566,10 @@ jQuery(document).ready(function() {
                     }
                 }
             }
+        }
+
+        public function status(){
+            echo("Hi");
         }
 
         /**
@@ -1578,6 +1599,16 @@ jQuery(document).ready(function($) {
          */
         function wpdocs_enqueue_custom_admin_style($hook_suffix)
         {
+            
+            if (get_current_screen()->id == 'shop_order') {
+                wp_register_script('woocommerce-finance-gateway-admin-js',plugins_url('/js/admin.js', __FILE__));
+                wp_enqueue_script('woocommerce-finance-gateway-admin-js');
+
+                // Enqueue the assets
+                wp_enqueue_script('jquery-ui-dialog');
+                wp_enqueue_style('wp-jquery-ui-dialog');
+              }
+
             // Check if it's the ?page=yourpagename. If not, just empty return before executing the folowing scripts.
             if ('woocommerce_page_wc-settings' !== $hook_suffix) {
                 return;
