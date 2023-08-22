@@ -1507,6 +1507,17 @@ jQuery(document).ready(function($) {
             return $finances;
         }
 
+        function get_application(string $applicationId)
+        {
+            $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
+
+            $response = $proxy->getApplication($applicationId);
+
+            $application = $response->data;
+
+            return $application;
+        }
+
         /**
          * Get Finance Platform Environment function
          * @return mixed
