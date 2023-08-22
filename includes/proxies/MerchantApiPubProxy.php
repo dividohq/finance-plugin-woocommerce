@@ -19,7 +19,8 @@ class MerchantApiPubProxy{
         'GET' => [
             'HEALTH' => '/health',
             'PLANS' => '/finance-plans',
-            'ENVIRONMENT' => '/environment'
+            'ENVIRONMENT' => '/environment',
+            'APPLICATION' => '/applications/%s'
         ],
         'POST' => [
             'APPLICATION' => '/applications',
@@ -36,7 +37,8 @@ class MerchantApiPubProxy{
         'GET' => [
             'HEALTH' => 200,
             'PLANS' => 200,
-            'ENVIRONMENT' => 200
+            'ENVIRONMENT' => 200,
+            'APPLICATION' => 200
         ],
         'POST' => [
             'APPLICATION' => 201,
@@ -118,6 +120,22 @@ class MerchantApiPubProxy{
         $action = 'PLANS';
 
         $response = $this->wrapper->get(self::PATHS[$method][$action]);
+        
+        $this->validateResponse($method, $action, $response);
+        
+        return $this->responseToObj($response);
+    }
+
+    public function getApplication(string $applicationId) :object{
+        $method = 'GET';
+        $action = 'APPLICATION';
+
+        $response = $this->wrapper->get(
+            sprintf(
+                self::PATHS[$method][$action],
+                $applicationId
+            )
+        );
         
         $this->validateResponse($method, $action, $response);
         
