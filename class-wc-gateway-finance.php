@@ -120,7 +120,7 @@ function woocommerce_finance_init()
             } else {
                 $this->max_loan_amount = intval($this->settings['maxLoanAmount']);
             }
-            $this->cart_threshold = isset($this->settings['cartThreshold']) ? intval($this->settings['cartThreshold']) : 250;
+            $this->cart_threshold = isset($this->settings['cartThreshold']) ? floatval($this->settings['cartThreshold']) : 250;
             $this->auto_fulfillment = isset($this->settings['autoFulfillment']) ? $this->settings['autoFulfillment'] : "yes";
             $this->auto_refund = isset($this->settings['autoRefund']) ? $this->settings['autoRefund'] : "yes";
             $this->auto_cancel = isset($this->settings['autoCancel']) ? $this->settings['autoCancel'] : "yes";
@@ -193,6 +193,8 @@ function woocommerce_finance_init()
             add_shortcode('finance_widget', array($this, 'anypage_widget'));
             //Since 1.0.3
             add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'finance_gateway_settings_link'));
+
+            add_filter('woocommerce_available_payment_gateways', array($this, 'showOptionAtCheckout'));
         }
 
         /**
@@ -601,29 +603,6 @@ jQuery(document).ready(function() {
                 }
 
                 return false;
-            }
-            // In Cart.
-            global $woocommerce;
-            $settings = $this->settings;
-            $threshold = $this->cart_threshold;
-            $upperLimit = $this->max_loan_amount;
-            $cart = $woocommerce->cart;
-            if (empty($cart)) {
-                return false;
-            }
-            if ($threshold > $cart->total) {
-                return false;
-            }
-            if ($upperLimit && $upperLimit < $cart->total) {
-                return false;
-            }
-            if ('all' === $settings['productSelect']) {
-                return true;
-            }
-            if ('price' === $settings['productSelect']) {
-                if ($cart->subtotal < $settings['priceSelection']) {
-                    return false;
-                }
             }
 
             return true;
@@ -1890,7 +1869,33 @@ jQuery(document).ready(function($) {
                 return false;
             } else return true;
         }
+
+        public function showOptionAtCheckout($gateways){
+            if(isset($gateways[$this->id])){
+                global $woocommerce;
+				$cartTotal = $woocommerce->cart->total;
+				// In Cart.
+				$settings = $this->settings;
+				$threshold = $this->cart_threshold;
+				$upperLimit = $this->max_loan_amount;
+
+				if ($threshold > $cartTotal || isset($upperLimit) && $upperLimit < $cartTotal) {
+					unset($gateways[$this->id]);
+                    return $gateways;
+				}
+				if (
+					$settings['productSelect'] !== 'all' 
+					&& 'price' === $settings['productSelect']
+					&& $cartTotal < $settings['priceSelection']
+				) {
+					unset($gateways[$this->id]);
+				}
+            }
+
+            return $gateways;
+        }
     }
+
 
     // end woocommerce_finance.
     global $woocommerce_finance;
