@@ -115,16 +115,16 @@ function woocommerce_finance_init()
             $this->buttonText = $this->settings['buttonText'] ?? '';
             if (!isset($this->settings['maxLoanAmount'])) {
                 $this->max_loan_amount = 25000; // A default value when env is spun up for the firts time
-            } elseif ($this->settings['maxLoanAmount'] === '') {
-                $this->max_loan_amount = false;
             } else {
-                $this->max_loan_amount = intval($this->settings['maxLoanAmount']);
+                $this->max_loan_amount = (empty($this->settings['maxLoanAmount']))
+                    ? false
+                    : floatval($this->settings['maxLoanAmount']);
             }
             $this->cart_threshold = isset($this->settings['cartThreshold']) ? floatval($this->settings['cartThreshold']) : 250;
             $this->auto_fulfillment = isset($this->settings['autoFulfillment']) ? $this->settings['autoFulfillment'] : "yes";
             $this->auto_refund = isset($this->settings['autoRefund']) ? $this->settings['autoRefund'] : "yes";
             $this->auto_cancel = isset($this->settings['autoCancel']) ? $this->settings['autoCancel'] : "yes";
-            $this->widget_threshold = isset($this->settings['widgetThreshold']) ? intval($this->settings['widgetThreshold']) : 250;
+            $this->widget_threshold = isset($this->settings['widgetThreshold']) ? floatval($this->settings['widgetThreshold']) : 250;
             $this->secret = $this->settings['secret'] ?? '';
             $this->product_select = $this->settings['productSelect'] ?? '';
             $this->useStoreLanguage = $this->settings['useStoreLanguage'] ?? '';
@@ -1871,8 +1871,9 @@ jQuery(document).ready(function($) {
         }
 
         public function showOptionAtCheckout($gateways){
+            global $woocommerce;
+
             if(isset($gateways[$this->id])){
-                global $woocommerce;
 				$cartTotal = $woocommerce->cart->total;
 				// In Cart.
 				$settings = $this->settings;
