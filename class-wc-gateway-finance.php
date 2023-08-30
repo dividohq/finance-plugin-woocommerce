@@ -645,29 +645,16 @@ jQuery(document).ready(function() {
          *
          * @return string|false
          */
-        public function get_checkout_plans()
+        public function convert_plans_to_comma_seperated_string(array $plans)
         {
-            $finances = $this->get_finances($this->get_finance_options());
-            if (is_array($finances)) {
-                $plans = array_keys($finances);
+            $plansArr = [];
+
+            /** @var Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
+            foreach($plans as $plan){
+                $plansArr[] = $plan->getId();
             }
 
-            return (is_array($plans)) ? implode(',', $plans) : false;
-        }
-
-        /**
-         * Get specific product plans.
-         *
-         * @since 1.0.0
-         *
-         * @param  object $product WC product instance.
-         * @return string|false
-         */
-        public function get_product_plans($product)
-        {
-            $finances = $this->get_product_finance_options($product);
-
-            return (is_array($finances)) ? implode(',', $finances) : false;
+            return implode(',', $plansArr);
         }
 
         /**
