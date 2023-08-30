@@ -609,7 +609,7 @@ jQuery(document).ready(function() {
          * @param array<ShortPlan> $plans
          * @return string
          */
-        public function convert_plans_to_comma_seperated_string(array $plans)
+        public function convert_plans_to_comma_seperated_string(array $plans) :string
         {
             $plansArr = [];
 
@@ -726,12 +726,12 @@ jQuery(document).ready(function() {
          *
          * @since 1.0.0
          *
-         * @return false
+         * @return void
          */
         public function product_write_panel_tab()
         {
             if (!$this->is_available()) {
-                return false;
+                return;
             }
             $environment = $this->get_finance_env();
             $tab_icon = 'https://s3-eu-west-1.amazonaws.com/content.divido.com/plugins/powered-by-divido/' . $environment . '/woocommerce/images/finance-icon.png';
@@ -1412,7 +1412,7 @@ jQuery(document).ready(function($) {
             try {
 
                 update_post_meta($order_id, '_finance_reference', $result_id);
-                update_post_meta($order_id, '_finance_description', $description);
+                update_post_meta($order_id, '_finance_description', $response->data->finance_plan->description ?? $_POST['divido_plan']);
                 update_post_meta($order_id, '_finance_amount', number_format($order->get_total(), 2, '.', ''));
 
                 return array(
@@ -1420,13 +1420,32 @@ jQuery(document).ready(function($) {
                     'redirect' => $result_redirect,
                 );
             } catch (Exception $e) {
-                $cancel_note = __('backend/orderpayment_rejection_error', 'woocommerce-finance-gateway') . ' (' . __('global/orderapplication_id_label', 'woocommerce-finance-gateway') . ': ' . $order_id . '). ' . __('globalorder_error_description_prefix', 'woocommerce-finance-gateway') . ': "' . $response->error . '". ';
+                $cancel_note = sprintf(
+                    "%s (%s: %s) %s: %s",
+                    __('backend/orderpayment_rejection_error', 'woocommerce-finance-gateway'),
+                    __('global/orderapplication_id_label', 'woocommerce-finance-gateway'),
+                    $order_id,
+                    __('globalorder_error_description_prefix', 'woocommerce-finance-gateway'),
+                    $response->data->error ?? $e->getMessage()
+                );
                 $order->add_order_note($cancel_note);
-                if (version_compare($this->get_woo_version(), '2.1.0') >= 0) {
-                    wc_add_notice(__('backend/orderpayment_rejection_error', 'woocommerce-finance-gateway') . ': ' . $decode->data->error . '');
-                } else {
-                    $woocommerce->add_error(__('backend/orderpayment_rejection_error', 'woocommerce-finance-gateway') . ': ' . $decode->data->error . '');
+                
+                $data = [
+                    'message' => $e->getMessage()
+                ];
+                if(isset($response->data->error)){
+                    $data['response'] = $response->data->error;
                 }
+                wc_add_notice(
+                    sprintf(
+                        "%s: %s",
+                        __('backend/orderpayment_rejection_error', 'woocommerce-finance-gateway'),
+                        $response->data->error ?? $e->getMessage()
+                    ),
+                    'error',
+                    $data
+                );
+                
             }
         }
 
@@ -1439,14 +1458,14 @@ jQuery(document).ready(function($) {
          * @param  boolean $refined filter by refined plans list (if limited in config) 
          * @return array Array of finances.
          */
-        function get_short_plans_array($onlyActive=true, $refined=true)
+        function get_short_plans_array($onlyActive=true, $refined=true) :array
         {
+            $finances = array();
             try {
                 if (!isset($this->finance_options)) {
                     $this->finance_options = $this->get_all_finances();
                 }
 
-                $finances = array();
                 foreach ($this->finance_options as $plan) {
                     $finances[$plan->id] = new Divido\Woocommerce\FinanceGateway\Models\ShortPlan(
                         $plan->id,
@@ -1456,6 +1475,7 @@ jQuery(document).ready(function($) {
                 }
             } catch (Exception $e) {
                 $this->logger->debug('Finance', sprintf("Error converting finance plans: %s", $e->getMessage()));
+                throw $e;
             }
 
             $finances = ($onlyActive) 
@@ -1635,13 +1655,10 @@ jQuery(document).ready(function($) {
                 'ref' => false,
                 'finance' => false,
             );
-            if (version_compare($this->woo_version, '3.0.0') >= 0) {
-                $ref = get_post_meta($order->get_id(), '_finance_reference', true);
-                $finance = get_post_meta($order->get_id(), '_finance', true);
-            } else {
-                $ref = get_post_meta($order->id, '_finance_reference', true);
-                $finance = get_post_meta($order->id, '_finance', true);
-            }
+
+            $ref = get_post_meta($order->get_id(), '_finance_reference', true);
+            $finance = get_post_meta($order->get_id(), '_finance', true);
+
             $result['ref'] = $ref;
             $result['finance'] = $finance;
 
