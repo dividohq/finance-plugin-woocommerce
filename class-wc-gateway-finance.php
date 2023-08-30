@@ -577,44 +577,14 @@ jQuery(document).ready(function() {
         }
 
         /**
-         * Get any finance options set for the checkout
-         *
-         * @since 1.0.0
-         *
-         * @return array|false
-         */
-        public function get_finance_options()
-        {
-            global $woocommerce;
-            if ('yes' !== $this->enabled) {
-                return false;
-            }
-            $finance_options = array();
-            if (is_checkout() || is_product()) {
-                foreach ($woocommerce->cart->get_cart() as $item) {
-                    $product = $item['data'];
-                    $finances = $this->get_product_finance_options($product);
-                    if (!$finances && !is_array($finances)) {
-                        return false;
-                    }
-                    foreach ($finances as $finance) {
-                        $finance_options[$finance] = $finance;
-                    }
-                }
-            }
-
-            return (count($finance_options) > 0) ? $finance_options : array();
-        }
-
-        /**
-         * Get Product specific finance options.
+         * Get Product specific finance options. Returns null if there are no plan rules specified for the product
          *
          * @since 1.0.0
          *
          * @param  object $product Product Instance.
-         * @return array|false
+         * @return array|null
          */
-        public function get_product_finance_options($product)
+        public function get_product_finance_plans($product) :?array
         {
             if (version_compare($this->woo_version, '3.0.0') >= 0) {
                 if ($product->get_type() === 'variation') {
@@ -625,17 +595,11 @@ jQuery(document).ready(function() {
             } else {
                 $data = maybe_unserialize(get_post_meta($product->id, 'woo_finance_product_tab', true));
             }
-            if (isset($data[0]) && is_array($data[0]) && isset($data[0]['active']) && 'selected' === $data[0]['active']) {
-                $finances = array();
-
-                return (is_array($data[0]['finances']) && count($data[0]['finances']) > 0) ? $data[0]['finances'] : array();
-            } elseif ('selection' === $this->settings['showFinanceOptions']) {
-                return $this->settings['showFinanceOptionSelection'];
-            } elseif ('all' === $this->settings['showFinanceOptions']) {
-                return false;
+            if (isset($data) && is_array($data) && isset($data['active']) && 'selected' === $data['active']) {
+                return (is_array($data['finances']) && count($data['finances']) > 0) ? $data['finances'] : array();
             }
 
-            return false;
+            return null;
         }
 
         /**
@@ -643,7 +607,8 @@ jQuery(document).ready(function() {
          *
          * @since 1.0.0
          *
-         * @return string|false
+         * @param array<ShortPlan> $plans
+         * @return string
          */
         public function convert_plans_to_comma_seperated_string(array $plans)
         {
