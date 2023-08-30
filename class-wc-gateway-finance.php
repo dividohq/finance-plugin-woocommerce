@@ -118,13 +118,29 @@ function woocommerce_finance_init()
             } else {
                 $this->max_loan_amount = (empty($this->settings['maxLoanAmount']))
                     ? false
-                    : floatval($this->settings['maxLoanAmount']);
+                    : (float) filter_var(
+                        $this->settings['maxLoanAmount'], 
+                        FILTER_SANITIZE_NUMBER_FLOAT, 
+                        FILTER_FLAG_ALLOW_FRACTION
+                    );
             }
-            $this->cart_threshold = isset($this->settings['cartThreshold']) ? floatval($this->settings['cartThreshold']) : 250;
+            $this->cart_threshold = isset($this->settings['cartThreshold']) 
+                ? (float) filter_var(
+                        $this->settings['cartThreshold'], 
+                        FILTER_SANITIZE_NUMBER_FLOAT, 
+                        FILTER_FLAG_ALLOW_FRACTION
+                    )
+                : 250;
             $this->auto_fulfillment = isset($this->settings['autoFulfillment']) ? $this->settings['autoFulfillment'] : "yes";
             $this->auto_refund = isset($this->settings['autoRefund']) ? $this->settings['autoRefund'] : "yes";
             $this->auto_cancel = isset($this->settings['autoCancel']) ? $this->settings['autoCancel'] : "yes";
-            $this->widget_threshold = isset($this->settings['widgetThreshold']) ? floatval($this->settings['widgetThreshold']) : 250;
+            $this->widget_threshold = isset($this->settings['widgetThreshold']) 
+                ? (float) filter_var(
+                        $this->settings['widgetThreshold'],
+                        FILTER_SANITIZE_NUMBER_FLOAT, 
+                        FILTER_FLAG_ALLOW_FRACTION
+                    )
+                : 250;
             $this->secret = $this->settings['secret'] ?? '';
             $this->product_select = $this->settings['productSelect'] ?? '';
             $this->useStoreLanguage = $this->settings['useStoreLanguage'] ?? '';
@@ -140,11 +156,7 @@ function woocommerce_finance_init()
             add_filter('woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2);
 
             // Load logger.
-            if (version_compare(WC_VERSION, '2.7', '<')) {
-                $this->logger = new WC_Logger();
-            } else {
-                $this->logger = wc_get_logger();
-            }
+            $this->logger = wc_get_logger();
 
             if (is_admin()) {
                 // Load the form fields.
@@ -157,11 +169,9 @@ function woocommerce_finance_init()
                 add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options')); // Version 2.0 Hook.
                 // product settings.
                 add_action('woocommerce_product_write_panel_tabs', array($this, 'product_write_panel_tab'));
-                if (version_compare(WC_VERSION, '2.7', '<')) {
-                    add_action('woocommerce_product_write_panels', array($this, 'product_write_panel'));
-                } else {
-                    add_action('woocommerce_product_data_panels', array($this, 'product_write_panel'));
-                }
+                
+                add_action('woocommerce_product_data_panels', array($this, 'product_write_panel'));
+                
                 add_action('woocommerce_process_product_meta', array($this, 'product_save_data'), 10, 2);
                 // product page.
 
@@ -335,7 +345,7 @@ function woocommerce_finance_init()
          */
         function enqueue()
         {
-            if ($this->api_key && is_product() || $this->api_key && is_checkout()) {
+            if ($this->api_key && (is_product() || is_checkout())) {
                 $key = preg_split('/\./', $this->api_key);
                 $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
                 $finance = $this->get_finance_env();
@@ -520,43 +530,33 @@ jQuery(document).ready(function() {
         }
 
         /**
-         * Provides a way to support both 2.6 and 2.7 since get_price_including_tax
-         * gets deprecated in 2.7, and wc_get_price_including_tax gets introduced in
-         * 2.7.
-         *
          * Returns a float representing the price of this product in pence/pennies
          *
          * @since  1.0.0
          * @param  WC_Product $product Product instance.
-         * @param  array $args Args array.
          * @return float
          */
-        private function get_price_including_tax($product, $args)
+        private function get_product_price_inc_tax($product):float
         {
-            if (version_compare(WC_VERSION, '2.7', '<')) {
-                $args = wp_parse_args(
-                    $args,
-                    array(
-                        'qty' => '1',
-                        'price' => '',
-                    )
-                );
-
-                $priceIncludingTax = $product->get_price_including_tax($args['qty'], $args['price']);
-            } else {
-                $priceIncludingTax = wc_get_price_including_tax($product, $args);
-            }
-
+            
+            $priceIncludingTax = wc_get_price_including_tax($product);
+            
             // $priceIncludingTax could be a float or string
             // Before we do math on this we need to convert the value to a float
             if (!is_float($priceIncludingTax)) {
-                $priceIncludingTax = floatval($priceIncludingTax);
+                $priceIncludingTax = (float) filter_var(
+                    $priceIncludingTax,
+                    FILTER_SANITIZE_NUMBER_FLOAT, 
+                    FILTER_FLAG_ALLOW_FRACTION
+                );
             }
 
-            // Multiply by 100 to get the pence/cents value
-            $priceIncludingTax = $priceIncludingTax * 100;
-
             return $priceIncludingTax;
+        }
+
+        private function toPence($amount):int{
+            $amount = filter_var($amount, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+            return (int) ($amount*100);
         }
 
         /**
@@ -586,15 +586,13 @@ jQuery(document).ready(function() {
          */
         public function get_product_finance_plans($product) :?array
         {
-            if (version_compare($this->woo_version, '3.0.0') >= 0) {
-                if ($product->get_type() === 'variation') {
-                    $data = maybe_unserialize(get_post_meta($product->get_parent_id(), 'woo_finance_product_tab', true));
-                } else {
-                    $data = maybe_unserialize(get_post_meta($product->get_id(), 'woo_finance_product_tab', true));
-                }
+
+            if ($product->get_type() === 'variation') {
+                $data = maybe_unserialize(get_post_meta($product->get_parent_id(), 'woo_finance_product_tab', true));
             } else {
-                $data = maybe_unserialize(get_post_meta($product->id, 'woo_finance_product_tab', true));
+                $data = maybe_unserialize(get_post_meta($product->get_id(), 'woo_finance_product_tab', true));
             }
+            
             if (isset($data) && is_array($data) && isset($data['active']) && 'selected' === $data['active']) {
                 return (is_array($data['finances']) && count($data['finances']) > 0) ? $data['finances'] : array();
             }
@@ -650,7 +648,7 @@ jQuery(document).ready(function() {
             }
             $plansStr = $this->convert_plans_to_comma_seperated_string($plans);
             
-            $price = $this->get_price_including_tax($product, []);
+            $price = $this->toPence($product->get_price());
 
             $language = ($this->useStoreLanguage === "yes") 
                 ? sprintf("data-language='%s'", $this->get_language())
@@ -694,7 +692,7 @@ jQuery(document).ready(function() {
             }
             $plansStr = $this->convert_plans_to_comma_seperated_string($plans);
 
-            $price = $this->get_price_including_tax($product, []);
+            $price = $this->toPence($product->get_price());
 
             $shortApiKey = explode('.',$this->api_key)[0];
             
@@ -1224,7 +1222,7 @@ jQuery(document).ready(function($) {
                 return;
             }
 
-            $amount = WC()->cart->total * 100;
+            $amount = $this->toPence(WC()->cart->total);
 
             $plans = $this->get_short_plans_array();
             if (isset($this->settings['productSelect']) && $this->settings['productSelect'] === 'selected'){
@@ -1279,15 +1277,12 @@ jQuery(document).ready(function($) {
             $products = array();
             $order_total = 0;
             foreach ($woocommerce->cart->get_cart() as $item) {
-                if (version_compare($this->get_woo_version(), '3.0.0') >= 0) {
-                    $_product = wc_get_product($item['data']->get_id());
-                    $name = $_product->get_title();
-                } else {
-                    $_product = $item['data']->post;
-                    $name = $_product->post_title;
-                }
+                
+                $_product = wc_get_product($item['data']->get_id());
+                $name = $_product->get_title();
+                
                 $quantity = $item['quantity'];
-                $price = $item['line_subtotal'] / $quantity * 100;
+                $price = $this->toPence($item['line_subtotal'] / $quantity);
                 $order_total += $item['line_subtotal'];
                 $products[] = array(
                     'name' => $name,
@@ -1303,7 +1298,7 @@ jQuery(document).ready(function($) {
                 $products[] = array(
                     'name' =>  __('global/ordershipping_label', 'woocommerce-finance-gateway'),
                     'quantity' => 1,
-                    'price' => round($shipping * 100),
+                    'price' => $this->toPence($shipping),
                     'sku' => 'SHPNG'
                 );
                 // Add shipping to order total.
@@ -1313,7 +1308,7 @@ jQuery(document).ready(function($) {
                 $products[] = array(
                     'name' =>  __('global/ordertaxes_label', 'woocommerce-finance-gateway'),
                     'quantity' => 1,
-                    'price' => round($tax * 100),
+                    'price' => $this->toPence($tax),
                     'sku' => 'TAX'
                 );
                 // Add tax to ordertotal.
@@ -1323,14 +1318,14 @@ jQuery(document).ready(function($) {
                 $products[] = array(
                     'name' =>  __('global/orderfees_label', 'woocommerce-finance-gateway'),
                     'quantity' => 1,
-                    'price' => round($fee->amount * 100),
+                    'price' => $this->toPence($fee->amount),
                     'sku' => 'FEES'
                 );
                 if ($fee->taxable) {
                     $products[] = array(
                         'name' =>  __('global/orderfee_tax_label', 'woocommerce-finance-gateway'),
                         'quantity' => 1,
-                        'price' => round($fee->tax * 100),
+                        'price' => $this->toPence($fee->tax),
                         'sku' => 'FEE_TAX'
                     );
                     $order_total += $fee->tax;
@@ -1343,13 +1338,13 @@ jQuery(document).ready(function($) {
                 $products[] = array(
                     'name' =>  __('global/orderdiscount_label', 'woocommerce-finance-gateway'),
                     'quantity' => 1,
-                    'price' => round(-$woocommerce->cart->get_cart_discount_total() * 100),
+                    'price' => $this->toPence(-$woocommerce->cart->get_cart_discount_total()),
                     'sku' => 'DSCNT'
                 );
                 // Deduct total discount.
                 $order_total -= $woocommerce->cart->get_cart_discount_total();
             }
-            $other = (int) ($order->get_total() - $order_total)*100;
+            $other = $this->toPence($order->get_total() - $order_total);
             if ($other !== 0) {
                 $products[] = array(
                     'name' =>  __('global/orderother_label', 'woocommerce-finance-gateway'),
@@ -1721,7 +1716,7 @@ jQuery(document).ready(function($) {
                 [
                     'name' => __('globalorder_id_label', 'woocommerce-finance-gateway') . ": $order_id",
                     'quantity' => 1,
-                    'price' => round($order_total * 100),
+                    'price' => $this->toPence($order_total),
                 ],
             ];
 
@@ -1739,7 +1734,7 @@ jQuery(document).ready(function($) {
                 [
                     'name' => __('globalorder_id_label', 'woocommerce-finance-gateway') . ": $order_id",
                     'quantity' => 1,
-                    'price' => round($order_total * 100),
+                    'price' => $this->toPence($order_total),
                 ],
             ];
 
@@ -1757,7 +1752,7 @@ jQuery(document).ready(function($) {
                 [
                     'name' => __('globalorder_id_label', 'woocommerce-finance-gateway') . ": $order_id",
                     'quantity' => 1,
-                    'price' => round($order_total * 100),
+                    'price' => $this->toPence($order_total),
                 ],
             ];
             // Create a new application activation model.
@@ -1818,15 +1813,24 @@ jQuery(document).ready(function($) {
         }
 
         private function doesProductMeetPriceThreshold(WC_Product $product):bool{
-            $priceThreshold = floatval($this->settings['priceSelection'] ?? 0);
-            if($product->get_price() < $priceThreshold){
+            $priceThreshold = (float) filter_var(
+                $this->settings['priceSelection'] ?? 0, 
+                FILTER_SANITIZE_NUMBER_FLOAT, 
+                FILTER_FLAG_ALLOW_FRACTION
+            );
+            if($this->get_product_price_inc_tax($product) < $priceThreshold){
                 return false;
             }
             return true;
         }
 
         private function doesProductMeetWidgetThreshold(WC_Product $product):bool {
-            if($product->get_price() < $this->widget_threshold){ 
+            $widgetThreshold = (float) filter_var(
+                $this->widget_threshold ?? 0, 
+                FILTER_SANITIZE_NUMBER_FLOAT, 
+                FILTER_FLAG_ALLOW_FRACTION
+            );
+            if($this->get_product_price_inc_tax($product) < $widgetThreshold){ 
                 return false;
             }
             return true;
