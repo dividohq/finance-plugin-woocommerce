@@ -881,7 +881,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
             );
 
             if (isset($this->api_key) && $this->api_key) {
-                $plans = $this->get_short_plans_array();
+                $plans = $this->get_short_plans_array(true, false);
 
                 try {
                     $options = array();
