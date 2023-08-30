@@ -623,24 +623,45 @@ jQuery(document).ready(function() {
         }
 
         /**
-         * Product calculator helper.
+         * Display Inline Product calculator widget
          *
-         * @param  object $product The current product.
          * @return void
          */
-        public function product_calculator($product)
+        public function product_calculator()
         {
             global $product;
-            if ($this->is_available($product)) {
-                $environment = $this->get_finance_env();
-                $plans = $this->get_product_plans($product);
-                $price = $this->get_price_including_tax($product, '');
-                $language = '';
-                if ($this->useStoreLanguage === "yes") {
-                    $language = 'data-language="' . $this->get_language() . '" ';
-                }
-                include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/calculator.php';
+            if (
+                $this->is_available() === false 
+                || $this->doesProductMeetWidgetThreshold($product) === false
+            ) {
+                return;
             }
+
+
+            $plans = $this->get_short_plans_array();
+            if (
+                isset($this->settings['productSelect'])
+                && $this->settings['productSelect'] === 'selected'
+            ) {
+                $plans = $this->filterPlansByProduct($product, $plans);
+            }
+            if(count($plans) === 0){
+                return;
+            }
+            $plansStr = $this->convert_plans_to_comma_seperated_string($plans);
+            
+            $price = $this->get_price_including_tax($product, []);
+
+            $language = ($this->useStoreLanguage === "yes") 
+                ? sprintf("data-language='%s'", $this->get_language())
+                : '';
+            
+            include_once sprintf(
+                '%s/%s/includes/calculator.php',
+                WP_PLUGIN_DIR, 
+                plugin_basename(dirname(__FILE__))
+            );
+            
         }
 
         /**
@@ -648,40 +669,56 @@ jQuery(document).ready(function() {
          *
          * @since 1.0.0
          *
-         * @param  object $product The current product.
          * @return void
          */
-        public function product_widget($product)
+        public function product_widget()
         {
             global $product;
-            if ($this->api_key) {
-                $price = $this->get_price_including_tax($product, '');
-                $plans = $this->get_product_plans($product);
-                $environment = $this->get_finance_env();
-                $shortApiKey = explode('.',$this->api_key)[0];
-                if ($this->is_available($product) && $price > (((int)$this->widget_threshold ?? 0) * 100)) {
-                    $button_text = '';
-                    if (!empty(sanitize_text_field($this->buttonText))) {
-                        $button_text = sanitize_text_field($this->buttonText);
-                    }
 
-                    $footnote = '';
-                    if (!empty(sanitize_text_field($this->footnote))) {
-                        $footnote = 'data-footnote="' . sanitize_text_field($this->footnote) . '" ';
-                    }
-
-                    $plans = $this->get_product_plans($product);
-
-                    $language = '';
-                    if ($this->useStoreLanguage === "yes") {
-                        $language = 'data-language="' . $this->get_language() . '" ';
-                    }
-
-                    $calcConfApiUrl = $this->calculator_config_api_url;
-
-                    include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/widget.php';
-                }
+            if (
+                $this->is_available() === false 
+                || $this->doesProductMeetWidgetThreshold($product)===false
+            ) {
+                return;
             }
+
+            $plans = $this->get_short_plans_array();
+            if (
+                isset($this->settings['productSelect'])
+                && $this->settings['productSelect'] === 'selected'
+            ) {
+                $plans = $this->filterPlansByProduct($product, $plans);
+            }
+            if(count($plans) === 0){
+                return;
+            }
+            $plansStr = $this->convert_plans_to_comma_seperated_string($plans);
+
+            $price = $this->get_price_including_tax($product, []);
+
+            $shortApiKey = explode('.',$this->api_key)[0];
+            
+            $button_text = '';
+            if (!empty(sanitize_text_field($this->buttonText))) {
+                $button_text = sanitize_text_field($this->buttonText);
+            }
+
+            $footnote = (!empty(sanitize_text_field($this->footnote)))
+                ? sprintf("data-footnote='%s'", sanitize_text_field($this->footnote))
+                : '';
+
+            $language = ($this->useStoreLanguage === "yes")
+                ? sprintf("data-language='%s'", $this->get_language())
+                : '';
+
+            $calcConfApiUrl = $this->calculator_config_api_url;
+
+            include_once sprintf(
+                '%s/%s/includes/widget.php',
+                WP_PLUGIN_DIR, 
+                plugin_basename(dirname(__FILE__))
+            );
+            
         }
 
         /**
