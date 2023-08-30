@@ -1798,7 +1798,9 @@ jQuery(document).ready(function($) {
         }
 
         /**
-         * Filters out an array of Product objects
+         * Filters out an array of Product objects based on the product price threshold set by the
+         * merchant in the config, or false otherwise
+         * (generally used at checkout to ascertain if the cart is viable for finance)
          *
          * @param array<WC_Product> $products
          * @return void
@@ -1812,6 +1814,15 @@ jQuery(document).ready(function($) {
             return true;
         }
 
+        /**
+         * Returns true if the product meets the product price threshold set by the merchant in the config
+         * or false otherwise
+         * (used at checkout if the merchant only wants all products to be over
+         * a certain price) 
+         *
+         * @param WC_Product $product
+         * @return boolean
+         */
         private function doesProductMeetPriceThreshold(WC_Product $product):bool{
             $priceThreshold = (float) filter_var(
                 $this->settings['priceSelection'] ?? 0, 
@@ -1824,6 +1835,13 @@ jQuery(document).ready(function($) {
             return true;
         }
 
+        /**
+         * Returns true if the product price meets the widget threshold set by the merchant in the config
+         * or false otherwise
+         *
+         * @param WC_Product $product
+         * @return boolean
+         */
         private function doesProductMeetWidgetThreshold(WC_Product $product):bool {
             $widgetThreshold = (float) filter_var(
                 $this->widget_threshold ?? 0, 
