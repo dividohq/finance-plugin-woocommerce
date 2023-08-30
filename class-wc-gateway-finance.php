@@ -152,49 +152,53 @@ function woocommerce_finance_init()
             }
             $this->woo_version = $this->get_woo_version();
 
-            add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options')); // Version 2.0 Hook.
-            // product settings.
-            add_action('woocommerce_product_write_panel_tabs', array($this, 'product_write_panel_tab'));
-            if (version_compare(WC_VERSION, '2.7', '<')) {
-                add_action('woocommerce_product_write_panels', array($this, 'product_write_panel'));
-            } else {
-                add_action('woocommerce_product_data_panels', array($this, 'product_write_panel'));
-            }
-            add_action('woocommerce_process_product_meta', array($this, 'product_save_data'), 10, 2);
-            // product page.
-
-            if ('disabled' !== $this->show_widget) {
-                if ('disabled' !== $this->calculator_theme) {
-                    add_action('woocommerce_after_single_product_summary', array($this, 'product_calculator'));
-                } else {
-                    add_action('woocommerce_single_product_summary', array($this, 'product_widget'), 15);
-                }
-            }
-            // order admin page (making sure it only adds once).
             global $finances_set_admin_order_display;
             if (!isset($finances_set_admin_order_display)) {
+                add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options')); // Version 2.0 Hook.
+                // product settings.
+                add_action('woocommerce_product_write_panel_tabs', array($this, 'product_write_panel_tab'));
+                if (version_compare(WC_VERSION, '2.7', '<')) {
+                    add_action('woocommerce_product_write_panels', array($this, 'product_write_panel'));
+                } else {
+                    add_action('woocommerce_product_data_panels', array($this, 'product_write_panel'));
+                }
+                add_action('woocommerce_process_product_meta', array($this, 'product_save_data'), 10, 2);
+                // product page.
+
+                if ('disabled' !== $this->show_widget) {
+                    
+                    if ('disabled' !== $this->calculator_theme) {
+                        add_action('woocommerce_after_single_product_summary', array($this, 'product_calculator'));
+                    } else {
+                        add_action('woocommerce_single_product_summary', array($this, 'product_widget'), 15);
+                    }
+                }
+                // order admin page (making sure it only adds once).
+            
                 add_action('woocommerce_admin_order_data_after_order_details', array($this, 'display_order_data_in_admin'));
+            
+                // checkout.
+                add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
+                // ajax callback.
+                add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
+                add_action('wp_ajax_woocommerce_finance_callback', array($this, 'callback'));
+                add_action('wp_head', array($this, 'add_api_to_head'));
+                add_action('woocommerce_order_status_completed', array($this, 'send_finance_fulfillment_request'), 10, 1);
+                add_action('woocommerce_order_status_refunded', array($this, 'send_refund_request'), 10, 1);
+                add_action('woocommerce_order_status_cancelled', array($this, 'send_cancellation_request'), 10, 1);
+
+                // scripts.
+                add_action('wp_enqueue_scripts', array($this, 'enqueue'));
+                add_action('admin_enqueue_scripts', array($this, 'wpdocs_enqueue_custom_admin_style'));
+                //Since 1.0.2
+                add_shortcode('finance_widget', array($this, 'anypage_widget'));
+                //Since 1.0.3
+                add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'finance_gateway_settings_link'));
+
+                add_filter('woocommerce_available_payment_gateways', array($this, 'showOptionAtCheckout'));
+
                 $finances_set_admin_order_display = true;
             }
-            // checkout.
-            add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
-            // ajax callback.
-            add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
-            add_action('wp_ajax_woocommerce_finance_callback', array($this, 'callback'));
-            add_action('wp_head', array($this, 'add_api_to_head'));
-            add_action('woocommerce_order_status_completed', array($this, 'send_finance_fulfillment_request'), 10, 1);
-            add_action('woocommerce_order_status_refunded', array($this, 'send_refund_request'), 10, 1);
-            add_action('woocommerce_order_status_cancelled', array($this, 'send_cancellation_request'), 10, 1);
-
-            // scripts.
-            add_action('wp_enqueue_scripts', array($this, 'enqueue'));
-            add_action('admin_enqueue_scripts', array($this, 'wpdocs_enqueue_custom_admin_style'));
-            //Since 1.0.2
-            add_shortcode('finance_widget', array($this, 'anypage_widget'));
-            //Since 1.0.3
-            add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'finance_gateway_settings_link'));
-
-            add_filter('woocommerce_available_payment_gateways', array($this, 'showOptionAtCheckout'));
         }
 
         /**
