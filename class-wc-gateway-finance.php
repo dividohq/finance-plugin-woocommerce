@@ -1464,35 +1464,28 @@ jQuery(document).ready(function($) {
          *
          * @since 1.0.0
          *
-         * @param  boolean $selection true or false depending on checkout or widget use.
+         * @param  boolean $onlyActive filter out inactive plans if true
          * @return array Array of finances.
          */
-        function get_finances($selection = false)
+        function get_short_plans_array($onlyActive=false)
         {
-            if (!isset($this->finance_options)) {
-                $this->finance_options = $this->get_all_finances();
-            }
-            $response = $this->finance_options; // array.
-            $finances = array();
-
             try {
-                foreach ($response as $_finance) {
-                    if ($_finance->active) {
-                        if ((!$selection && !is_array($selection)) || in_array($_finance->id, $selection, true)) {
-                            $finances[$_finance->id] = $_finance->description;
-                            $finances[$_finance->id] = array(
-                                'description' => $_finance->description,
-                                'min_deposit' => $_finance->deposit->minimum_percentage,
-                                'max_deposit' => $_finance->deposit->maximum_percentage,
-                            );
-                        }
-                    }
+                if (!isset($this->finance_options)) {
+                    $this->finance_options = $this->get_all_finances();
+                }
+
+                $finances = array();
+                foreach ($this->finance_options as $plan) {
+                    $finances[$plan->id] = new Divido\Woocommerce\FinanceGateway\Models\ShortPlan(
+                        $plan->id,
+                        $plan->description,
+                        $plan->active
+                    );
                 }
             } catch (Exception $e) {
-                return [];
-            } finally {
-                return $finances;
+                $this->logger->debug('Finance', sprintf("Error converting finance plans: %s", $e->getMessage()));
             }
+            return ($onlyActive) ? $this->filterPlansByActive($finances) : $finances;
         }
 
         /**
@@ -1833,6 +1826,83 @@ jQuery(document).ready(function($) {
             if(empty($this->calculator_config_api_url)){
                 return false;
             } else return true;
+        }
+
+        /**
+         * Filters out an array of Product objects
+         *
+         * @param array<WC_Product> $products
+         * @return void
+         */
+        private function doProductsMeetProductPriceThreshold(array $products){
+            foreach($products as $item){
+                if($this->doesProductMeetPriceThreshold($item) === false){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private function doesProductMeetPriceThreshold(WC_Product $product):bool{
+            $priceThreshold = floatval($this->settings['priceSelection'] ?? 0);
+            if($product->get_price() < $priceThreshold){
+                return false;
+            }
+            return true;
+        }
+
+        private function doesProductMeetWidgetThreshold(WC_Product $product):bool {
+            if($product->get_price() < $this->widget_threshold){ 
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Filters the plans available based on the plans available for the cart items
+         *
+         * @param array<ShortPlan> $plans
+         * @param array<WC_Product> $products
+         * @return array<ShortPlan>
+         */
+        private function filterPlansByProducts(array $plans, array $products):array{
+            foreach($products as $product){
+                $plans = $this->filterPlansByProduct($product, $plans);
+                if(count($plans) === 0){
+                    return $plans;
+                }
+            }
+            return $plans;
+        }
+
+        /**
+         * Removes plans from an array which are not configured for the product
+         *
+         * @param WC_Product $product
+         * @param array<ShortPlan> $plans
+         * @return array<ShortPlan>
+         */
+        private function filterPlansByProduct(WC_Product $product, array $plans):array{
+            $productPlans = $this->get_product_finance_plans($product);
+            if($productPlans === null){
+                return $plans;
+            }
+            foreach($plans as $key=>$plan){
+                if(!in_array($plan->getId(), $productPlans)){
+                    unset($plans[$key]);
+                }
+            }
+            return $plans;
+        }
+
+        private function filterPlansByActive(array $plans):array{
+            /** @var \Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
+            foreach($plans as $key=>$plan){
+                if($plan->isActive() === false){
+                    unset($plans[$key]);
+                }
+            }
+            return $plans;
         }
 
         public function showOptionAtCheckout($gateways){
