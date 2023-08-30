@@ -1898,25 +1898,37 @@ jQuery(document).ready(function($) {
 
         public function showOptionAtCheckout($gateways){
             global $woocommerce;
+            if(!empty($woocommerce->cart)){
+                if(isset($gateways[$this->id])){
+                    $cartTotal = $woocommerce->cart->total;
+                    // In Cart.
+                    $settings = $this->settings;
+                    $threshold = $this->cart_threshold;
+                    $upperLimit = $this->max_loan_amount;
 
-            if(isset($gateways[$this->id])){
-				$cartTotal = $woocommerce->cart->total;
-				// In Cart.
-				$settings = $this->settings;
-				$threshold = $this->cart_threshold;
-				$upperLimit = $this->max_loan_amount;
+                    if ($threshold > $cartTotal || isset($upperLimit) && $upperLimit < $cartTotal) {
+                        unset($gateways[$this->id]);
+                        return $gateways;
+                    }
+                    
+                    $cartItems = array_map(function($item){
+                        return $item['data'];
+                    }, $woocommerce->cart->get_cart_contents());
 
-				if ($threshold > $cartTotal || isset($upperLimit) && $upperLimit < $cartTotal) {
-					unset($gateways[$this->id]);
-                    return $gateways;
-				}
-				if (
-					$settings['productSelect'] !== 'all' 
-					&& 'price' === $settings['productSelect']
-					&& $cartTotal < $settings['priceSelection']
-				) {
-					unset($gateways[$this->id]);
-				}
+                    if (
+                        isset($settings['productSelect'])
+                        && $settings['productSelect'] === 'price'
+                        && $this->doProductsMeetProductPriceThreshold($cartItems) === false
+                    ){
+                        unset($gateways[$this->id]);
+                    } elseif (
+                        isset($settings['productSelect'])
+                        && $settings['productSelect'] === 'selected'
+                        && empty($this->filterPlansByProducts($this->get_short_plans_array(), $cartItems))
+                    ){
+                        unset($gateways[$this->id]);
+                    }
+                }
             }
 
             return $gateways;
