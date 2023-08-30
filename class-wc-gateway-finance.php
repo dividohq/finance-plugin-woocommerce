@@ -1219,31 +1219,43 @@ jQuery(document).ready(function($) {
         function payment_fields()
         {
 
-            $finances = $this->get_finances($this->get_finance_options());
-            if ($finances) {
-                $user_country = $this->get_country_code();
-                if (empty($user_country)) :
-                    esc_html_e('frontend/checkoutchoose_country_msg', 'woocommerce-finance-gateway');
-
-                    return;
-                endif;
-                if (!in_array($user_country, $this->avaiable_countries, true)) :
-                    esc_html_e('frontend/checkout/errorinvalid_country_error', 'woocommerce-finance-gateway');
-
-                    return;
-                endif;
-                $amount = WC()->cart->total * 100;
-                $environment = $this->get_finance_env();
-                $plans = $this->get_checkout_plans();
-                $footnote = $this->footnote;
-                $language = '';
-                if ($this->useStoreLanguage === "yes") {
-                    $language = 'data-language="' . $this->get_language() . '" ';
-                }
-                $shortApiKey = explode('.',$this->api_key)[0];
-                $calcConfApiUrl = $this->calculator_config_api_url;
-                include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/includes/checkout.php';
+            $user_country = $this->get_country_code();
+            if (empty($user_country)) {
+                esc_html_e('frontend/checkoutchoose_country_msg', 'woocommerce-finance-gateway');
+                return;
             }
+
+            if (!in_array($user_country, $this->avaiable_countries, true)) {
+                esc_html_e('frontend/checkout/errorinvalid_country_error', 'woocommerce-finance-gateway');
+                return;
+            }
+
+            $amount = WC()->cart->total * 100;
+
+            $plans = $this->get_short_plans_array();
+            if (isset($this->settings['productSelect']) && $this->settings['productSelect'] === 'selected'){
+                global $woocommerce;
+                $cartItems = array_map(function($item){
+                    return $item['data'];
+                }, $woocommerce->cart->get_cart_contents());
+                $plans = $this->filterPlansByProducts($plans, $cartItems);
+            }
+            $plansStr = $this->convert_plans_to_comma_seperated_string($plans);
+
+            $footnote = $this->footnote;
+
+            $language = ($this->useStoreLanguage === "yes")
+                ? sprintf("data-language='%s'",$this->get_language())
+                : '';
+            
+            $shortApiKey = explode('.',$this->api_key)[0];
+            $calcConfApiUrl = $this->calculator_config_api_url;
+            include_once sprintf(
+                '%s/%s/includes/checkout.php',
+                WP_PLUGIN_DIR,
+                plugin_basename(dirname(__FILE__))
+            );
+            
         }
 
         /**
