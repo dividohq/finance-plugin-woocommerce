@@ -1873,6 +1873,12 @@ jQuery(document).ready(function($) {
             return $plans;
         }
 
+        /**
+         * Removes any plans from an array of ShortPlans, where the plan is inactive
+         *
+         * @param array $plans
+         * @return array
+         */
         private function filterPlansByActive(array $plans):array{
             /** @var \Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
             foreach($plans as $key=>$plan){
@@ -1883,7 +1889,13 @@ jQuery(document).ready(function($) {
             return $plans;
         }
 
-        public function showOptionAtCheckout($gateways){
+        /**
+         * Filters out our payment method at checkout if it doesn't fit the config criteria
+         *
+         * @param array $gateways
+         * @return array
+         */
+        public function showOptionAtCheckout(array $gateways):array{
             global $woocommerce;
             if(!empty($woocommerce->cart)){
                 if(isset($gateways[$this->id])){
