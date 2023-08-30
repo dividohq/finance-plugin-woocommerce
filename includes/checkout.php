@@ -5,7 +5,7 @@
 <div id="financeWidget"
     data-calculator-widget
     data-mode="calculator"
-    data-plans="<?= $plans; ?>"
+    data-plans="<?= $plansStr; ?>"
     data-amount="<?= $amount; ?>"
     data-footnote="<?= $footnote; ?>"
     <?= $language; ?>

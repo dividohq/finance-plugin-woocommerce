@@ -287,7 +287,7 @@ function woocommerce_finance_init()
         }
 
         /**
-         * Get  Finances Wrapper
+         * Get the response from the GET /finance-plans API call, either from the cache or API
          *
          * Calls Finance endpoint to return all finances for merchant
          *
@@ -882,19 +882,13 @@ jQuery("input[name=_tab_finance_active]").change(function() {
             );
 
             if (isset($this->api_key) && $this->api_key) {
-                $response = $this->get_all_finances();
-                // $settings = $this->get_finance_env();
-                $finance = [];
-                foreach ($response as $finances) {
-                    if ($finances->active) {
-                        $finance[$finances->id] = $finances->description;
-                    }
-                }
-                $options = array();
+                $plans = $this->get_short_plans_array();
 
                 try {
-                    foreach ($finance as $key => $descriptions) {
-                        $options[$key] = $descriptions;
+                    $options = array();
+                    /** @var \Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
+                    foreach ($plans as $plan) {
+                        $options[$plan->getId()] = $plan->getName();
                     }
                     $this->form_fields = array_merge(
                         $this->form_fields,
@@ -1156,8 +1150,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
 
                 if (isset($this->api_key) && $this->api_key) {
                     $response = $this->get_all_finances();
-                    $options = array();
-                    if ([] === $response) {
+                    if (empty($response)) {
                     ?>
     <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
         <b><?php esc_html_e('backend/errorinvalid_api_key_error', 'woocommerce-finance-gateway'); ?></b>

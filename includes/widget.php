@@ -3,7 +3,7 @@
 <div
     data-calculator-widget
     data-mode="lightbox"
-    data-plans="<?= $plans;?>"
+    data-plans="<?= $plansStr;?>"
     data-amount="<?= $price; ?>"
     <?= $language; ?>
     <?php if(!empty($button_text)) echo("data-button-text=\"{$button_text}\""); ?>

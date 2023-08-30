@@ -2,7 +2,7 @@
 <div id="financeCalculator"
     data-calculator-widget
     data-mode="calculator"
-    data-plans="<?php print $plans;?>"
+    data-plans="<?= $plansStr; ?>"
     data-amount="<?php print $price; ?>"
     <?php print $language; ?>
  >
