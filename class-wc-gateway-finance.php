@@ -681,6 +681,7 @@ jQuery(document).ready(function() {
             }
 
             $plans = $this->get_short_plans_array();
+            //var_dump($plans);
             if (
                 isset($this->settings['productSelect'])
                 && $this->settings['productSelect'] === 'selected'
@@ -1434,9 +1435,10 @@ jQuery(document).ready(function($) {
          * @since 1.0.0
          *
          * @param  boolean $onlyActive filter out inactive plans if true
+         * @param  boolean $refined filter by refined plans list (if limited in config) 
          * @return array Array of finances.
          */
-        function get_short_plans_array($onlyActive=false)
+        function get_short_plans_array($onlyActive=true, $refined=true)
         {
             try {
                 if (!isset($this->finance_options)) {
@@ -1454,7 +1456,19 @@ jQuery(document).ready(function($) {
             } catch (Exception $e) {
                 $this->logger->debug('Finance', sprintf("Error converting finance plans: %s", $e->getMessage()));
             }
-            return ($onlyActive) ? $this->filterPlansByActive($finances) : $finances;
+
+            $finances = ($onlyActive) 
+                ? $this->filterPlansByActive($finances) 
+                : $finances;
+
+            $finances = ($refined 
+                && isset($this->settings['showFinanceOptions']) 
+                && $this->settings['showFinanceOptions'] === 'selection'
+            )
+                ? $this->filterPlansByRefineList($finances) 
+                : $finances;
+            
+            return $finances;
         }
 
         /**
@@ -1904,6 +1918,28 @@ jQuery(document).ready(function($) {
                     unset($plans[$key]);
                 }
             }
+            return $plans;
+        }
+
+        /**
+         * Filters plans by the refined List in the merchant plugin config
+         *
+         * @param array $plans
+         * @return array
+         */
+        private function filterPlansByRefineList(array $plans): array{
+            $refinedPlans = $this->settings['showFinanceOptionSelection'] ?? [];
+            
+            if(empty($refinedPlans)){
+                return $plans;
+            }
+
+            foreach($plans as $key=>$plan){
+                if(!in_array($plan->getId(), $refinedPlans)){
+                    unset($plans[$key]);
+                }
+            }
+            
             return $plans;
         }
 
