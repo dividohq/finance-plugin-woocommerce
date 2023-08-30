@@ -1281,163 +1281,154 @@ jQuery(document).ready(function($) {
         function process_payment($order_id)
         {
             global $woocommerce;
+            
             $order = new WC_Order($order_id);
             if (
-                !isset($_POST['submit-payment-form-nonce'])
-                || !wp_verify_nonce($_POST['submit-payment-form-nonce'], 'submit-payment-form')
+                !isset($_POST['divido_plan'], $_POST['divido_deposit'], $_POST['submit-payment-form-nonce'])
             ) {
-                return;
+                throw new \Exception("Missing important payload data");
             }
-
-            $finances = $this->get_finances($this->get_finance_options());
-            foreach ($finances as $_finance => $value) {
-                if (isset($_POST['divido_plan']) && $_finance === $_POST['divido_plan']) { // Input var okay.
-                    $finance = $_finance;
-                    $description = $value['description'];
-                    $min_deposit = $value['min_deposit'];
-                    $max_deposit = $value['max_deposit'];
-                }
+            
+            if(!wp_verify_nonce($_POST['submit-payment-form-nonce'], 'submit-payment-form')) {
+                throw new \Exception("Could not verify order");
             }
-            if (isset($_finance)) {
-                $products = array();
-                $order_total = 0;
-                foreach ($woocommerce->cart->get_cart() as $item) {
-                    if (version_compare($this->get_woo_version(), '3.0.0') >= 0) {
-                        $_product = wc_get_product($item['data']->get_id());
-                        $name = $_product->get_title();
-                    } else {
-                        $_product = $item['data']->post;
-                        $name = $_product->post_title;
-                    }
-                    $quantity = $item['quantity'];
-                    $price = $item['line_subtotal'] / $quantity * 100;
-                    $order_total += $item['line_subtotal'];
-                    $products[] = array(
-                        'name' => $name,
-                        'quantity' => (int) $quantity,
-                        'price' => round($price),
-                        'sku' => $item['data']->get_sku() ?? $item['data']->get_id()
-                    );
-                }
-                $deposit = (isset($_POST['divido_deposit']) && round($_POST['divido_deposit']) > 0) ? sanitize_text_field(wp_unslash($_POST['divido_deposit'])) : $min_deposit; // Input var okay.
-                if ($woocommerce->cart->needs_shipping()) {
-                    $shipping = $order->get_total_shipping();
-                    $shipping = (float) $shipping;
-
-                    $products[] = array(
-                        'name' =>  __('global/ordershipping_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round($shipping * 100),
-                        'sku' => 'SHPNG'
-                    );
-                    // Add shipping to order total.
-                    $order_total += $shipping;
-                }
-                foreach ($woocommerce->cart->get_taxes() as $tax) {
-                    $products[] = array(
-                        'name' =>  __('global/ordertaxes_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round($tax * 100),
-                        'sku' => 'TAX'
-                    );
-                    // Add tax to ordertotal.
-                    $order_total += $tax;
-                }
-                foreach ($woocommerce->cart->get_fees() as $fee) {
-                    $products[] = array(
-                        'name' =>  __('global/orderfees_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round($fee->amount * 100),
-                        'sku' => 'FEES'
-                    );
-                    if ($fee->taxable) {
-                        $products[] = array(
-                            'name' =>  __('global/orderfee_tax_label', 'woocommerce-finance-gateway'),
-                            'quantity' => 1,
-                            'price' => round($fee->tax * 100),
-                            'sku' => 'FEE_TAX'
-                        );
-                        $order_total += $fee->tax;
-                    }
-                    // Add Fee to order total.
-                    $order_total += $fee->amount;
-                }
-                // Gets the total discount amount(including coupons) - both Taxed and untaxed.
-                if ($woocommerce->cart->get_cart_discount_total()) {
-                    $products[] = array(
-                        'name' =>  __('global/orderdiscount_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round(-$woocommerce->cart->get_cart_discount_total() * 100),
-                        'sku' => 'DSCNT'
-                    );
-                    // Deduct total discount.
-                    $order_total -= $woocommerce->cart->get_cart_discount_total();
-                }
-                $other = $order->get_total() - $order_total;
-                if (0 !== $other) {
-                    $products[] = array(
-                        'name' =>  __('global/orderother_label', 'woocommerce-finance-gateway'),
-                        'quantity' => 1,
-                        'price' => round($other),
-                        'sku' => 'OTHER'
-                    );
-                }
-
-                $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
-
-                $application = (new \Divido\MerchantSDK\Models\Application())
-                    ->withCountryId($order->get_billing_country())
-                    ->withFinancePlanId($finance)
-                    ->withApplicants(
-                        [
-                            [
-                                'firstName' => $order->get_billing_first_name(),
-                                'lastName' => $order->get_billing_last_name(),
-                                'phoneNumber' => str_replace(' ', '', $order->get_billing_phone()),
-                                'email' => $order->get_billing_email(),
-                                'addresses' => array([
-                                    'postcode' => $order->get_billing_postcode(),
-                                    'text' => $order->get_billing_postcode() . ' ' . $order->get_billing_address_1() . ' ' . $order->get_billing_city()
-                                ]),
-                            ],
-                        ]
-                    )
-                    ->withOrderItems($products)
-                    ->withDepositAmount(round($deposit))
-                    ->withFinalisationRequired(false)
-                    ->withMerchantReference(strval($order_id))
-                    ->withUrls([
-                        'merchant_redirect_url' => $order->get_checkout_order_received_url(),
-                        'merchant_checkout_url' => wc_get_checkout_url(),
-                        'merchant_response_url' => admin_url('admin-ajax.php') . '?action=woocommerce_finance_callback',
-                    ])
-                    ->withMetadata([
-                        'order_number' => $order_id,
-                        'ecom_platform'         => 'woocommerce',
-                        'ecom_platform_version' => WC_VERSION,
-                        'ecom_base_url'         => wc_get_checkout_url(),
-                        'plugin_version'        => $this->plugin_version,
-                        'merchant_reference'    => strval($order_id)
-                    ]);
-
-                if ('' !== $this->secret) {
-                    $secret = $this->create_signature(json_encode($application->getPayload()), $this->secret);
-                    $proxy->addSecretHeader($secret);
-                }
-                
-                if (empty(get_post_meta($order_id, "_finance_reference", true))) {
-                    $response = $proxy->postApplication($application);
+            
+            $products = array();
+            $order_total = 0;
+            foreach ($woocommerce->cart->get_cart() as $item) {
+                if (version_compare($this->get_woo_version(), '3.0.0') >= 0) {
+                    $_product = wc_get_product($item['data']->get_id());
+                    $name = $_product->get_title();
                 } else {
-                    $applicationId = get_post_meta($order_id, "_finance_reference", true);
-                    $application = $application->withId($applicationId);
-                    $response = $proxy->updateApplication($application);
+                    $_product = $item['data']->post;
+                    $name = $_product->post_title;
                 }
+                $quantity = $item['quantity'];
+                $price = $item['line_subtotal'] / $quantity * 100;
+                $order_total += $item['line_subtotal'];
+                $products[] = array(
+                    'name' => $name,
+                    'quantity' => (int) $quantity,
+                    'price' => round($price),
+                    'sku' => $item['data']->get_sku() ?? $item['data']->get_id()
+                );
+            }
+            
+            if ($woocommerce->cart->needs_shipping() && $order->get_total_shipping()>0) {
+                $shipping = $order->get_total_shipping();
 
-                $result_id = $response->data->id;
-                $result_redirect = $response->data->urls->application_url;
-                
+                $products[] = array(
+                    'name' =>  __('global/ordershipping_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => round($shipping * 100),
+                    'sku' => 'SHPNG'
+                );
+                // Add shipping to order total.
+                $order_total += $shipping;
+            }
+            foreach ($woocommerce->cart->get_taxes() as $tax) {
+                $products[] = array(
+                    'name' =>  __('global/ordertaxes_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => round($tax * 100),
+                    'sku' => 'TAX'
+                );
+                // Add tax to ordertotal.
+                $order_total += $tax;
+            }
+            foreach ($woocommerce->cart->get_fees() as $fee) {
+                $products[] = array(
+                    'name' =>  __('global/orderfees_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => round($fee->amount * 100),
+                    'sku' => 'FEES'
+                );
+                if ($fee->taxable) {
+                    $products[] = array(
+                        'name' =>  __('global/orderfee_tax_label', 'woocommerce-finance-gateway'),
+                        'quantity' => 1,
+                        'price' => round($fee->tax * 100),
+                        'sku' => 'FEE_TAX'
+                    );
+                    $order_total += $fee->tax;
+                }
+                // Add Fee to order total.
+                $order_total += $fee->amount;
+            }
+            // Gets the total discount amount(including coupons) - both Taxed and untaxed.
+            if ($woocommerce->cart->get_cart_discount_total()) {
+                $products[] = array(
+                    'name' =>  __('global/orderdiscount_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => round(-$woocommerce->cart->get_cart_discount_total() * 100),
+                    'sku' => 'DSCNT'
+                );
+                // Deduct total discount.
+                $order_total -= $woocommerce->cart->get_cart_discount_total();
+            }
+            $other = (int) ($order->get_total() - $order_total)*100;
+            if ($other !== 0) {
+                $products[] = array(
+                    'name' =>  __('global/orderother_label', 'woocommerce-finance-gateway'),
+                    'quantity' => 1,
+                    'price' => $other,
+                    'sku' => 'OTHER'
+                );
             }
 
+            $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
+
+            $application = (new \Divido\MerchantSDK\Models\Application())
+                ->withCountryId($order->get_billing_country())
+                ->withFinancePlanId($_POST['divido_plan'])
+                ->withApplicants(
+                    [
+                        [
+                            'firstName' => $order->get_billing_first_name(),
+                            'lastName' => $order->get_billing_last_name(),
+                            'phoneNumber' => str_replace(' ', '', $order->get_billing_phone()),
+                            'email' => $order->get_billing_email(),
+                            'addresses' => array([
+                                'postcode' => $order->get_billing_postcode(),
+                                'text' => $order->get_billing_postcode() . ' ' . $order->get_billing_address_1() . ' ' . $order->get_billing_city()
+                            ]),
+                        ],
+                    ]
+                )
+                ->withOrderItems($products)
+                ->withDepositAmount((int) $_POST['divido_deposit'])
+                ->withFinalisationRequired(false)
+                ->withMerchantReference(strval($order_id))
+                ->withUrls([
+                    'merchant_redirect_url' => $order->get_checkout_order_received_url(),
+                    'merchant_checkout_url' => wc_get_checkout_url(),
+                    'merchant_response_url' => admin_url('admin-ajax.php') . '?action=woocommerce_finance_callback',
+                ])
+                ->withMetadata([
+                    'order_number' => $order_id,
+                    'ecom_platform'         => 'woocommerce',
+                    'ecom_platform_version' => WC_VERSION,
+                    'ecom_base_url'         => wc_get_checkout_url(),
+                    'plugin_version'        => $this->plugin_version,
+                    'merchant_reference'    => strval($order_id)
+                ]);
+
+            if ('' !== $this->secret) {
+                $secret = $this->create_signature(json_encode($application->getPayload()), $this->secret);
+                $proxy->addSecretHeader($secret);
+            }
+            
+            if (empty(get_post_meta($order_id, "_finance_reference", true))) {
+                $response = $proxy->postApplication($application);
+            } else {
+                $applicationId = get_post_meta($order_id, "_finance_reference", true);
+                $application = $application->withId($applicationId);
+                $response = $proxy->updateApplication($application);
+            }
+            
+            $result_id = $response->data->id;
+            $result_redirect = $response->data->urls->application_url;
+                
             try {
 
                 update_post_meta($order_id, '_finance_reference', $result_id);
