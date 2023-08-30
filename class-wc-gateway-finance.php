@@ -233,7 +233,7 @@ function woocommerce_finance_init()
          */
         public function anypage_widget($atts)
         {
-            if ('yes' !== $this->enabled || '' === $this->api_key) {
+            if (!$this->is_available()) {
                 return false;
             }
             $finance = $this->get_finance_env();
@@ -556,52 +556,16 @@ jQuery(document).ready(function() {
         }
 
         /**
-         * Check if this gateway is enabled and available in the user's country.
+         * Check if this gateway is enabled and an api key is set
          *
          * @since 1.0.0
          *
-         * @param  boolean $product Product Instace.
-         * @return float
+         * @return bool
          */
-        public function is_available($product = false)
+        public function is_available():bool
         {
 
             if ('yes' !== $this->enabled || '' === $this->api_key) {
-                return false;
-            }
-
-            if (is_checkout()) {
-                $checkout_finance_options = $this->get_checkout_plans();
-                if (!$checkout_finance_options) {
-                    return false;
-                }
-            }
-
-            if (is_object($product)) {
-                if (version_compare($this->woo_version, '3.0.0') >= 0) {
-                    $data = maybe_unserialize(get_post_meta($product->get_id(), 'woo_finance_product_tab', true));
-                } else {
-                    $data = maybe_unserialize(get_post_meta($product->id, 'woo_finance_product_tab', true));
-                }
-                if (isset($data[0]) && is_array($data[0]) && isset($data[0]['active']) && 'selected' === $data[0]['active']) {
-                    if (is_array($data[0]['finances']) && count($data[0]['finances']) > 0) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } elseif ('price' === $this->settings['productSelect']) {
-                    $limit = $this->settings['priceSelection'];
-                    if ($this->get_price_including_tax($product, '') >= $limit * 100) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } elseif ('selection' === $this->settings['productSelect']) {
-                    return false;
-                } elseif ('all' === $this->settings['productSelect']) {
-                    return true;
-                }
-
                 return false;
             }
 
@@ -648,9 +612,6 @@ jQuery(document).ready(function() {
          */
         public function get_product_finance_options($product)
         {
-            if ('yes' !== $this->enabled) {
-                return false;
-            }
             if (version_compare($this->woo_version, '3.0.0') >= 0) {
                 if ($product->get_type() === 'variation') {
                     $data = maybe_unserialize(get_post_meta($product->get_parent_id(), 'woo_finance_product_tab', true));
@@ -776,7 +737,7 @@ jQuery(document).ready(function() {
          */
         public function product_write_panel_tab()
         {
-            if ('yes' !== $this->enabled) {
+            if (!$this->is_available()) {
                 return false;
             }
             $environment = $this->get_finance_env();
@@ -817,7 +778,7 @@ jQuery(document).ready(function() {
          */
         public function product_write_panel()
         {
-            if ('yes' !== $this->enabled) {
+            if (!$this->is_available()) {
                 return false;
             }
             global $post;
