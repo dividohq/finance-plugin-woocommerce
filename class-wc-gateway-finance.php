@@ -973,6 +973,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                     'selected' => __('backend/configfinance_specific_products_option', 'woocommerce-finance-gateway'),
                                     'price' => __('backend/configfinance_threshold_products_option', 'woocommerce-finance-gateway'),
                                 ),
+                                'description' => __('backend/configproduct_select_plans_guide_msg', 'woocommerce-finance-gateway')
                             ),
                             'priceSelection' => array(
                                 'title' => __('backend/configproduct_price_threshold_label', 'woocommerce-finance-gateway'),
