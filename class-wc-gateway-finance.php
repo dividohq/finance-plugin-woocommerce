@@ -164,8 +164,9 @@ function woocommerce_finance_init()
             }
             $this->woo_version = $this->get_woo_version();
 
-            global $finances_set_admin_order_display;
-            if (!isset($finances_set_admin_order_display)) {
+            /** ensures we only add related hooks once (seems to occur twice otherwise) */
+            global $hooksAdded;
+            if (!isset($hooksAdded)) {
                 add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options')); // Version 2.0 Hook.
                 // product settings.
                 add_action('woocommerce_product_write_panel_tabs', array($this, 'product_write_panel_tab'));
@@ -207,7 +208,7 @@ function woocommerce_finance_init()
 
                 add_filter('woocommerce_available_payment_gateways', array($this, 'showOptionAtCheckout'));
 
-                $finances_set_admin_order_display = true;
+                $hooksAdded = true;
             }
         }
 
