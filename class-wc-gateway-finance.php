@@ -777,17 +777,15 @@ jQuery(document).ready(function() {
             global $post;
             $tab_data = maybe_unserialize(get_post_meta($post->ID, 'woo_finance_product_tab', true));
             if (empty($tab_data)) {
-                $tab_data = array();
-                $tab_data[] = array(
+                $tab_data = array(
                     'active' => 'default',
                     'finances' => array(),
                 );
             }
-            if (empty($tab_data[0]['finances'])) {
-                $tab_data[0]['finances'] = array();
+            if (empty($tab_data['finances'])) {
+                $tab_data['finances'] = array();
             }
-            $finances = $this->get_finances();
-
+            $finances = $this->get_short_plans_array();
         ?>
 <div id="finance_tab" class="panel woocommerce_options_panel">
     <p class="form-field _hide_title_field ">
@@ -795,11 +793,11 @@ jQuery(document).ready(function() {
             for="_available"><?php esc_html_e('frontend/productavailable_on_finance_label', 'woocommerce-finance-gateway'); ?></label>
 
         <input type="radio" class="checkbox" name="_tab_finance_active" id="finance_active_default" value="default"
-            <?php print ('default' === $tab_data[0]['active']) ? 'checked' : ''; ?>>
+            <?php print ('default' === $tab_data['active']) ? 'checked="checked"' : ''; ?>>
         <?php esc_html_e('frontend/productdefault_settings_label', 'woocommerce-finance-gateway'); ?>
         <br style="clear:both;" />
         <input type="radio" class="checkbox" name="_tab_finance_active" id="finance_active_selected" value="selected"
-            <?php print ('selected' === $tab_data[0]['active']) ? 'checked' : ''; ?>>
+            <?php print ('selected' === $tab_data['active']) ? 'checked="checked"' : ''; ?>>
         <?php esc_html_e('frontend/productselected_plans_label', 'woocommerce-finance-gateway'); ?>
         <br style="clear:both;" />
     </p>
@@ -807,11 +805,11 @@ jQuery(document).ready(function() {
         <label
             for="_hide_title"><?php esc_html_e('frontend/productselected_plans_label', 'woocommerce-finance-gateway'); ?></label>
 
-        <?php foreach ($finances as $finance => $value) { ?>
-        <input type="checkbox" class="checkbox" name="_tab_finances[]" id="finances_<?php print esc_attr($finance); ?>"
-            value="<?php print esc_attr($finance); ?>"
-            <?php print (in_array($finance, $tab_data[0]['finances'], true)) ? 'checked' : ''; ?>>
-        &nbsp;<?php print esc_attr($value['description']); ?>
+        <?php foreach ($finances as $plan) { ?>
+        <input type="checkbox" class="checkbox" name="_tab_finances[]" id="finances_<?php print esc_attr($plan->getId()); ?>"
+            value="<?php print esc_attr($plan->getId()); ?>"
+            <?php print (in_array($plan->getId(), $tab_data['finances'], true)) ? "checked='checked'" : ''; ?>>
+        &nbsp;<?php print esc_attr($plan->getName()); ?>
         <br style="clear:both;" />
         <?php } ?>
     </p>
@@ -846,24 +844,14 @@ jQuery("input[name=_tab_finance_active]").change(function() {
         public function product_save_data($post_id, $post)
         {
             $active = isset($_POST['_tab_finance_active']) ? sanitize_text_field(wp_unslash($_POST['_tab_finance_active'])) : ''; // Input var okay.
-            $finances = isset($_POST['_tab_finances']) ? wp_unslash($_POST['_tab_finances']) : ''; // Input var okay.
+            $finances = isset($_POST['_tab_finances']) ? wp_unslash($_POST['_tab_finances']) : []; // Input var okay.
             if ((empty($active) || 'default' === $active) && get_post_meta($post_id, 'woo_finance_product_tab', true)) {
                 delete_post_meta($post_id, 'woo_finance_product_tab');
             } else {
-                $tab_data = array();
-                $tab_title = isset($tab_title) ? $tab_title : '';
-                $tab_id = '';
-                // convert the tab title into an id string.
-                $tab_id = strtolower($tab_title);
-                $tab_id = preg_replace('/[^\w\s]/', '', $tab_id); // remove non-alphas, numbers, underscores or whitespace.
-                $tab_id = preg_replace('/_+/', ' ', $tab_id); // replace all underscores with single spaces.
-                $tab_id = preg_replace('/\s+/', '-', $tab_id); // replace all multiple spaces with single dashes.
-                $tab_id = 'tab-' . $tab_id; // prepend with 'tab-' string.
                 // save the data to the database.
-                $tab_data[] = array(
+                $tab_data = array(
                     'active' => $active,
-                    'finances' => $finances,
-                    'id' => $tab_id,
+                    'finances' => $finances
                 );
                 update_post_meta($post_id, 'woo_finance_product_tab', $tab_data);
             }
