@@ -681,7 +681,7 @@ jQuery(document).ready(function() {
             }
 
             $plans = $this->get_short_plans_array();
-            //var_dump($plans);
+            
             if (
                 isset($this->settings['productSelect'])
                 && $this->settings['productSelect'] === 'selected'
