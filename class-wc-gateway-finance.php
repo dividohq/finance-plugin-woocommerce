@@ -60,9 +60,12 @@ function woocommerce_finance_init()
          */
         public $api_key;
 
-        private float $widgetThreshold;
+        private float $cart_threshold;
 
-        private array $settings;
+        private ?float $max_loan_amount;
+
+        private float $widget_threshold;
+
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
 
@@ -117,17 +120,15 @@ function woocommerce_finance_init()
             $this->calculator_config_api_url = $this->settings['calcConfApiUrl'] ?? '';
             $this->footnote = $this->settings['footnote'] ?? '';
             $this->buttonText = $this->settings['buttonText'] ?? '';
-            if (!isset($this->settings['maxLoanAmount'])) {
-                $this->max_loan_amount = 25000; // A default value when env is spun up for the firts time
-            } else {
-                $this->max_loan_amount = (empty($this->settings['maxLoanAmount']))
-                    ? false
-                    : (float) filter_var(
-                        $this->settings['maxLoanAmount'], 
-                        FILTER_SANITIZE_NUMBER_FLOAT, 
-                        FILTER_FLAG_ALLOW_FRACTION
-                    );
-            }
+            
+            $this->max_loan_amount = (empty($this->settings['maxLoanAmount']))
+                ? null
+                : (float) filter_var(
+                    $this->settings['maxLoanAmount'], 
+                    FILTER_SANITIZE_NUMBER_FLOAT, 
+                    FILTER_FLAG_ALLOW_FRACTION
+                );
+            
             $this->cart_threshold = isset($this->settings['cartThreshold']) 
                 ? (float) filter_var(
                         $this->settings['cartThreshold'], 
@@ -1859,7 +1860,7 @@ jQuery(document).ready(function($) {
          * @return boolean
          */
         private function doesProductMeetWidgetThreshold(WC_Product $product):bool {
-            if($this->get_product_price_inc_tax($product) < $this->widgetThreshold){ 
+            if($this->get_product_price_inc_tax($product) < $this->widget_threshold){ 
                 return false;
             }
             return true;
