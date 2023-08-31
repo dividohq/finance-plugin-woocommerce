@@ -1933,7 +1933,7 @@ jQuery(document).ready(function($) {
             $threshold = $this->cart_threshold;
             $upperLimit = $this->max_loan_amount;
 
-            if ($threshold > $cartTotal || isset($upperLimit) && $upperLimit < $cartTotal) {
+            if ($threshold > $cartTotal || is_float($upperLimit) && $upperLimit < $cartTotal) {
                 unset($gateways[$this->id]);
                 return $gateways;
             }
