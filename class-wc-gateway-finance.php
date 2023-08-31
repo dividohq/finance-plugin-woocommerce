@@ -211,7 +211,8 @@ function woocommerce_finance_init()
                 add_shortcode('finance_widget', array($this, 'anypage_widget'));
 
                 // scripts.
-                add_action('wp_enqueue_scripts', array($this, 'enqueue'));
+                add_action('wp_enqueue_scripts', array($this, 'enqueue_action'));
+                
                 add_action('admin_enqueue_scripts', array($this, 'wpdocs_enqueue_custom_admin_style'));
                 add_action('wp_footer', array($this, 'add_calc_conf_to_footer'));
                 
@@ -263,15 +264,7 @@ function woocommerce_finance_init()
                 return false;
             }
 
-            $finance = $this->get_finance_env();
-            if ($this->isV4()){
-                wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
-            } elseif ($this->environment === 'production') {
-                wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
-            } else {
-                wp_register_script('woocommerce-finance-gateway-calculator', '//cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
-            }
-            wp_enqueue_script('woocommerce-finance-gateway-calculator');
+            $this->enqueue();
 
             $attributes = shortcode_atts(array(
                 'amount' => 250,
@@ -352,8 +345,14 @@ function woocommerce_finance_init()
             }
         }
 
+        function enqueue_action(){
+            if ($this->api_key && (is_product() || is_checkout())) {
+                $this->enqueue();
+            }
+        }
+
         /**
-         * Enque Add Finance styles and scripts
+         * Enqeue Add Finance styles and scripts
          *
          * @since 1.0.0
          *
@@ -361,19 +360,18 @@ function woocommerce_finance_init()
          */
         function enqueue()
         {
-            if ($this->api_key && (is_product() || is_checkout())) {
-                $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
-                $finance = $this->get_finance_env();
+            $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
+            $finance = $this->get_finance_env();
 
-                if ($this->isV4()){
-                    wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
-                } elseif ($this->environment === 'production') {
-                    wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
-                } else {
-                    wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
-                }
-                wp_register_style('woocommerce-finance-gateway-style', plugins_url('', __FILE__) . '/css/style.css', false, 1.0);
+            if ($this->isV4()){
+                wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
+            } elseif ($this->environment === 'production') {
+                wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.calculator.js', false, 1.0, true);
+            } else {
+                wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
             }
+            wp_register_style('woocommerce-finance-gateway-style', plugins_url('', __FILE__) . '/css/style.css', false, 1.0);
+        
             wp_enqueue_style('woocommerce-finance-gateway-style');
             wp_enqueue_script('woocommerce-finance-gateway-calculator');
         }
