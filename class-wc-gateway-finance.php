@@ -60,11 +60,11 @@ function woocommerce_finance_init()
          */
         public $api_key;
 
-        private float $cart_threshold;
+        private ?float $cart_threshold;
 
         private ?float $max_loan_amount;
 
-        private float $widget_threshold;
+        private ?float $widget_threshold;
 
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
@@ -132,23 +132,23 @@ function woocommerce_finance_init()
                     FILTER_FLAG_ALLOW_FRACTION
                 );
             
-            $this->cart_threshold = isset($this->settings['cartThreshold']) 
-                ? (float) filter_var(
-                        $this->settings['cartThreshold'], 
-                        FILTER_SANITIZE_NUMBER_FLOAT, 
-                        FILTER_FLAG_ALLOW_FRACTION
-                    )
-                : 250;
+            $this->cart_threshold = isset($this->settings['cartThreshold'])
+                ? null
+                : (float) filter_var(
+                    $this->settings['cartThreshold'], 
+                    FILTER_SANITIZE_NUMBER_FLOAT, 
+                    FILTER_FLAG_ALLOW_FRACTION
+                );
             $this->auto_fulfillment = isset($this->settings['autoFulfillment']) ? $this->settings['autoFulfillment'] : "yes";
             $this->auto_refund = isset($this->settings['autoRefund']) ? $this->settings['autoRefund'] : "yes";
             $this->auto_cancel = isset($this->settings['autoCancel']) ? $this->settings['autoCancel'] : "yes";
-            $this->widget_threshold = isset($this->settings['widgetThreshold']) 
-                ? (float) filter_var(
-                        $this->settings['widgetThreshold'],
-                        FILTER_SANITIZE_NUMBER_FLOAT, 
-                        FILTER_FLAG_ALLOW_FRACTION
-                    )
-                : 250;
+            $this->widget_threshold = (empty($this->settings['widgetThreshold']))
+                ? null
+                : (float) filter_var(
+                    $this->settings['widgetThreshold'],
+                    FILTER_SANITIZE_NUMBER_FLOAT, 
+                    FILTER_FLAG_ALLOW_FRACTION
+                );
             $this->secret = $this->settings['secret'] ?? '';
             $this->product_select = $this->settings['productSelect'] ?? '';
             $this->useStoreLanguage = $this->settings['useStoreLanguage'] ?? '';
@@ -716,13 +716,9 @@ jQuery(document).ready(function() {
             $environment = $this->get_finance_env();
             $tab_icon = 'https://s3-eu-west-1.amazonaws.com/content.divido.com/plugins/powered-by-divido/' . $environment . '/woocommerce/images/finance-icon.png';
 
-            if (version_compare(WOOCOMMERCE_VERSION, '2.0.0') >= 0) {
-                $style = 'content:"";padding:5px 5px 5px 22px; background-image:url(' . $tab_icon . '); background-repeat:no-repeat;background-size: 15px 15px;background-position:8px 8px;';
-                $active_style = '';
-            } else {
-                $style = 'content:"";padding:5px 5px 5px 22px; line-height:16px; border-bottom:1px solid #d5d5d5; text-shadow:0 1px 1px #fff; color:#555555;background-size: 15px 15px; background-image:url(' . $tab_icon . '); background-repeat:no-repeat; background-position:8px 8px;';
-                $active_style = '#woocommerce-product-data ul.product_data_tabs li.my_plugin_tab.active a { border-bottom: 1px solid #F8F8F8; }';
-            }
+            $style = 'content:"";padding:5px 5px 5px 22px; background-image:url(' . $tab_icon . '); background-repeat:no-repeat;background-size: 15px 15px;background-position:8px 8px;';
+            $active_style = '';
+            
             ?>
 <style type="text/css">
 #woocommerce-product-data ul.product_data_tabs li.finance_tab a {
@@ -935,14 +931,12 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                             'cartThreshold' => array(
                                 'title' => __('backend/configcart_threshold_label', 'woocommerce-finance-gateway'),
                                 'type' => 'text',
-                                'description' => __('backend/configcart_threshold_description', 'woocommerce-finance-gateway'),
-                                'default' => '250',
+                                'description' => __('backend/configcart_threshold_description', 'woocommerce-finance-gateway')
                             ),
                             'maxLoanAmount' => array(
                                 'title' => __('backend/configcart_maximum_label', 'woocommerce-finance-gateway'),
                                 'type' => 'text',
-                                'description' => __('backend/configcart_maximum_description', 'woocommerce-finance-gateway'),
-                                'default' => '25000',
+                                'description' => __('backend/configcart_maximum_description', 'woocommerce-finance-gateway')
                             ),
                             'productSelect' => array(
                                 'title' => __('backend/configproduct_selection_label', 'woocommerce-finance-gateway'),
@@ -958,8 +952,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                             'priceSelection' => array(
                                 'title' => __('backend/configproduct_price_threshold_label', 'woocommerce-finance-gateway'),
                                 'type' => 'text',
-                                'description' => __('backend/configproduct_price_threshold_description', 'woocommerce-finance-gateway'),
-                                'default' => '350',
+                                'description' => __('backend/configproduct_price_threshold_description', 'woocommerce-finance-gateway')
                             ),
                             'Widget Settings' => array(
                                 'title' => __('backend/configwidget_settings_header', 'woocommerce-finance-gateway'),
@@ -996,7 +989,6 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                                 'title' => __('backend/configwidget_minimum_label', 'woocommerce-finance-gateway'),
                                 'type' => 'text',
                                 'description' => __('backend/configwidget_minimum_description', 'woocommerce-finance-gateway'),
-                                'default' => '250',
                             ),
                             'buttonText' => array(
                                 'title' => __('backend/configwidget_button_text_label', 'woocommerce-finance-gateway'),
