@@ -213,7 +213,7 @@ function woocommerce_finance_init()
                 // scripts.
                 add_action('wp_enqueue_scripts', array($this, 'enqueue'));
                 add_action('admin_enqueue_scripts', array($this, 'wpdocs_enqueue_custom_admin_style'));
-                add_action('wp_footer', array($this, 'add_api_to_head'));
+                add_action('wp_footer', array($this, 'add_calc_conf_to_footer'));
                 
                 add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'finance_gateway_settings_link'));
 
@@ -362,7 +362,6 @@ function woocommerce_finance_init()
         function enqueue()
         {
             if ($this->api_key && (is_product() || is_checkout())) {
-                $key = preg_split('/\./', $this->api_key);
                 $protocol = (isset($_SERVER['HTTPS']) && 'on' === $_SERVER['HTTPS']) ? 'https' : 'http'; // Input var okay.
                 $finance = $this->get_finance_env();
 
@@ -387,13 +386,11 @@ function woocommerce_finance_init()
         /**
          * Add Finance Javascript
          *
-         * We need to add some specific js to the head of the page to ensure the element reloads
-         *
          * @since 1.0.0
          *
          * @return void
          */
-        function add_api_to_head()
+        function add_calc_conf_to_footer()
         {
             if ($this->api_key) {
                 $shortKey = preg_split('/\./', $this->api_key)[0];
