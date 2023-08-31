@@ -69,6 +69,9 @@ function woocommerce_finance_init()
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
 
+        const INLINE_CALCULATOR_MODE = 'calculator';
+        const LIGHTBOX_CALCULATOR_MODE = 'lightbox';
+
         function wpdocs_load_textdomain()
         {
             if (!load_plugin_textdomain(
@@ -183,9 +186,9 @@ function woocommerce_finance_init()
                 if ('disabled' !== $this->show_widget) {
                     
                     if ('disabled' !== $this->calculator_theme) {
-                        add_action('woocommerce_after_single_product_summary', array($this, 'product_calculator'));
+                        add_action('woocommerce_after_single_product_summary', array($this, 'inline_product_calculator'));
                     } else {
-                        add_action('woocommerce_single_product_summary', array($this, 'product_widget'), 15);
+                        add_action('woocommerce_single_product_summary', array($this, 'lightbox_product_calculator'));
                     }
                 }
                 // order admin page (making sure it only adds once).
@@ -272,15 +275,15 @@ function woocommerce_finance_init()
 
             $attributes = shortcode_atts(array(
                 'amount' => 250,
-                'mode' => 'calculator',
+                'mode' => self::INLINE_CALCULATOR_MODE,
                 'button_text' => '',
                 'plans' => '',
                 'footnote' => ''
             ), $atts, 'finance_widget');
 
-            $mode = ($attributes['mode'] === 'lightbox')
-                ? 'lightbox'
-                : 'calculator';
+            $mode = ($attributes['mode'] === self::LIGHTBOX_CALCULATOR_MODE)
+                ? self::LIGHTBOX_CALCULATOR_MODE
+                : self::INLINE_CALCULATOR_MODE;
 
             $plansStr = (!empty($attributes["plans"] && is_string($attributes["plans"])))
                 ? $attributes["plans"]
@@ -650,11 +653,11 @@ jQuery(document).ready(function() {
         }
 
         /**
-         * Display Inline Product calculator widget
+         * Display Product calculator widget
          *
          * @return void
          */
-        public function product_calculator()
+        public function product_calculator(string $mode=self::LIGHTBOX_CALCULATOR_MODE)
         {
             global $product;
             if (
@@ -663,7 +666,6 @@ jQuery(document).ready(function() {
             ) {
                 return;
             }
-
 
             $plans = $this->get_short_plans_array();
             if (
@@ -684,7 +686,7 @@ jQuery(document).ready(function() {
                 : '';
             
             include_once sprintf(
-                '%s/%s/includes/calculator.php',
+                '%s/%s/includes/widget.php',
                 WP_PLUGIN_DIR, 
                 plugin_basename(dirname(__FILE__))
             );
@@ -692,61 +694,23 @@ jQuery(document).ready(function() {
         }
 
         /**
-         * Product widget helper.
-         *
-         * @since 1.0.0
+         * Show the inline calculator
          *
          * @return void
          */
-        public function product_widget()
+        public function inline_product_calculator()
         {
-            global $product;
+            $this->product_calculator(self::INLINE_CALCULATOR_MODE);
+        }
 
-            if (
-                $this->is_available() === false 
-                || $this->doesProductMeetWidgetThreshold($product)===false
-            ) {
-                return;
-            }
-
-            $plans = $this->get_short_plans_array();
-            
-            if (
-                isset($this->settings['productSelect'])
-                && $this->settings['productSelect'] === 'selected'
-            ) {
-                $plans = $this->filterPlansByProduct($product, $plans);
-            }
-            if(count($plans) === 0){
-                return;
-            }
-            $plansStr = $this->convert_plans_to_comma_seperated_string($plans);
-
-            $price = $this->toPence($product->get_price());
-
-            $shortApiKey = explode('.',$this->api_key)[0];
-            
-            $button_text = '';
-            if (!empty(sanitize_text_field($this->buttonText))) {
-                $button_text = sanitize_text_field($this->buttonText);
-            }
-
-            $footnote = (!empty(sanitize_text_field($this->footnote)))
-                ? sprintf("data-footnote='%s'", sanitize_text_field($this->footnote))
-                : '';
-
-            $language = ($this->useStoreLanguage === "yes")
-                ? sprintf("data-language='%s'", $this->get_language())
-                : '';
-
-            $calcConfApiUrl = $this->calculator_config_api_url;
-
-            include_once sprintf(
-                '%s/%s/includes/widget.php',
-                WP_PLUGIN_DIR, 
-                plugin_basename(dirname(__FILE__))
-            );
-            
+        /**
+         * Show the lightbox calculator
+         *
+         * @return void
+         */
+        public function lightbox_product_calculator()
+        {
+            $this->product_calculator(self::LIGHTBOX_CALCULATOR_MODE);
         }
 
         /**

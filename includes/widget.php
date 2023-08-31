@@ -2,7 +2,7 @@
 
 <div
     data-calculator-widget
-    data-mode="lightbox"
+    data-mode="<?= $mode; ?>"
     data-plans="<?= $plansStr;?>"
     data-amount="<?= $price; ?>"
     <?= $language; ?>
