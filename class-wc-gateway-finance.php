@@ -162,7 +162,6 @@ function woocommerce_finance_init()
                 // Load the form fields.
                 $this->init_form_fields();
             }
-            $this->woo_version = $this->get_woo_version();
 
             /** ensures we only add related hooks once (seems to occur twice otherwise) */
             global $hooksAdded;
@@ -1198,7 +1197,7 @@ jQuery(document).ready(function($) {
                 $order = new WC_Order(sanitize_text_field(wp_unslash($_GET['order_id']))); // Input var okay.
 
                 return $order->billing_country;
-            } elseif (version_compare($this->woo_version, '3.0.0') >= 0 && $woocommerce->customer->get_billing_country()) {
+            } elseif ($woocommerce->customer->get_billing_country()) {
                 return $woocommerce->customer->get_billing_country(); // Version 3.0+.
             } elseif ($woocommerce->customer->get_country()) {
                 return $woocommerce->customer->get_country(); // Version ~2.0.
@@ -1620,25 +1619,6 @@ jQuery(document).ready(function($) {
                 'plugin_version' => $plugindata['Version'],
             );
             wp_send_json($response);
-        }
-
-        /**
-         * Check WooCommerce version.
-         *
-         * @return string WooCommerce version.
-         */
-        function get_woo_version()
-        {
-            if (!function_exists('get_plugins')) {
-                include_once ABSPATH . 'wp-admin/includes/plugin.php';
-            }
-            $plugin_folder = get_plugins('/woocommerce');
-            $plugin_file = 'woocommerce.php';
-            if (isset($plugin_folder[$plugin_file]['Version'])) {
-                return $plugin_folder[$plugin_file]['Version'];
-            } else {
-                return null;
-            }
         }
 
         /**
