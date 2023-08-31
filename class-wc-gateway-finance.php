@@ -395,7 +395,6 @@ function woocommerce_finance_init()
          */
         function add_api_to_head()
         {
-            var_dump($this->buttonText);
             if ($this->api_key) {
                 $shortKey = preg_split('/\./', $this->api_key)[0];
 
