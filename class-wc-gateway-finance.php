@@ -1916,38 +1916,44 @@ jQuery(document).ready(function($) {
          * @return array
          */
         public function showOptionAtCheckout(array $gateways):array{
+            
+            if(!isset($gateways[$this->id])){
+                return $gateways;
+            }
+
             global $woocommerce;
-            if(!empty($woocommerce->cart)){
-                if(isset($gateways[$this->id])){
-                    $cartTotal = $woocommerce->cart->total;
-                    // In Cart.
-                    $settings = $this->settings;
-                    $threshold = $this->cart_threshold;
-                    $upperLimit = $this->max_loan_amount;
+            if(empty($woocommerce->cart)){
+                unset($gateways[$this->id]);
+                return $gateways;
+            }
+                
+            $cartTotal = $woocommerce->cart->total;
+            // In Cart.
+            $settings = $this->settings;
+            $threshold = $this->cart_threshold;
+            $upperLimit = $this->max_loan_amount;
 
-                    if ($threshold > $cartTotal || isset($upperLimit) && $upperLimit < $cartTotal) {
-                        unset($gateways[$this->id]);
-                        return $gateways;
-                    }
-                    
-                    $cartItems = array_map(function($item){
-                        return $item['data'];
-                    }, $woocommerce->cart->get_cart_contents());
+            if ($threshold > $cartTotal || isset($upperLimit) && $upperLimit < $cartTotal) {
+                unset($gateways[$this->id]);
+                return $gateways;
+            }
+            
+            $cartItems = array_map(function($item){
+                return $item['data'];
+            }, $woocommerce->cart->get_cart_contents());
 
-                    if (
-                        isset($settings['productSelect'])
-                        && $settings['productSelect'] === 'price'
-                        && $this->doProductsMeetProductPriceThreshold($cartItems) === false
-                    ){
-                        unset($gateways[$this->id]);
-                    } elseif (
-                        isset($settings['productSelect'])
-                        && $settings['productSelect'] === 'selected'
-                        && empty($this->filterPlansByProducts($this->get_short_plans_array(), $cartItems))
-                    ){
-                        unset($gateways[$this->id]);
-                    }
-                }
+            if (
+                isset($settings['productSelect'])
+                && $settings['productSelect'] === 'price'
+                && $this->doProductsMeetProductPriceThreshold($cartItems) === false
+            ){
+                unset($gateways[$this->id]);
+            } elseif (
+                isset($settings['productSelect'])
+                && $settings['productSelect'] === 'selected'
+                && empty($this->filterPlansByProducts($this->get_short_plans_array(), $cartItems))
+            ){
+                unset($gateways[$this->id]);
             }
 
             return $gateways;
