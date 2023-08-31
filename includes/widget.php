@@ -23,21 +23,4 @@
             });
         });
     });
-<?php if(!empty($calcConfApiUrl)){ ?>
-    window.__calculatorConfig = {
-        <?php if(!empty($button_text)){ ?>
-        overrides: {
-            theme: {
-                modes: {
-                    Lightbox: {
-                        linkText: '<?= $button_text ?>'
-                    }
-                }
-            }
-        },
-        <?php } ?>
-        apiKey: '<?= $shortApiKey ?>',
-        calculatorApiPubUrl: '<?= $calcConfApiUrl ?>'
-    };
-<?php } ?>
 </script>

@@ -194,20 +194,24 @@ function woocommerce_finance_init()
             
                 // checkout.
                 add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
+
                 // ajax callback.
                 add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
                 add_action('wp_ajax_woocommerce_finance_callback', array($this, 'callback'));
-                add_action('wp_head', array($this, 'add_api_to_head'));
+
+                //hooks
                 add_action('woocommerce_order_status_completed', array($this, 'send_finance_fulfillment_request'), 10, 1);
                 add_action('woocommerce_order_status_refunded', array($this, 'send_refund_request'), 10, 1);
                 add_action('woocommerce_order_status_cancelled', array($this, 'send_cancellation_request'), 10, 1);
 
+                // shortcodes
+                add_shortcode('finance_widget', array($this, 'anypage_widget'));
+
                 // scripts.
                 add_action('wp_enqueue_scripts', array($this, 'enqueue'));
                 add_action('admin_enqueue_scripts', array($this, 'wpdocs_enqueue_custom_admin_style'));
-                //Since 1.0.2
-                add_shortcode('finance_widget', array($this, 'anypage_widget'));
-                //Since 1.0.3
+                add_action('wp_footer', array($this, 'add_api_to_head'));
+                
                 add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'finance_gateway_settings_link'));
 
                 add_filter('woocommerce_available_payment_gateways', array($this, 'showOptionAtCheckout'));
@@ -255,6 +259,7 @@ function woocommerce_finance_init()
             if (!$this->is_available()) {
                 return false;
             }
+
             $finance = $this->get_finance_env();
             if ($this->isV4()){
                 wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
@@ -266,39 +271,42 @@ function woocommerce_finance_init()
             wp_enqueue_script('woocommerce-finance-gateway-calculator');
 
             $attributes = shortcode_atts(array(
-                'amount' => '250',
-                'mode' => 'lightbox',
-                'buttonText' => '',
+                'amount' => 250,
+                'mode' => 'calculator',
+                'button_text' => '',
                 'plans' => '',
                 'footnote' => ''
             ), $atts, 'finance_widget');
 
-            if (is_array($atts)) {
-                foreach ($atts as $key => $value) {
-                    $attributes[$key] = $value;
-                }
-            }
+            $mode = ($attributes['mode'] === 'lightbox')
+                ? 'lightbox'
+                : 'calculator';
 
-            $mode = 'data-mode="lightbox"';
-            if ($attributes['mode'] != 'lightbox') {
-                $mode = ' data-mode="calculator"';
-            }
-
-            $plans = '';
-            if ($attributes["plans"] != '') {
-                $plans = ' data-plans="' . $attributes["plans"] . '"';
-            }
+            $plansStr = (!empty($attributes["plans"] && is_string($attributes["plans"])))
+                ? $attributes["plans"]
+                : $this->convert_plans_to_comma_seperated_string($this->get_short_plans_array());
 
             $buttonText = '';
-            if ($attributes["buttonText"] != '') {
-                $buttonText = ' data-button-text="' . $attributes["buttonText"] . '"';
-            }
-            $footnote = '';
-            if ($attributes["footnote"] != '') {
-                $footnote = ' data-footnote="' . $attributes["footnote"] . '"';
+            if(!empty($attributes["button_text"] && is_string($attributes['button_text']))){
+                $buttonText = sprintf('data-button-text="%s"', $attributes['button_text']);
+                $this->buttonText = $attributes['button_text'];
             }
 
-            return '<div data-calculator-widget ' . $mode . ' data-amount="' . esc_attr($attributes["amount"]) . '" ' . $buttonText . ' ' . $footnote . ' ' . $plans . ' ></div>';
+            $footnote = (!empty($attributes["footnote"] && is_string($attributes['footnote'])))
+                ? sprintf('data-footnote="%s"', $attributes["footnote"])
+                : '';
+            
+            $amount = $this->toPence($attributes['amount']);
+
+            return sprintf(
+                '<div data-calculator-widget data-mode="%s" data-amount="%d" %s %s data-plans="%s" ></div>',
+                $mode,
+                $amount,
+                $buttonText,
+                $footnote,
+                $plansStr
+            );
+
         }
 
         /**
@@ -384,15 +392,31 @@ function woocommerce_finance_init()
          */
         function add_api_to_head()
         {
+            var_dump($this->buttonText);
             if ($this->api_key) {
-                $key = preg_split('/\./', $this->api_key);
+                $shortKey = preg_split('/\./', $this->api_key)[0];
 
 ?>
 <script type='text/javascript'>
-window.__widgetConfig = {
-    apiKey: '<?php echo esc_attr(strtolower($key[0])); ?>'
-
-};
+<?php if(!empty($this->calculator_config_api_url)){ ?>
+    window.__calculatorConfig = {
+        <?php if(!empty($this->buttonText)){ ?>
+        overrides: {
+            theme: {
+                modes: {
+                    Lightbox: {
+                        linkText: '<?= $this->buttonText ?>'
+                    }
+                }
+            }
+        },
+        <?php } ?>
+        apiKey: '<?= $shortKey ?>',
+        calculatorApiPubUrl: '<?= $this->calculator_config_api_url ?>'
+    };
+<?php } else { ?>
+    window.__widgetConfig = {apiKey: '<?= $shortKey ?>'};
+<?php } ?>
 
 </script>
 <script>
