@@ -373,14 +373,9 @@ function woocommerce_finance_init()
                     wp_register_script('woocommerce-finance-gateway-calculator', $protocol . '://cdn.divido.com/widget/v3/' . $finance . '.' . $this->environment . '.calculator.js', false, 1.0, true);
                 }
                 wp_register_style('woocommerce-finance-gateway-style', plugins_url('', __FILE__) . '/css/style.css', false, 1.0);
-                $array = array(
-                    'environment' => __($finance)
-                );
-                wp_localize_script('woocoomerce-finance-gateway-calculator_price_update', 'environment', $array);
             }
             wp_enqueue_style('woocommerce-finance-gateway-style');
             wp_enqueue_script('woocommerce-finance-gateway-calculator');
-            wp_enqueue_script('woocoomerce-finance-gateway-calculator_price_update');
         }
 
         /**
