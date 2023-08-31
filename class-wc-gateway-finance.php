@@ -60,6 +60,10 @@ function woocommerce_finance_init()
          */
         public $api_key;
 
+        private float $widgetThreshold;
+
+        private array $settings;
+
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
 
         function wpdocs_load_textdomain()
@@ -1855,12 +1859,7 @@ jQuery(document).ready(function($) {
          * @return boolean
          */
         private function doesProductMeetWidgetThreshold(WC_Product $product):bool {
-            $widgetThreshold = (float) filter_var(
-                $this->widget_threshold ?? 0, 
-                FILTER_SANITIZE_NUMBER_FLOAT, 
-                FILTER_FLAG_ALLOW_FRACTION
-            );
-            if($this->get_product_price_inc_tax($product) < $widgetThreshold){ 
+            if($this->get_product_price_inc_tax($product) < $this->widgetThreshold){ 
                 return false;
             }
             return true;
