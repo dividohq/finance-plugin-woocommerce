@@ -1969,22 +1969,25 @@ jQuery(document).ready(function($) {
          */
         private function getTrueCartThreshold():?float{
             $min = null;
+            $configMin = $this->toPence($this->cart_threshold);
+
+            $plans = $this->get_short_plans_array();
+            if(empty($plans)){
+                return $configMin;
+            }
+
             /** @var Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
-            foreach($this->get_short_plans_array() as $plan){
+            foreach($plans as $plan){
                 if($min === null || $plan->getCreditMinimum() < $min){
                     $min = $plan->getCreditMinimum();
                 }
             }
 
-            if(
-                is_float($this->cart_threshold)
-                && is_int($min)
-                && $this->cart_threshold > $min
-            ){
-                $min = $this->cart_threshold;
+            if(is_float($configMin) && $configMin > $min){
+                $min = $configMin;
             }
 
-            return (is_numeric($min)) ? floatval($min/100) : null;
+            return floatval($min/100);
         }
         
         /**
@@ -1995,7 +1998,7 @@ jQuery(document).ready(function($) {
          */
         private function getTrueCartMax():?float{
             $max = null;
-            $configMax = $this->max_loan_amount;
+            $configMax = $this->toPence($this->max_loan_amount);
 
             $plans = $this->get_short_plans_array();
             if(empty($plans)){
