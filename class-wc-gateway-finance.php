@@ -1241,11 +1241,15 @@ jQuery(document).ready(function($) {
             if (
                 !isset($_POST['divido_plan'], $_POST['divido_deposit'], $_POST['submit-payment-form-nonce'])
             ) {
-                throw new \Exception("Missing important payload data");
+                throw new \Exception(
+                    esc_html_e('frontend/checkout/errordefault_api_error_msg', 'woocommerce-finance-gateway')
+                );
             }
             
             if(!wp_verify_nonce($_POST['submit-payment-form-nonce'], 'submit-payment-form')) {
-                throw new \Exception("Could not verify order");
+                throw new \Exception(
+                    esc_html_e('frontend/checkout/errordefault_api_error_msg', 'woocommerce-finance-gateway')
+                );
             }
             
             $products = array();
