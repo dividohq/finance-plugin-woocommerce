@@ -1442,6 +1442,8 @@ jQuery(document).ready(function($) {
                     $finances[$plan->id] = new Divido\Woocommerce\FinanceGateway\Models\ShortPlan(
                         $plan->id,
                         $plan->description,
+                        (int) $plan->credit_amount->minimum_amount,
+                        (int) $plan->credit_amount->maximum_amount,
                         $plan->active
                     );
                 }
@@ -1930,8 +1932,8 @@ jQuery(document).ready(function($) {
             $cartTotal = $woocommerce->cart->total;
             // In Cart.
             $settings = $this->settings;
-            $threshold = $this->cart_threshold;
-            $upperLimit = $this->max_loan_amount;
+            $threshold = $this->getTrueCartThreshold();
+            $upperLimit = $this->getTrueCartMax();
 
             if ($threshold > $cartTotal || is_float($upperLimit) && $upperLimit < $cartTotal) {
                 unset($gateways[$this->id]);
@@ -1957,6 +1959,61 @@ jQuery(document).ready(function($) {
             }
 
             return $gateways;
+        }
+
+        /**
+         * Retrieves the actual min credit amount from the plans available
+         * Can be overriden by config value if greater than plans min
+         *
+         * @return float|null
+         */
+        private function getTrueCartThreshold():?float{
+            $min = null;
+            /** @var Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
+            foreach($this->get_short_plans_array() as $plan){
+                if($min === null || $plan->getCreditMinimum() < $min){
+                    $min = $plan->getCreditMinimum();
+                }
+            }
+
+            if(
+                is_float($this->cart_threshold)
+                && is_int($min)
+                && $this->cart_threshold > $min
+            ){
+                $min = $this->cart_threshold;
+            }
+
+            return (is_numeric($min)) ? floatval($min/100) : null;
+        }
+        
+        /**
+         * Retrieves the actual min credit amount from the plans available
+         * Can be overriden by config values if less than plans min
+         *
+         * @return float|null
+         */
+        private function getTrueCartMax():?float{
+            $max = null;
+            $configMax = $this->max_loan_amount;
+
+            $plans = $this->get_short_plans_array();
+            if(empty($plans)){
+                return $configMax;
+            }
+
+            /** @var Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
+            foreach($plans as $plan){
+                if($max === null || $plan->getCreditMinimum() > $max){
+                    $max = $plan->getCreditMaximum();
+                }
+            }
+
+            if(is_float($configMax) && $configMax < $max){
+                $max = $configMax;
+            }
+
+            return floatval($max/100);
         }
     }
 
