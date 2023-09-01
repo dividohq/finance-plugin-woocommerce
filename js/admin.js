@@ -15,15 +15,27 @@ jQuery(document).ready(function($) {
     const saveBtn = document.getElementsByClassName('save_order')[0];
 
     const currentStatus = document.getElementById('order_status').value;
-    console.log(currentStatus);
+
+    var statusCheck = true;
     
     saveBtn.addEventListener('click', (event) => {
-        event.preventDefault();
+        if(statusCheck){
+            event.preventDefault();
+        }else return;
+
+        if(!document.getElementById('financeId')){
+            statusCheck = false;
+            event.target.click();
+            return;
+        }
+
         const newStatus = document.getElementById('order_status').value;
+        
         const financeId = document.getElementById('financeId').value;
         
         if(!financeId || newStatus === currentStatus || !checkStatuses.find((e) => e === newStatus)){
-            console.log("Nothing to do here");
+            statusCheck = false;
+            event.target.click();
             return;
         }
         
@@ -32,13 +44,15 @@ jQuery(document).ready(function($) {
         const request = new XMLHttpRequest();
         request.onreadystatechange = () => {
             if(request.readyState === XMLHttpRequest.DONE && request.status === 200){
-                $('#financeStatusModal .contents').text(request.responseText);
+                const response = request.responseText;
+
+                $('#financeStatusModal .contents').text(response.message);
                 $('#financeStatusModal')
                     .dialog({
                         title: 'This is a title'
                     })
                     .dialog('open');
-                console.log(request.responseText)
+                console.log(response)
                 /*
                 if( //ignore ){
                     event.target.trigger('click');
