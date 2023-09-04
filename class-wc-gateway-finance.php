@@ -94,6 +94,9 @@ function woocommerce_finance_init()
             ]
         ];
 
+        const REFUND_ACTION = 'refund';
+        const CANCEL_ACTION = 'cancel';
+
         function wpdocs_load_textdomain()
         {
             if (!load_plugin_textdomain(
@@ -215,9 +218,26 @@ function woocommerce_finance_init()
                 }
                 // order admin page (making sure it only adds once).
                 add_action('woocommerce_admin_order_data_after_order_details', array($this, 'display_order_data_in_admin'));
+<<<<<<< HEAD
             
                 // checkout.
                 add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
+=======
+                add_action('admin_head', array($this, 'setConfig'));
+                $finances_set_admin_order_display = true;
+            }
+            // checkout.
+            add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
+            // ajax callback.
+            add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
+            add_action('wp_ajax_woocommerce_finance_callback', array($this, 'callback'));
+            add_action('wp_ajax_woocommerce_finance_status-check', array($this, 'check_status'));
+            add_action('wp_ajax_woocommerce_finance_status-update', array($this, 'update_status'));
+            add_action('wp_head', array($this, 'add_api_to_head'));
+            add_action('woocommerce_order_status_completed', array($this, 'send_finance_fulfillment_request'), 10, 1);
+            add_action('woocommerce_order_status_refunded', array($this, 'send_refund_request'), 10, 1);
+            add_action('woocommerce_order_status_cancelled', array($this, 'send_cancellation_request'), 10, 1);
+>>>>>>> 28c3836 (feat: handle status update)
 
                 // ajax callback.
                 add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
@@ -584,14 +604,15 @@ jQuery(document).ready(function() {
             }
         }
 
-        public function status(){
+        public function check_status(){
             $newStatus = $_GET['status'];
             
             $return = [
                 'message' => null,
                 'reasons' => null,
                 'notify' => false,
-                'action' => 'proceed'
+                'action' => 'proceed',
+                'title' => 'Do you wish to proceed?'
             ];
             $response = ['Unactionable event'];
             try{
@@ -602,37 +623,83 @@ jQuery(document).ready(function() {
                 return;
             }
             if($newStatus === 'wc-cancelled' && $this->auto_cancel === "yes"){
-                // handle cancelled
-                
                 $cancelable = $application->amounts->cancelable_amount;
                 $currency = $application->currency->id;
                 $amount = sprintf("%s %s", $cancelable, $currency);
-                $response = [__('backend/promptcancel_confirmation_prompt', 'woocommerce-finance-gateway')];
+                $return['title'] = __('backend/promptcancel_confirmation_prompt', 'woocommerce-finance-gateway');
                 $response[] = sprintf(
                     __('backend/warningcancel_amount_warning_msg', 'woocommerce-finance-gateway'),
                     $amount,
                     $amount
                 );
                 $return['notify'] = true;
-                $return['action'] = 'cancel';
+                $return['action'] = self::CANCEL_ACTION;
 
             }elseif($newStatus === 'wc-refunded' && $this->auto_refund === "yes"){
-                // handle refund
                 $application = $this->get_application($_GET['id']);
                 $refundable = $application->amounts->cancelable_amount;
                 $currency = $application->currency->id;
                 $amount = sprintf("%s %s", $refundable, $currency);
-                $response = [__('backend/promptrefund_confirmation_prompt', 'woocommerce-finance-gateway')];
-                $response[] = sprintf(
+                $return['title'] = __('backend/promptrefund_confirmation_prompt', 'woocommerce-finance-gateway');
+                $response = [sprintf(
                     __('backend/warningrefund_amount_warning_msg', 'woocommerce-finance-gateway'),
                     $amount,
                     $amount
-                );
+                )];
                 $return['notify'] = true;
-                $return['action'] = 'refund';
+                $return['action'] = self::REFUND_ACTION;
             }
-            $return['reasons'] = self::REASONS[$application->lender->app_name] ?? null;
+            if(isset(self::REASONS[$application->lender->app_name])){
+                $return['reasons'] = self::REASONS[$application->lender->app_name];
+                $response[] = sprintf(
+                    "%s requests that you provide a reason from the list below:",
+                    $application->lender->app_name
+                );
+            }
             $return['message'] = $response;
+            wp_send_json($return);
+        }
+
+        public function update_status(){
+
+            $return = [
+                'success' => false,
+                'message' => 'Nothing happened'
+            ];
+
+            try{
+                $application = $this->get_application($_GET['application_id']);
+
+                switch($_GET['wf_action']){
+                    case self::CANCEL_ACTION:
+                        $return['response'] = $this->set_cancelled(
+                            $application->id, 
+                            $application->amounts->cancelable_amount, 
+                            $application->merchant_reference
+                        );
+                        $return['message'] = 'Lender successfully notified of cancellation request';
+                        $return['success'] = true;
+                        break;
+                    case self::REFUND_ACTION:
+                        $return['response'] = $this->set_refund(
+                            $application->id, 
+                            $application->amounts->refundable_amount, 
+                            $application->merchant_reference
+                        );
+                        $return['message'] = 'Lender successfully notified of refund request';
+                        $return['success'] = true;
+                        break;
+                    default:
+                        $return['message'] = "Could not find action";
+                        break;
+                }
+            }
+            catch(MerchantApiBadResponseException $e){
+                $return['message'] = sprintf("Application %s not possible", $_GET['wf_action']);
+            } catch (\Exception $e) {
+                $return['message'] = $e->getMessage();
+            }
+
             wp_send_json($return);
         }
 

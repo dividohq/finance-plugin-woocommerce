@@ -6,7 +6,6 @@ jQuery(document).ready(function($) {
     $('#financeStatusModal').dialog({
         autoOpen:false, 
         draggable:false,
-        dialogClass: 'wp-dialog',
         create: function () {
             // style fix for WordPress admin
             $('.ui-dialog-titlebar-close').addClass('ui-button');
@@ -30,12 +29,14 @@ jQuery(document).ready(function($) {
         }
 
         const newStatus = document.getElementById('order_status').value;
-        
+        console.log(newStatus);
+
         const financeId = document.getElementById('financeId').value;
         
         if(!financeId || newStatus === currentStatus || !checkStatuses.find((e) => e === newStatus)){
-            statusCheck = false;
-            event.target.click();
+            console.log("Here");
+            //statusCheck = false;
+            //event.target.click();
             return;
         }
         
@@ -44,28 +45,28 @@ jQuery(document).ready(function($) {
         const request = new XMLHttpRequest();
         request.onreadystatechange = () => {
             if(request.readyState === XMLHttpRequest.DONE && request.status === 200){
-                const response = request.response;
-                console.log(response);
-                for(key in response.message){
+                const checkRes = request.response;
+                console.log(checkRes);
+                for(key in checkRes.message){
                     let paragraph = document.createElement("p");
-                    paragraph.innerText = response.message[key];
+                    paragraph.innerText = checkRes.message[key];
                     $("#financeStatusModal .contents").append(paragraph);
                 }
-                $('#financeStatusModal .contents').innerHTML = response.message;
-                if(response.reasons != null){
+                $('#financeStatusModal .contents').text = "";
+                if(checkRes.reasons != null){
                     const reasonSelect = document.createElement("select");
                     reasonSelect.setAttribute('id', 'pbdReason')
                     reasonSelect.classList.add('custom-select');
-                    for(reason in response.reasons) {
+                    for(reason in checkRes.reasons) {
                         let option = document.createElement("option");
-                        option.text = response.reasons[reason]
+                        option.text = checkRes.reasons[reason]
                         option.value = reason
                         reasonSelect.add(option);
                     }
                     $("#financeStatusModal .contents").append(reasonSelect);
                 }
                 const continueBtn = {
-                    text: response.action+" (without notifying lender)",
+                    text: checkRes.action+" (without notifying lender)",
                     click: function(){
                         statusCheck = false;
                         event.target.click();
@@ -75,14 +76,49 @@ jQuery(document).ready(function($) {
         
                 let buttons = [continueBtn];
 
+                if(checkRes.notify){
+                    buttons.push({
+                        text: checkRes.action+" and notify lender",
+                        click: function(){
+                            var updateUrl = 'admin-ajax.php';
+                            $.ajax({
+                                url: updateUrl,
+                                type: 'GET',
+                                data: {
+                                    action: 'woocommerce_finance_status-update',
+                                    wf_action: checkRes.action,
+                                    application_id: financeId,
+                                    reason: (document.getElementById('pbdReason'))
+                                        ? $('#pbdReason').val()
+                                        : null
+                                }
+                            }).done(function(updateRes){
+                                console.log(updateRes);
+                                $("#financeStatusModal .contents")
+                                    .html("<p>"+updateRes.message+"</p>");
+        
+                                let newBtns = [];
+                                if(updateRes.success === false){
+                                    newBtns.push(continueBtn);
+                                }
+                                $('#financeStatusModal')
+                                .dialog({
+                                    buttons: newBtns
+                                })
+                            });
+                        }
+                    });
+                }
+
                 $('#financeStatusModal')
                     .dialog({
+                        title: checkRes.title,
                         buttons: buttons
                     })
                     .dialog('open');
             }
         }
-        request.open("GET", statusCheckPath+'?action=woocommerce_finance_status&status='+newStatus+'&id='+financeId);
+        request.open("GET", statusCheckPath+'?action=woocommerce_finance_status-check&status='+newStatus+'&id='+financeId);
         request.responseType = "json";
         request.send();
             // on done either display a modal
