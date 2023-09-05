@@ -44,12 +44,22 @@ jQuery(document).ready(function($) {
         request.onreadystatechange = () => {
             if(request.readyState === XMLHttpRequest.DONE && request.status === 200){
                 const checkRes = request.response;
-                for(key in checkRes.message){
-                    let paragraph = document.createElement("p");
-                    paragraph.innerText = checkRes.message[key];
-                    $("#financeStatusModal .contents").append(paragraph);
+
+                if(checkRes.bypass === true){
+                    statusCheck = false;
+                    event.target.click();
+                    return;
                 }
+
                 $('#financeStatusModal .contents').text = "";
+                if(typeof(checkRes.message) == "object"){
+                    for(key in checkRes.message){
+                        let paragraph = document.createElement("p");
+                        paragraph.innerText = checkRes.message[key];
+                        $("#financeStatusModal .contents").append(paragraph);
+                    }
+                }
+                
                 if(checkRes.reasons != null){
                     const reasonSelect = document.createElement("select");
                     reasonSelect.setAttribute('id', 'pbdReason')

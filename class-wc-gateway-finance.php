@@ -593,6 +593,7 @@ jQuery(document).ready(function() {
                 'message' => null,
                 'reasons' => null,
                 'notify' => false,
+                'bypass' => false,
                 'action' => 'proceed',
                 'title' => 'Do you wish to proceed?'
             ];
@@ -604,16 +605,24 @@ jQuery(document).ready(function() {
                 wp_send_json($return);
                 return;
             }
+
+            $paymentMethod = get_post_meta($application->merchant_reference, '_payment_method', true);
+            if($paymentMethod !== $this->id){
+                $return['bypass'] = true;
+                wp_send_json($return);
+                return;
+            }
+
             if($newStatus === 'wc-cancelled' && $this->auto_cancel === "yes"){
                 $cancelable = number_format($application->amounts->cancelable_amount/100, 2);
                 $currency = $application->currency->id;
                 $amount = sprintf("%s %s", $cancelable, $currency);
                 $return['title'] = __('backend/promptcancel_confirmation_prompt', 'woocommerce-finance-gateway');
-                $response[] = sprintf(
+                $response = [sprintf(
                     __('backend/warningcancel_amount_warning_msg', 'woocommerce-finance-gateway'),
                     $amount,
                     $amount
-                );
+                )];
                 $return['notify'] = true;
                 $return['action'] = self::CANCEL_ACTION;
 
@@ -655,6 +664,15 @@ jQuery(document).ready(function() {
             try{
                 $application = $this->get_application($_GET['application_id']);
 
+                $paymentMethod = get_post_meta($application->merchant_reference, '_payment_method', true);
+                if($paymentMethod !== $this->id){
+                    throw new \Exception("This order doesn't appear to be financed");
+                }
+                $order = wc_get_order($application->merchant_reference);
+                if(!$order){
+                    throw new \Exception("There was an issue retrieving the order");
+                }
+
                 switch($_GET['wf_action']){
                     case self::CANCEL_ACTION:
                         $return['response'] = $this->set_cancelled(
@@ -663,6 +681,7 @@ jQuery(document).ready(function() {
                             $application->merchant_reference,
                             $reason
                         );
+                        $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_cancellation_sent_msg', 'woocommerce-finance-gateway'));
                         $return['message'] = 'Lender successfully notified of cancellation request';
                         $return['success'] = true;
                         break;
@@ -673,6 +692,7 @@ jQuery(document).ready(function() {
                             $application->merchant_reference,
                             $reason
                         );
+                        $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_refund_sent_msg', 'woocommerce-finance-gateway'));
                         $return['message'] = 'Lender successfully notified of refund request';
                         $return['success'] = true;
                         break;
@@ -1841,46 +1861,6 @@ jQuery(document).ready(function($) {
                     $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_fulfillment_sent_msg', 'woocommerce-finance-gateway'));
                 } else {
                     $this->logger->debug('Finance', 'Auto Fulfillment not sent');
-                }
-            } else {
-                return false;
-            }
-        }
-
-        function send_refund_request($order_id)
-        {
-            $wc_order_id = (string) $order_id;
-            $name = get_post_meta($order_id, '_payment_method', true);
-            $order = wc_get_order($order_id);
-            $order_total = $order->get_total();
-            if ('finance' === $name) {
-                if ('no' !== $this->auto_refund) {
-                    $ref_and_finance = $this->get_ref_finance($order);
-                    $this->logger->debug('Finance', 'Auto refund selected' . $ref_and_finance['ref']);
-                    $this->set_refund($ref_and_finance['ref'], $order_total, $wc_order_id);
-                    $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_refund_sent_msg', 'woocommerce-finance-gateway'));
-                } else {
-                    $this->logger->debug('Finance', 'Auto Refund not sent');
-                }
-            } else {
-                return false;
-            }
-        }
-
-        function send_cancellation_request($order_id)
-        {
-            $wc_order_id = (string) $order_id;
-            $name = get_post_meta($order_id, '_payment_method', true);
-            $order = wc_get_order($order_id);
-            $order_total = $order->get_total();
-            if ('finance' === $name) {
-                if ('no' !== $this->auto_cancel) {
-                    $ref_and_finance = $this->get_ref_finance($order);
-                    $this->logger->debug('Finance', 'Auto cancellation selected' . $ref_and_finance['ref']);
-                    $this->set_cancelled($ref_and_finance['ref'], $order_total, $wc_order_id);
-                    $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_cancellation_sent_msg', 'woocommerce-finance-gateway'));
-                } else {
-                    $this->logger->debug('Finance', 'Auto cancellation not sent');
                 }
             } else {
                 return false;
