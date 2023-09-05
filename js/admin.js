@@ -29,14 +29,12 @@ jQuery(document).ready(function($) {
         }
 
         const newStatus = document.getElementById('order_status').value;
-        console.log(newStatus);
 
         const financeId = document.getElementById('financeId').value;
         
         if(!financeId || newStatus === currentStatus || !checkStatuses.find((e) => e === newStatus)){
-            console.log("Here");
-            //statusCheck = false;
-            //event.target.click();
+            statusCheck = false;
+            event.target.click();
             return;
         }
         
@@ -46,7 +44,6 @@ jQuery(document).ready(function($) {
         request.onreadystatechange = () => {
             if(request.readyState === XMLHttpRequest.DONE && request.status === 200){
                 const checkRes = request.response;
-                console.log(checkRes);
                 for(key in checkRes.message){
                     let paragraph = document.createElement("p");
                     paragraph.innerText = checkRes.message[key];
@@ -93,18 +90,17 @@ jQuery(document).ready(function($) {
                                         : null
                                 }
                             }).done(function(updateRes){
-                                console.log(updateRes);
                                 $("#financeStatusModal .contents")
                                     .html("<p>"+updateRes.message+"</p>");
-        
-                                let newBtns = [];
-                                if(updateRes.success === false){
+                                if(updateRes.success === false) {
+                                    let newBtns = [];
                                     newBtns.push(continueBtn);
+                                    $('#financeStatusModal').dialog({buttons:newBtns});
+                                } else {
+                                    statusCheck = false;
+                                    event.target.click();
+                                    return;
                                 }
-                                $('#financeStatusModal')
-                                .dialog({
-                                    buttons: newBtns
-                                })
                             });
                         }
                     });

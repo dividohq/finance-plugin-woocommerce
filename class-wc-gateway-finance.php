@@ -88,9 +88,6 @@ function woocommerce_finance_init()
                 "LOAN_AMENDED" => "Loan Amended",
                 "NOT_GOING_AHEAD" => "Not Going Ahead",
                 "NO_CUSTOMER_INFORMATION" => "No Customer Information"
-            ],
-            "Demo" => [
-                "SOMETHING" => "This is a reason"
             ]
         ];
 
@@ -218,26 +215,11 @@ function woocommerce_finance_init()
                 }
                 // order admin page (making sure it only adds once).
                 add_action('woocommerce_admin_order_data_after_order_details', array($this, 'display_order_data_in_admin'));
-<<<<<<< HEAD
             
                 // checkout.
                 add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
-=======
+
                 add_action('admin_head', array($this, 'setConfig'));
-                $finances_set_admin_order_display = true;
-            }
-            // checkout.
-            add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
-            // ajax callback.
-            add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
-            add_action('wp_ajax_woocommerce_finance_callback', array($this, 'callback'));
-            add_action('wp_ajax_woocommerce_finance_status-check', array($this, 'check_status'));
-            add_action('wp_ajax_woocommerce_finance_status-update', array($this, 'update_status'));
-            add_action('wp_head', array($this, 'add_api_to_head'));
-            add_action('woocommerce_order_status_completed', array($this, 'send_finance_fulfillment_request'), 10, 1);
-            add_action('woocommerce_order_status_refunded', array($this, 'send_refund_request'), 10, 1);
-            add_action('woocommerce_order_status_cancelled', array($this, 'send_cancellation_request'), 10, 1);
->>>>>>> 28c3836 (feat: handle status update)
 
                 // ajax callback.
                 add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
@@ -623,7 +605,7 @@ jQuery(document).ready(function() {
                 return;
             }
             if($newStatus === 'wc-cancelled' && $this->auto_cancel === "yes"){
-                $cancelable = $application->amounts->cancelable_amount;
+                $cancelable = number_format($application->amounts->cancelable_amount/100, 2);
                 $currency = $application->currency->id;
                 $amount = sprintf("%s %s", $cancelable, $currency);
                 $return['title'] = __('backend/promptcancel_confirmation_prompt', 'woocommerce-finance-gateway');
@@ -637,7 +619,7 @@ jQuery(document).ready(function() {
 
             }elseif($newStatus === 'wc-refunded' && $this->auto_refund === "yes"){
                 $application = $this->get_application($_GET['id']);
-                $refundable = $application->amounts->cancelable_amount;
+                $refundable = number_format($application->amounts->refundable_amount/100, 2);
                 $currency = $application->currency->id;
                 $amount = sprintf("%s %s", $refundable, $currency);
                 $return['title'] = __('backend/promptrefund_confirmation_prompt', 'woocommerce-finance-gateway');
@@ -662,9 +644,12 @@ jQuery(document).ready(function() {
 
         public function update_status(){
 
+            $reason = (isset($_GET['reason'])) ? $_GET['reason'] : null;
+
             $return = [
                 'success' => false,
-                'message' => 'Nothing happened'
+                'message' => 'Nothing happened',
+                'reason' => $reason
             ];
 
             try{
@@ -675,7 +660,8 @@ jQuery(document).ready(function() {
                         $return['response'] = $this->set_cancelled(
                             $application->id, 
                             $application->amounts->cancelable_amount, 
-                            $application->merchant_reference
+                            $application->merchant_reference,
+                            $reason
                         );
                         $return['message'] = 'Lender successfully notified of cancellation request';
                         $return['success'] = true;
@@ -684,7 +670,8 @@ jQuery(document).ready(function() {
                         $return['response'] = $this->set_refund(
                             $application->id, 
                             $application->amounts->refundable_amount, 
-                            $application->merchant_reference
+                            $application->merchant_reference,
+                            $reason
                         );
                         $return['message'] = 'Lender successfully notified of refund request';
                         $return['success'] = true;
@@ -695,7 +682,8 @@ jQuery(document).ready(function() {
                 }
             }
             catch(MerchantApiBadResponseException $e){
-                $return['message'] = sprintf("Application %s not possible", $_GET['wf_action']);
+                $return['message'] = sprintf("Application %s not possible: %s", $_GET['wf_action'], $e->getMessage());
+                $return['context'] = $e->getContext();
             } catch (\Exception $e) {
                 $return['message'] = $e->getMessage();
             }
@@ -1911,7 +1899,7 @@ jQuery(document).ready(function($) {
          * @param  [string] $tracking_numbers - If there are any tracking numbers to attach we apply here.
          * @return void
          */
-        function set_cancelled($application_id, $order_total, $order_id)
+        function set_cancelled(string $application_id, int $order_total, string $order_id, string $reason=null)
         {
             $items = [
                 [
@@ -1924,23 +1912,32 @@ jQuery(document).ready(function($) {
             $applicationCancellation = (new \Divido\MerchantSDK\Models\ApplicationCancellation())
                 ->withOrderItems($items);
 
+            if($reason !== null){
+                $applicationCancellation = $applicationCancellation->withReason($reason);
+            }
+
             //Todo: Check if SDK is null
             $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
             $proxy->postCancellation($application_id, $applicationCancellation);
         }
 
-        function set_refund($application_id, $order_total, $order_id)
+        function set_refund(string $application_id, int $order_total, string $order_id, ?string $reason = null)
         {
             $items = [
                 [
                     'name' => __('globalorder_id_label', 'woocommerce-finance-gateway') . ": $order_id",
                     'quantity' => 1,
-                    'price' => $this->toPence($order_total),
+
+                    'price' => $this->toPence($order_total)
                 ],
             ];
 
             $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationRefund())
                 ->withOrderItems($items);
+
+            if($reason !== null){
+                $applicationRefund = $applicationRefund->withReason($reason);
+            }
 
             //Todo: Check if SDK is null
             $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
