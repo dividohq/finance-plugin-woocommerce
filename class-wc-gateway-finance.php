@@ -1999,27 +1999,23 @@ jQuery(document).ready(function($) {
          */
         private function getTrueCartMax():?float{
             $max = null;
-            $configMax = (is_float($this->max_loan_amount))
-                ? $this->toPence($this->max_loan_amount)
-                : null;
-
-            $plans = $this->get_short_plans_array();
-            if(empty($plans)){
-                return $configMax;
-            }
 
             /** @var Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
-            foreach($plans as $plan){
+            foreach($this->get_short_plans_array() as $plan){
                 if($max === null || $plan->getCreditMinimum() > $max){
                     $max = $plan->getCreditMaximum();
                 }
             }
 
-            if(is_float($configMax) && $configMax < $max){
-                $max = $configMax;
+            if(
+                is_float($this->max_loan_amount) 
+                && is_int($max)
+                && $this->toPence($this->max_loan_amount) < $max
+            ){
+                return $this->max_loan_amount;
             }
 
-            return floatval($max/100);
+            return (is_numeric($max)) ? floatval($max/100) : null;
         }
     }
 
