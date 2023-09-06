@@ -5,7 +5,7 @@
 <div id="financeWidget"
     data-calculator-widget
     data-mode="calculator"
-    data-plans="<?= $plans; ?>"
+    data-plans="<?= $plansStr; ?>"
     data-amount="<?= $amount; ?>"
     data-footnote="<?= $footnote; ?>"
     <?= $language; ?>
@@ -16,12 +16,6 @@
    jQuery(document).ready(function($) {
       waitForElementToDisplay('#financeWidget', 1000);
    });
-   <?php if(!empty($calcConfApiUrl)){ ?>
-   window.__calculatorConfig = {
-      apiKey: '<?= $shortApiKey ?>',
-      calculatorApiPubUrl: '<?= $calcConfApiUrl ?>'
-   };
-<?php } ?>
 </script>
 <div class="clear"></div>
 </fieldset>

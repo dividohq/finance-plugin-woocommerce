@@ -19,7 +19,8 @@
         "files": [
             "includes/proxies/MerchantApiPubProxy.php",
             "includes/wrappers/HttpApiWrapper.php",
-            "includes/exceptions/ResponseException.php"
+            "includes/exceptions/ResponseException.php",
+            "includes/models/ShortPlan.php"
         ]
     }
 }

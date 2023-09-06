@@ -2,8 +2,8 @@
 
 <div
     data-calculator-widget
-    data-mode="lightbox"
-    data-plans="<?= $plans;?>"
+    data-mode="<?= $mode; ?>"
+    data-plans="<?= $plansStr;?>"
     data-amount="<?= $price; ?>"
     <?= $language; ?>
     <?php if(!empty($button_text)) echo("data-button-text=\"{$button_text}\""); ?>
@@ -23,21 +23,4 @@
             });
         });
     });
-<?php if(!empty($calcConfApiUrl)){ ?>
-    window.__calculatorConfig = {
-        <?php if(!empty($button_text)){ ?>
-        overrides: {
-            theme: {
-                modes: {
-                    Lightbox: {
-                        linkText: '<?= $button_text ?>'
-                    }
-                }
-            }
-        },
-        <?php } ?>
-        apiKey: '<?= $shortApiKey ?>',
-        calculatorApiPubUrl: '<?= $calcConfApiUrl ?>'
-    };
-<?php } ?>
 </script>
