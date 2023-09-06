@@ -132,7 +132,7 @@ function woocommerce_finance_init()
                     FILTER_FLAG_ALLOW_FRACTION
                 );
             
-            $this->cart_threshold = isset($this->settings['cartThreshold'])
+            $this->cart_threshold = (empty($this->settings['cartThreshold']))
                 ? null
                 : (float) filter_var(
                     $this->settings['cartThreshold'], 
