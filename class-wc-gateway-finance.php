@@ -132,7 +132,7 @@ function woocommerce_finance_init()
                     FILTER_FLAG_ALLOW_FRACTION
                 );
             
-            $this->cart_threshold = isset($this->settings['cartThreshold'])
+            $this->cart_threshold = (empty($this->settings['cartThreshold']))
                 ? null
                 : (float) filter_var(
                     $this->settings['cartThreshold'], 
@@ -597,14 +597,14 @@ jQuery(document).ready(function() {
         }
 
         /**
-         * Get Product specific finance options. Returns null if there are no plan rules specified for the product
+         * Get Product specific finance options. Returns an empty array if nothing has been set
          *
          * @since 1.0.0
          *
          * @param  object $product Product Instance.
-         * @return array|null
+         * @return array
          */
-        public function get_product_finance_plans($product) :?array
+        public function get_product_finance_plans($product) :array
         {
 
             if ($product->get_type() === 'variation') {
@@ -612,12 +612,12 @@ jQuery(document).ready(function() {
             } else {
                 $data = maybe_unserialize(get_post_meta($product->get_id(), 'woo_finance_product_tab', true));
             }
-            
+
             if (isset($data) && is_array($data) && isset($data['active']) && 'selected' === $data['active']) {
                 return (is_array($data['finances']) && count($data['finances']) > 0) ? $data['finances'] : array();
             }
 
-            return null;
+            return [];
         }
 
         /**
@@ -762,6 +762,13 @@ jQuery(document).ready(function() {
                 $tab_data['finances'] = array();
             }
             $finances = $this->get_short_plans_array();
+
+            $warningMsg = sprintf(
+                __('backend/warningselected_plans_specific_products_warning_msg', 'woocommerce-finance-gateway'),
+                "<b>".__('frontend/productselected_plans_label', 'woocommerce-finance-gateway')."</b>",
+                "<b>".__('backend/configproduct_selection_label', 'woocommerce-finance-gateway')."</b>",
+                "<b>".__('backend/configfinance_specific_products_option', 'woocommerce-finance-gateway')."</b>"
+            )
         ?>
 <div id="finance_tab" class="panel woocommerce_options_panel">
     <p class="form-field _hide_title_field ">
@@ -788,7 +795,9 @@ jQuery(document).ready(function() {
         &nbsp;<?php print esc_attr($plan->getName()); ?>
         <br style="clear:both;" />
         <?php } ?>
+        <p><?= $warningMsg ?></p>
     </p>
+    
 </div>
 <script type="text/javascript">
 function checkActive() {
@@ -1866,9 +1875,7 @@ jQuery(document).ready(function($) {
          */
         private function filterPlansByProduct(WC_Product $product, array $plans):array{
             $productPlans = $this->get_product_finance_plans($product);
-            if($productPlans === null){
-                return $plans;
-            }
+            
             foreach($plans as $key=>$plan){
                 if(!in_array($plan->getId(), $productPlans)){
                     unset($plans[$key]);
@@ -1999,27 +2006,23 @@ jQuery(document).ready(function($) {
          */
         private function getTrueCartMax():?float{
             $max = null;
-            $configMax = (is_float($this->max_loan_amount))
-                ? $this->toPence($this->max_loan_amount)
-                : null;
-
-            $plans = $this->get_short_plans_array();
-            if(empty($plans)){
-                return $configMax;
-            }
 
             /** @var Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
-            foreach($plans as $plan){
+            foreach($this->get_short_plans_array() as $plan){
                 if($max === null || $plan->getCreditMinimum() > $max){
                     $max = $plan->getCreditMaximum();
                 }
             }
 
-            if(is_float($configMax) && $configMax < $max){
-                $max = $configMax;
+            if(
+                is_float($this->max_loan_amount) 
+                && is_int($max)
+                && $this->toPence($this->max_loan_amount) < $max
+            ){
+                return $this->max_loan_amount;
             }
 
-            return floatval($max/100);
+            return (is_numeric($max)) ? floatval($max/100) : null;
         }
     }
 
