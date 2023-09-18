@@ -72,6 +72,8 @@ function woocommerce_finance_init()
         const INLINE_CALCULATOR_MODE = 'calculator';
         const LIGHTBOX_CALCULATOR_MODE = 'lightbox';
 
+        const DEFAULT_SHORTCODE_AMOUNT = 1000;
+
         function wpdocs_load_textdomain()
         {
             if (!load_plugin_textdomain(
@@ -267,7 +269,7 @@ function woocommerce_finance_init()
             $this->enqueue();
 
             $attributes = shortcode_atts(array(
-                'amount' => 250,
+                'amount' => null,
                 'mode' => self::INLINE_CALCULATOR_MODE,
                 'button_text' => '',
                 'plans' => '',
@@ -277,10 +279,6 @@ function woocommerce_finance_init()
             $mode = ($attributes['mode'] === self::LIGHTBOX_CALCULATOR_MODE)
                 ? self::LIGHTBOX_CALCULATOR_MODE
                 : self::INLINE_CALCULATOR_MODE;
-
-            $plansStr = (!empty($attributes["plans"] && is_string($attributes["plans"])))
-                ? $attributes["plans"]
-                : $this->convert_plans_to_comma_seperated_string($this->get_short_plans_array());
 
             $buttonText = '';
             if(!empty($attributes["button_text"] && is_string($attributes['button_text']))){
@@ -292,7 +290,33 @@ function woocommerce_finance_init()
                 ? sprintf('data-footnote="%s"', $attributes["footnote"])
                 : '';
             
-            $amount = $this->toPence($attributes['amount']);
+            if (is_product()){
+                global $product;
+                if($this->doesProductMeetWidgetThreshold($product) === false){
+                    return;
+                }
+                $plans = $this->get_short_plans_array();
+                if (
+                    isset($this->settings['productSelect'])
+                    && $this->settings['productSelect'] === 'selected'
+                ) {
+                    $plans = $this->filterPlansByProduct($product, $plans);
+                }
+                if(count($plans) === 0){
+                    return;
+                }
+                $plansStr = $this->convert_plans_to_comma_seperated_string($plans);
+                $amount = $this->toPence($product->get_price());
+            } else {
+                $amount = (isset($attributes['amount']) && is_numeric($attributes['amount']))
+                    ? $this->toPence(floatval($attributes['amount']))
+                    : $this->toPence(self::DEFAULT_SHORTCODE_AMOUNT);
+                
+                $plansStr = (!empty($attributes["plans"] && is_string($attributes["plans"])))
+                    ? $attributes["plans"]
+                    : $this->convert_plans_to_comma_seperated_string($this->get_short_plans_array());
+                
+            }
 
             return sprintf(
                 '<div data-calculator-widget data-mode="%s" data-amount="%d" %s %s data-plans="%s" ></div>',
