@@ -45,6 +45,10 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
  == Changelog ==
 
+Version 2.6.2
+Fix: Amends erroneous refund notification URL path
+Feat: Shorcode widget automatically picks up on the price of a product if shortcode is used on product page
+
 Version 2.6.1
 Fix: Fixes issue with payment method not displaying at checkout when cart threshold is set
 Fix: Fixes duplicated links in backend
