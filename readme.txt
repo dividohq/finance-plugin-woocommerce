@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      6.3.1
-Stable tag:        2.6.1
-Version:           2.6.1
+Stable tag:        2.6.2
+Version:           2.6.2
 
 License: GPLv2 or later
 
