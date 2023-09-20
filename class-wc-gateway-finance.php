@@ -693,6 +693,10 @@ jQuery(document).ready(function() {
             
             $price = $this->toPence($product->get_price());
 
+            $footnote = (isset($this->footnote) && !empty($this->footnote)) 
+                ? sprintf(' data-footnote="%s"', $this->footnote) 
+                : "";
+
             $language = ($this->useStoreLanguage === "yes") 
                 ? sprintf("data-language='%s'", $this->get_language())
                 : '';
