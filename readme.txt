@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      6.3.1
-Stable tag:        2.6.1
-Version:           2.6.1
+Stable tag:        2.6.2
+Version:           2.6.2
 
 License: GPLv2 or later
 
@@ -44,6 +44,10 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+
+Version 2.6.2
+Fix: Amends erroneous refund notification URL path
+Feat: Shorcode widget automatically picks up on the price of a product if shortcode is used on product page
 
 Version 2.6.1
 Fix: Fixes issue with payment method not displaying at checkout when cart threshold is set

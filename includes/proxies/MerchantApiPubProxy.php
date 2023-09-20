@@ -24,7 +24,7 @@ class MerchantApiPubProxy{
         'POST' => [
             'APPLICATION' => '/applications',
             'ACTIVATION' => '/applications/%s/activations',
-            'REFUND' => '/application/%s/refunds',
+            'REFUND' => '/applications/%s/refunds',
             'CANCELLATION' => '/applications/%s/cancellations'
         ],
         'PATCH' => [
