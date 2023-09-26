@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd" bootstrap="tests/bootstrap.php">
+  <testsuites>
+    <testsuite name="unit">
+      <directory suffix="Test.php">tests/unit</directory>
+    </testsuite>
+  </testsuites>
+  <coverage includeUncoveredFiles="true">
+    <report>
+      <text outputFile="coverage.out" showUncoveredFiles="false" showOnlySummary="true"/>
+      <xml outputDirectory="xml-coverage"/>
+  </report>
+  </coverage>
+  <source>
+    <include>
+      <file>class-wc-gateway-finance.php</file>
+      <directory suffix=".php">includes</directory>
+    </include>
+  </source>
+  
+</phpunit>

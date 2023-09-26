@@ -22,5 +22,8 @@
             "includes/exceptions/ResponseException.php",
             "includes/models/ShortPlan.php"
         ]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.3"
     }
 }
