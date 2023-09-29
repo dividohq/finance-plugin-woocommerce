@@ -10,13 +10,13 @@ defined('ABSPATH') or die('Denied');
  *
  * @package Finance Gateway
  * @author Divido <support@divido.com>
- * @copyright 2019 Divido Financial Services
+ * @copyright 2023 Divido Financial Services
  * @license MIT
  *
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.6.2
+ * Version: 2.7.0
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
@@ -126,7 +126,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.6.2';
+            $this->plugin_version = '2.7.0';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';

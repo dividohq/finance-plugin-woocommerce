@@ -8,7 +8,7 @@ Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      6.3.1
 Stable tag:        2.6.2
-Version:           2.6.2
+Version:           2.7.0
 
 License: GPLv2 or later
 
@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+
+Version 2.7.0
+Feat: Adds extra information for the merchant when attempting to refund/cancel an order placed via the plugin 
 
 Version 2.6.2
 Fix: Amends erroneous refund notification URL path
