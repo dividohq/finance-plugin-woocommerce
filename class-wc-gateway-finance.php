@@ -224,12 +224,12 @@ function woocommerce_finance_init()
                 // ajax callback.
                 add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
                 add_action('wp_ajax_woocommerce_finance_callback', array($this, 'callback'));
+                add_action('wp_ajax_woocommerce_finance_status-check', array($this, 'check_status'));
+                add_action('wp_ajax_woocommerce_finance_status-update', array($this, 'update_status'));
 
                 //hooks
                 add_action('woocommerce_order_status_completed', array($this, 'send_finance_fulfillment_request'), 10, 1);
-                add_action('woocommerce_order_status_refunded', array($this, 'send_refund_request'), 10, 1);
-                add_action('woocommerce_order_status_cancelled', array($this, 'send_cancellation_request'), 10, 1);
-
+                
                 // shortcodes
                 add_shortcode('finance_widget', array($this, 'anypage_widget'));
 
