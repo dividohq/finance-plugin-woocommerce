@@ -5,6 +5,8 @@ use PHPUnit\Framework\TestCase;
 
 final class GatewayTest extends TestCase
 {
+    private WC_Gateway_Finance $gateway;
+    
     public function setUp():void{
         $this->gateway = new WC_Gateway_Finance();
     }
@@ -15,5 +17,5 @@ final class GatewayTest extends TestCase
             $this->gateway->id
         );
     }
-    
+
 }
