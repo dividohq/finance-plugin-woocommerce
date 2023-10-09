@@ -1370,9 +1370,6 @@ jQuery(document).ready(function($) {
             }
 
             $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
-            
-            preg_match('/^([\d]+)(.+)/', $order->get_shipping_address_1(), $shippingAddress);
-            preg_match('/^([\d]+)(.+)/', $order->get_billing_address_1(), $billingAddress);
 
             $application = (new \Divido\MerchantSDK\Models\Application())
                 ->withCountryId($order->get_billing_country())
@@ -1385,27 +1382,19 @@ jQuery(document).ready(function($) {
                             'phoneNumber' => str_replace(' ', '', $order->get_billing_phone()),
                             'email' => $order->get_billing_email(),
                             'addresses' => array([
-                                'buildingNumber' => $billingAddress[1],
-                                'town' => $order->get_billing_city(),
                                 'postcode' => $order->get_billing_postcode(),
-                                'street' => trim($billingAddress[2]),
                                 'country' => $order->get_billing_country(),
                                 'text' => implode(' ', [
                                     $order->get_billing_address_1(),
-                                    $order->get_billing_postcode(),
-                                    $order->get_billing_country()
+                                    $order->get_billing_city()
                                 ])
                             ]),
 							'shippingAddress' => [
-								'buildingNumber' => $shippingAddress[1],
-								'postcode' => $order->get_shipping_postcode(),
-								'town' => $order->get_shipping_city(),
-								'street' => trim($shippingAddress[2]),
-								'Country' => $order->get_shipping_country(),
+								'postcode' => (empty($order->get_shipping_postcode())) ? $order->get_billing_postcode() : $order->get_shipping_postcode(),
+								'country' => (empty($order->get_shipping_country())) ? $order->get_billing_country() : $order->get_shipping_country(),
 								'text' => implode(' ', [
-									$order->get_shipping_address_1(),
-									$order->get_shipping_postcode(),
-									$order->get_shipping_country()
+									(empty($order->get_shipping_address_1())) ? $order->get_billing_address_1() : $order->get_shipping_address_1(),
+									(empty($order->get_shipping_city())) ? $order->get_billing_city() : $order->get_shipping_city()
 								])
 							]
                         ]
