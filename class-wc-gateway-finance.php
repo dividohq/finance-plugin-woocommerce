@@ -1,6 +1,7 @@
 <?php
 
 use Divido\MerchantSDK\Environment;
+use Divido\MerchantSDK\Exceptions\MerchantApiBadResponseException;
 use Divido\Woocommerce\FinanceGateway\Proxies\MerchantApiPubProxy;
 
 defined('ABSPATH') or die('Denied');
@@ -9,19 +10,19 @@ defined('ABSPATH') or die('Denied');
  *
  * @package Finance Gateway
  * @author Divido <support@divido.com>
- * @copyright 2019 Divido Financial Services
+ * @copyright 2023 Divido Financial Services
  * @license MIT
  *
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.6.2
+ * Version: 2.7.0
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
  * Text Domain: woocommerce-finance-gateway
  * Domain Path: /i18n/languages/
- * WC tested up to: 8.0.3
+ * WC tested up to: 8.1.1
  */
 
 /**
@@ -66,6 +67,10 @@ function woocommerce_finance_init()
 
         private ?float $widget_threshold;
 
+        private string $auto_refund;
+
+        private string $auto_cancel;
+
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
 
@@ -73,6 +78,21 @@ function woocommerce_finance_init()
         const LIGHTBOX_CALCULATOR_MODE = 'lightbox';
 
         const DEFAULT_SHORTCODE_AMOUNT = 1000;
+
+        const REASONS = [
+            "novuna" => [
+                "ALTERNATIVE_PAYMENT_METHOD_USED" => "Alternative Payment Method Used",
+                "GOODS_FAULTY" => "Goods Faulty",
+                "GOODS_NOT_RECEIVED" => "Goods Not Received",
+                "GOODS_RETURNED" => "Goods Returned",
+                "LOAN_AMENDED" => "Loan Amended",
+                "NOT_GOING_AHEAD" => "Not Going Ahead",
+                "NO_CUSTOMER_INFORMATION" => "No Customer Information"
+            ]
+        ];
+
+        const REFUND_ACTION = 'refund';
+        const CANCEL_ACTION = 'cancel';
 
         function wpdocs_load_textdomain()
         {
@@ -106,7 +126,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.6.2';
+            $this->plugin_version = '2.7.0';
             add_action('init', array($this, 'wpdocs_load_textdomain'));
 
             $this->id = 'finance';
@@ -194,21 +214,22 @@ function woocommerce_finance_init()
                     }
                 }
                 // order admin page (making sure it only adds once).
-            
                 add_action('woocommerce_admin_order_data_after_order_details', array($this, 'display_order_data_in_admin'));
             
                 // checkout.
                 add_filter('woocommerce_payment_gateways', array($this, 'add_method'));
 
+                add_action('admin_head', array($this, 'setConfig'));
+
                 // ajax callback.
                 add_action('wp_ajax_nopriv_woocommerce_finance_callback', array($this, 'callback'));
                 add_action('wp_ajax_woocommerce_finance_callback', array($this, 'callback'));
+                add_action('wp_ajax_woocommerce_finance_status-check', array($this, 'check_status'));
+                add_action('wp_ajax_woocommerce_finance_status-update', array($this, 'update_status'));
 
                 //hooks
                 add_action('woocommerce_order_status_completed', array($this, 'send_finance_fulfillment_request'), 10, 1);
-                add_action('woocommerce_order_status_refunded', array($this, 'send_refund_request'), 10, 1);
-                add_action('woocommerce_order_status_cancelled', array($this, 'send_cancellation_request'), 10, 1);
-
+                
                 // shortcodes
                 add_shortcode('finance_widget', array($this, 'anypage_widget'));
 
@@ -473,10 +494,24 @@ jQuery(document).ready(function() {
             $ref_and_finance = $this->get_ref_finance($order);
             if ($ref_and_finance['ref']) {
                 echo '<p class="form-field form-field-wide"><strong>' . esc_attr(__('backend/orderfinance_reference_number_label', 'woocommerce-finance-gateway')) . ':</strong><br />' . esc_html($ref_and_finance['ref']) . '</p>';
+                echo(sprintf('<input type=\'hidden\' id=\'financeId\' value=\'%s\'>', esc_html($ref_and_finance['ref'])));
+                echo('<div id=\'financeStatusModal\'><div class=\'contents\'></div></div>');
             }
             if ($ref_and_finance['finance']) {
                 echo '<p class="form-field form-field-wide"><strong>' . esc_attr(__('backend/orderfinance_plan_id_label', 'woocommerce-finance-gateway')) . ':</strong><br />' . esc_html($ref_and_finance['finance']) . '</p>';
             }
+        }
+
+        public function setConfig(){
+            echo('<script language=\'javascript\'>');
+                echo(sprintf(
+                    'const statusCheckPath = \'%s\'', 
+                    sprintf(
+                        '%s',
+                         str_replace(get_site_url(null, '', 'admin'), '', admin_url('admin-ajax.php')))
+                )
+            );
+            echo('</script>');
         }
 
         /**
@@ -549,6 +584,131 @@ jQuery(document).ready(function() {
                     }
                 }
             }
+        }
+
+        public function check_status(){
+            $newStatus = $_GET['status'];
+            
+            $return = [
+                'message' => null,
+                'reasons' => null,
+                'notify' => false,
+                'bypass' => false,
+                'action' => 'proceed',
+                'title' => 'Do you wish to proceed?'
+            ];
+            $response = ['Unactionable event'];
+            try{
+                $application = $this->get_application($_GET['id']);
+            } catch(MerchantApiBadResponseException $e){
+                $return['message'] = "It appears you are using a different api key...";
+                wp_send_json($return);
+                return;
+            }
+
+            $paymentMethod = get_post_meta($application->merchant_reference, '_payment_method', true);
+            if($paymentMethod !== $this->id){
+                $return['bypass'] = true;
+                wp_send_json($return);
+                return;
+            }
+
+            if($newStatus === 'wc-cancelled' && $this->auto_cancel === "yes"){
+                $cancelable = number_format($application->amounts->cancelable_amount/100, 2);
+                $currency = $application->currency->id;
+                $amount = sprintf("%s %s", $cancelable, $currency);
+                $return['title'] = __('backend/promptcancel_confirmation_prompt', 'woocommerce-finance-gateway');
+                $response = [sprintf(
+                    __('backend/warningcancel_amount_warning_msg', 'woocommerce-finance-gateway'),
+                    $amount,
+                    $amount
+                )];
+                $return['notify'] = true;
+                $return['action'] = self::CANCEL_ACTION;
+
+            }elseif($newStatus === 'wc-refunded' && $this->auto_refund === "yes"){
+                $application = $this->get_application($_GET['id']);
+                $refundable = number_format($application->amounts->refundable_amount/100, 2);
+                $currency = $application->currency->id;
+                $amount = sprintf("%s %s", $refundable, $currency);
+                $return['title'] = __('backend/promptrefund_confirmation_prompt', 'woocommerce-finance-gateway');
+                $response = [sprintf(
+                    __('backend/warningrefund_amount_warning_msg', 'woocommerce-finance-gateway'),
+                    $amount,
+                    $amount
+                )];
+                $return['notify'] = true;
+                $return['action'] = self::REFUND_ACTION;
+            }
+            if(isset(self::REASONS[$application->lender->app_name])){
+                $return['reasons'] = self::REASONS[$application->lender->app_name];
+                $response[] = sprintf(
+                    "%s requests that you provide a reason from the list below:",
+                    $application->lender->app_name
+                );
+            }
+            $return['message'] = $response;
+            wp_send_json($return);
+        }
+
+        public function update_status(){
+
+            $reason = (isset($_GET['reason'])) ? $_GET['reason'] : null;
+
+            $return = [
+                'success' => false,
+                'message' => 'Nothing happened',
+                'reason' => $reason
+            ];
+
+            try{
+                $application = $this->get_application($_GET['application_id']);
+
+                $paymentMethod = get_post_meta($application->merchant_reference, '_payment_method', true);
+                if($paymentMethod !== $this->id){
+                    throw new \Exception("This order doesn't appear to be financed");
+                }
+                $order = wc_get_order($application->merchant_reference);
+                if(!$order){
+                    throw new \Exception("There was an issue retrieving the order");
+                }
+
+                switch($_GET['wf_action']){
+                    case self::CANCEL_ACTION:
+                        $return['response'] = $this->set_cancelled(
+                            $application->id, 
+                            $application->amounts->cancelable_amount, 
+                            $application->merchant_reference,
+                            $reason
+                        );
+                        $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_cancellation_sent_msg', 'woocommerce-finance-gateway'));
+                        $return['message'] = 'Lender successfully notified of cancellation request';
+                        $return['success'] = true;
+                        break;
+                    case self::REFUND_ACTION:
+                        $return['response'] = $this->set_refund(
+                            $application->id, 
+                            $application->amounts->refundable_amount, 
+                            $application->merchant_reference,
+                            $reason
+                        );
+                        $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_refund_sent_msg', 'woocommerce-finance-gateway'));
+                        $return['message'] = 'Lender successfully notified of refund request';
+                        $return['success'] = true;
+                        break;
+                    default:
+                        $return['message'] = "Could not find action";
+                        break;
+                }
+            }
+            catch(MerchantApiBadResponseException $e){
+                $return['message'] = sprintf("Application %s not possible: %s", $_GET['wf_action'], $e->getMessage());
+                $return['context'] = $e->getContext();
+            } catch (\Exception $e) {
+                $return['message'] = $e->getMessage();
+            }
+
+            wp_send_json($return);
         }
 
         /**
@@ -1507,6 +1667,17 @@ jQuery(document).ready(function($) {
             return $finances;
         }
 
+        function get_application(string $applicationId)
+        {
+            $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
+
+            $response = $proxy->getApplication($applicationId);
+
+            $application = $response->data;
+
+            return $application;
+        }
+
         /**
          * Get Finance Platform Environment function
          * @return mixed
@@ -1567,6 +1738,16 @@ jQuery(document).ready(function($) {
          */
         function wpdocs_enqueue_custom_admin_style($hook_suffix)
         {
+            
+            if (get_current_screen()->id == 'shop_order') {
+                wp_register_script('woocommerce-finance-gateway-admin-js',plugins_url('/js/admin.js', __FILE__));
+                wp_enqueue_script('woocommerce-finance-gateway-admin-js');
+
+                // Enqueue the assets
+                wp_enqueue_script('jquery-ui-dialog');
+                wp_enqueue_style('wp-jquery-ui-dialog');
+              }
+
             // Check if it's the ?page=yourpagename. If not, just empty return before executing the folowing scripts.
             if ('woocommerce_page_wc-settings' !== $hook_suffix) {
                 return;
@@ -1686,46 +1867,6 @@ jQuery(document).ready(function($) {
             }
         }
 
-        function send_refund_request($order_id)
-        {
-            $wc_order_id = (string) $order_id;
-            $name = get_post_meta($order_id, '_payment_method', true);
-            $order = wc_get_order($order_id);
-            $order_total = $order->get_total();
-            if ('finance' === $name) {
-                if ('no' !== $this->auto_refund) {
-                    $ref_and_finance = $this->get_ref_finance($order);
-                    $this->logger->debug('Finance', 'Auto refund selected' . $ref_and_finance['ref']);
-                    $this->set_refund($ref_and_finance['ref'], $order_total, $wc_order_id);
-                    $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_refund_sent_msg', 'woocommerce-finance-gateway'));
-                } else {
-                    $this->logger->debug('Finance', 'Auto Refund not sent');
-                }
-            } else {
-                return false;
-            }
-        }
-
-        function send_cancellation_request($order_id)
-        {
-            $wc_order_id = (string) $order_id;
-            $name = get_post_meta($order_id, '_payment_method', true);
-            $order = wc_get_order($order_id);
-            $order_total = $order->get_total();
-            if ('finance' === $name) {
-                if ('no' !== $this->auto_cancel) {
-                    $ref_and_finance = $this->get_ref_finance($order);
-                    $this->logger->debug('Finance', 'Auto cancellation selected' . $ref_and_finance['ref']);
-                    $this->set_cancelled($ref_and_finance['ref'], $order_total, $wc_order_id);
-                    $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_cancellation_sent_msg', 'woocommerce-finance-gateway'));
-                } else {
-                    $this->logger->debug('Finance', 'Auto cancellation not sent');
-                }
-            } else {
-                return false;
-            }
-        }
-
         /**
          * Function that will activate an application or set to fulfilled on dividio.
          *
@@ -1738,7 +1879,7 @@ jQuery(document).ready(function($) {
          * @param  [string] $tracking_numbers - If there are any tracking numbers to attach we apply here.
          * @return void
          */
-        function set_cancelled($application_id, $order_total, $order_id)
+        function set_cancelled(string $application_id, int $order_total, string $order_id, string $reason=null)
         {
             $items = [
                 [
@@ -1751,23 +1892,32 @@ jQuery(document).ready(function($) {
             $applicationCancellation = (new \Divido\MerchantSDK\Models\ApplicationCancellation())
                 ->withOrderItems($items);
 
+            if($reason !== null){
+                $applicationCancellation = $applicationCancellation->withReason($reason);
+            }
+
             //Todo: Check if SDK is null
             $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
             $proxy->postCancellation($application_id, $applicationCancellation);
         }
 
-        function set_refund($application_id, $order_total, $order_id)
+        function set_refund(string $application_id, int $order_total, string $order_id, ?string $reason = null)
         {
             $items = [
                 [
                     'name' => __('globalorder_id_label', 'woocommerce-finance-gateway') . ": $order_id",
                     'quantity' => 1,
-                    'price' => $this->toPence($order_total),
+
+                    'price' => $this->toPence($order_total)
                 ],
             ];
 
             $applicationRefund = (new \Divido\MerchantSDK\Models\ApplicationRefund())
                 ->withOrderItems($items);
+
+            if($reason !== null){
+                $applicationRefund = $applicationRefund->withReason($reason);
+            }
 
             //Todo: Check if SDK is null
             $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
