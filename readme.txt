@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      6.3.2
-Stable tag:        2.7.0
-Version:           2.7.0
+Stable tag:        2.7.1
+Version:           2.7.1
 
 License: GPLv2 or later
 
@@ -44,6 +44,9 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+
+Version 2.7.1
+Fix: Rolls back some cosmetic non PHP 7.4 compatible changes
 
 Version 2.7.0
 Feat: Adds extra information for the merchant when attempting to refund/cancel an order placed via the plugin 
