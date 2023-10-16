@@ -47,7 +47,14 @@ class HttpApiWrapper{
         return $response;
     }
 
-    public function post(string $path, mixed $body): array{
+    /**
+     * Wraps the wp_remote_post function
+     *
+     * @param string $path
+     * @param string|array $body
+     * @return array
+     */
+    public function post(string $path, $body): array{
         $args = array_merge($this->defaultArgs, [
             'method' => 'POST',
             'body' => $body
@@ -65,7 +72,14 @@ class HttpApiWrapper{
         return $response;
     }
 
-    public function patch(string $path, mixed $body):array{
+    /**
+     * Wrapper for the wp_remote_post method when used to PATCH
+     *
+     * @param string $path
+     * @param string|array $body
+     * @return array
+     */
+    public function patch(string $path, $body):array{
         $args = array_merge($this->defaultArgs, [
             'method' => 'PATCH',
             'body' => $body
