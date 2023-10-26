@@ -1384,18 +1384,20 @@ jQuery(document).ready(function($) {
                             'addresses' => array([
                                 'postcode' => $order->get_billing_postcode(),
                                 'country' => $order->get_billing_country(),
-                                'text' => implode(' ', [
+                                'text' => implode(', ', array_filter([
+                                    $order->get_billing_address_2(),
                                     $order->get_billing_address_1(),
                                     $order->get_billing_city()
-                                ])
+                                ]))
                             ]),
 							'shippingAddress' => [
 								'postcode' => (empty($order->get_shipping_postcode())) ? $order->get_billing_postcode() : $order->get_shipping_postcode(),
 								'country' => (empty($order->get_shipping_country())) ? $order->get_billing_country() : $order->get_shipping_country(),
-								'text' => implode(' ', [
+								'text' => implode(', ', array_filter([
+									(empty($order->get_shipping_address_2())) ? $order->get_billing_address_2() : $order->get_shipping_address_2(),
 									(empty($order->get_shipping_address_1())) ? $order->get_billing_address_1() : $order->get_shipping_address_1(),
 									(empty($order->get_shipping_city())) ? $order->get_billing_city() : $order->get_shipping_city()
-								])
+								]))
 							]
                         ]
                     ]
