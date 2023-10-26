@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd" bootstrap="tests/bootstrap.php">
+<phpunit 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd" 
+  bootstrap="tests/bootstrap.php" 
+  displayDetailsOnTestsThatTriggerWarnings="true"
+>
   <testsuites>
     <testsuite name="unit">
       <directory suffix="Test.php">tests/unit</directory>
@@ -16,6 +21,10 @@
       <file>class-wc-gateway-finance.php</file>
       <directory suffix=".php">includes</directory>
     </include>
+    <exclude>
+      <file>includes/checkout.php</file>
+      <file>includes/widget.php</file>
+    </exclude>
   </source>
   
 </phpunit>
