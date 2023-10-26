@@ -6,3 +6,6 @@ wpcs/
 vendor/
 composer.lock
 .php_cs.cache
+.phpunit.result.cache
+xml-coverage
+coverage.out
