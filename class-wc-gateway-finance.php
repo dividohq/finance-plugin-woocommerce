@@ -895,6 +895,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
             );
 
             if (isset($this->api_key) && $this->api_key) {
+                
                 $plans = $this->get_short_plans_array(true, false);
 
                 try {
@@ -1918,7 +1919,7 @@ jQuery(document).ready(function($) {
          * @param array $plans
          * @return array
          */
-        private function filterPlansByActive(array $plans):array{
+        public function filterPlansByActive(array $plans):array{
             /** @var \Divido\Woocommerce\FinanceGateway\Models\ShortPlan $plan */
             foreach($plans as $key=>$plan){
                 if($plan->isActive() === false){
@@ -1934,7 +1935,7 @@ jQuery(document).ready(function($) {
          * @param array $plans
          * @return array
          */
-        private function filterPlansByRefineList(array $plans): array{
+        public function filterPlansByRefineList(array $plans): array{
             $refinedPlans = $this->settings['showFinanceOptionSelection'] ?? [];
             
             if(empty($refinedPlans)){
