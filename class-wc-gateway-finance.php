@@ -1436,7 +1436,7 @@ jQuery(document).ready(function($) {
             
             $order = new WC_Order($order_id);
             if (
-                !isset($_POST['divido_plan'], $_POST['divido_deposit'], $_POST['submit-payment-form-nonce'])
+                !isset($_POST['divido_plan'], $_POST['submit-payment-form-nonce'])
             ) {
                 throw new \Exception(
                     esc_html_e('frontend/checkout/errordefault_api_error_msg', 'woocommerce-finance-gateway')
@@ -1541,15 +1541,31 @@ jQuery(document).ready(function($) {
                             'lastName' => $order->get_billing_last_name(),
                             'phoneNumber' => str_replace(' ', '', $order->get_billing_phone()),
                             'email' => $order->get_billing_email(),
-                            'addresses' => array([
+                            'addresses' => array(array_filter([
+                                'co' =>  $order->get_billing_company(),
                                 'postcode' => $order->get_billing_postcode(),
-                                'text' => $order->get_billing_postcode() . ' ' . $order->get_billing_address_1() . ' ' . $order->get_billing_city()
-                            ]),
-                        ],
+                                'country' => $order->get_billing_country(),
+                                'text' => implode(', ', array_filter([
+                                    $order->get_billing_address_2(),
+                                    $order->get_billing_address_1(),
+                                    $order->get_billing_city(),
+                                ]))
+                            ])),
+							'shippingAddress' => array_filter([
+                                'co' => (empty($order->get_shipping_company())) ? $order->get_billing_company() : $order->get_shipping_company(),
+								'postcode' => (empty($order->get_shipping_postcode())) ? $order->get_billing_postcode() : $order->get_shipping_postcode(),
+								'country' => (empty($order->get_shipping_country())) ? $order->get_billing_country() : $order->get_shipping_country(),
+								'text' => implode(', ', array_filter([
+									(empty($order->get_shipping_address_2())) ? $order->get_billing_address_2() : $order->get_shipping_address_2(),
+									(empty($order->get_shipping_address_1())) ? $order->get_billing_address_1() : $order->get_shipping_address_1(),
+									(empty($order->get_shipping_city())) ? $order->get_billing_city() : $order->get_shipping_city()
+								]))
+							])
+                        ]
                     ]
                 )
                 ->withOrderItems($products)
-                ->withDepositAmount((int) $_POST['divido_deposit'])
+                ->withDepositAmount((int) $_POST['divido_deposit'] ?? 0)
                 ->withFinalisationRequired(false)
                 ->withMerchantReference(strval($order_id))
                 ->withUrls([
