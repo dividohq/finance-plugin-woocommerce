@@ -1381,16 +1381,18 @@ jQuery(document).ready(function($) {
                             'lastName' => $order->get_billing_last_name(),
                             'phoneNumber' => str_replace(' ', '', $order->get_billing_phone()),
                             'email' => $order->get_billing_email(),
-                            'addresses' => array([
+                            'addresses' => array(array_filter([
+                                'co' =>  $order->get_billing_company(),
                                 'postcode' => $order->get_billing_postcode(),
                                 'country' => $order->get_billing_country(),
                                 'text' => implode(', ', array_filter([
                                     $order->get_billing_address_2(),
                                     $order->get_billing_address_1(),
-                                    $order->get_billing_city()
+                                    $order->get_billing_city(),
                                 ]))
-                            ]),
-							'shippingAddress' => [
+                            ])),
+							'shippingAddress' => array_filter([
+                                'co' => (empty($order->get_shipping_company())) ? $order->get_billing_company() : $order->get_shipping_company(),
 								'postcode' => (empty($order->get_shipping_postcode())) ? $order->get_billing_postcode() : $order->get_shipping_postcode(),
 								'country' => (empty($order->get_shipping_country())) ? $order->get_billing_country() : $order->get_shipping_country(),
 								'text' => implode(', ', array_filter([
@@ -1398,7 +1400,7 @@ jQuery(document).ready(function($) {
 									(empty($order->get_shipping_address_1())) ? $order->get_billing_address_1() : $order->get_shipping_address_1(),
 									(empty($order->get_shipping_city())) ? $order->get_billing_city() : $order->get_shipping_city()
 								]))
-							]
+							])
                         ]
                     ]
                 )
