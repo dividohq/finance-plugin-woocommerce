@@ -6,7 +6,7 @@ Tags:              woothemes,woocommerce,payment gateway,payment,module,ecommerc
 Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
-Tested up to:      6.4.1
+Tested up to:      6.4.2
 Stable tag:        2.7.2
 Version:           2.7.2
 
