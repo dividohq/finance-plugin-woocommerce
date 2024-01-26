@@ -196,6 +196,12 @@ function woocommerce_finance_init()
             /** ensures we only add related hooks once (seems to occur twice otherwise) */
             global $hooksAdded;
             if (!isset($hooksAdded)) {
+                add_action( 'before_woocommerce_init', function() {
+                    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+                        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+                    }
+                } );
+                
                 add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options')); // Version 2.0 Hook.
                 // product settings.
                 add_action('woocommerce_product_write_panel_tabs', array($this, 'product_write_panel_tab'));
