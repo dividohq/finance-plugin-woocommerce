@@ -1779,7 +1779,8 @@ jQuery(document).ready(function($) {
         }
 
         /**
-         * Validate the payment form.
+         * Magic Woocom function called at checkout after the order is submitted
+         * Exists to validate the fields created via the payment_fields function
          *
          * @since 1.0.0
          *
