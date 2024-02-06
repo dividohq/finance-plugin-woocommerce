@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      6.4.2
-Stable tag:        2.7.2
-Version:           2.7.2
+Stable tag:        2.8.0
+Version:           2.8.0
 
 License: GPLv2 or later
 
@@ -44,6 +44,10 @@ Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation"
 
 
  == Changelog ==
+
+Version 2.8.0
+Feat: Adds Woocommerce blocks compatibility
+Chore: Confirms HPOS compatibility
 
 Version 2.7.2
 Feat: Adds shipping address to finance application and improves address parsing
