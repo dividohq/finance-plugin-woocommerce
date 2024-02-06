@@ -16,7 +16,7 @@ defined('ABSPATH') or die('Denied');
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.7.2
+ * Version: 2.8.0
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
@@ -28,7 +28,7 @@ defined('ABSPATH') or die('Denied');
 /**
  * Load the woocommerce plugin.
  */
-add_action('plugins_loaded', 'woocommerce_finance_init', 0);
+add_action('plugins_loaded', 'woocommerce_finance_init');
 
 /**
  * Inititalize script for finance plugin.
@@ -37,11 +37,12 @@ add_action('plugins_loaded', 'woocommerce_finance_init', 0);
  */
 function woocommerce_finance_init()
 {
+    
     if (!class_exists('WC_Payment_Gateway')) {
         return;
     }
-    include_once WP_PLUGIN_DIR . '/' . plugin_basename(dirname(__FILE__)) . '/vendor/autoload.php';
-
+    include_once WC_Finance_Payments::plugin_abspath(). '/vendor/autoload.php';
+    
     /**
      * Finance Payment Gateway class
      **/
@@ -71,6 +72,8 @@ function woocommerce_finance_init()
 
         private string $auto_cancel;
 
+        private string $environment;
+
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
 
@@ -99,19 +102,19 @@ function woocommerce_finance_init()
             if (!load_plugin_textdomain(
                 'woocommerce-finance-gateway',
                 false,
-                dirname(plugin_basename(__FILE__)) . '/i18n/languages'
+                WC_Finance_Payments::plugin_abspath(). 'i18n/languages'
             )) {
                 $locale = determine_locale();
-                $split = explode("_", $locale, 1);
-                $iso = $split[0];
-                $dumb_locale = "{$iso}_" . strtoupper($iso);
+                //$split = explode("_", $locale, 2);
+                //$iso = $split[0];
+                //$dumb_locale = "{$iso}_" . strtoupper($iso);
                 if (!load_textdomain(
                     'woocommerce-finance-gateway',
-                    WP_PLUGIN_DIR . '/' . dirname(plugin_basename(__FILE__)) . "/i18n/languages/woocommerce-finance-gateway-{$dumb_locale}.mo"
+                    WC_Finance_Payments::plugin_abspath() . "i18n/languages/woocommerce-finance-gateway-{$locale}.mo"
                 )) {
                     load_textdomain(
                         'woocommerce-finance-gateway',
-                        WP_PLUGIN_DIR . '/' . dirname(plugin_basename(__FILE__)) . '/i18n/languages/woocommerce-finance-gateway-en_GB.mo'
+                        WC_Finance_Payments::plugin_abspath() . 'i18n/languages/woocommerce-finance-gateway-en_GB.mo'
                     );
                 }
             }
@@ -126,10 +129,10 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.7.2';
-            add_action('init', array($this, 'wpdocs_load_textdomain'));
+            $this->plugin_version = '2.8.0';
+            $this->wpdocs_load_textdomain();
 
-            $this->id = 'finance';
+            $this->id = 'divido-finance';
             $this->method_title = __('globalplugin_title', 'woocommerce-finance-gateway');
             $this->method_description = __('globalplugin_description', 'woocommerce-finance-gateway');
             $this->has_fields = true;
@@ -196,12 +199,16 @@ function woocommerce_finance_init()
             /** ensures we only add related hooks once (seems to occur twice otherwise) */
             global $hooksAdded;
             if (!isset($hooksAdded)) {
+                /*
                 add_action( 'before_woocommerce_init', function() {
                     if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
                         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
                     }
+                    if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+                        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
+                    }
                 } );
-                
+                */
                 add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options')); // Version 2.0 Hook.
                 // product settings.
                 add_action('woocommerce_product_write_panel_tabs', array($this, 'product_write_panel_tab'));
@@ -420,7 +427,7 @@ function woocommerce_finance_init()
             } else {
                 wp_register_script('woocommerce-finance-gateway-calculator', sprintf('//cdn.divido.com/widget/v3/%s.%s.calculator.js', $lender, $this->environment), false, 1.0, true);
             }
-            wp_register_style('woocommerce-finance-gateway-style', plugins_url('', __FILE__) . '/css/style.css', false, 1.0);
+            wp_register_style('woocommerce-finance-gateway-style', WC_Finance_Payments::plugin_url() . '/css/style.css', false, 1.0);
         
             wp_enqueue_style('woocommerce-finance-gateway-style');
             wp_enqueue_script('woocommerce-finance-gateway-calculator');
@@ -1047,15 +1054,15 @@ jQuery("input[name=_tab_finance_active]").change(function() {
             $this->init_settings();
             $this->form_fields = array(
                 'url' => array(
-                    'title' => __('backend/configenvironment_url_label', 'woocommerce-finance-gateway'),
+                    'title' => $this->_translate('backend/config', 'environment_url_label'),
                     'type' => 'text',
-                    'description' => __('backend/configenvironment_url_description', 'woocommerce-finance-gateway'),
+                    'description' => $this->_translate('backend/config', 'environment_url_description'),
                     'default' => $this->get_default_merchant_api_pub_url($this->api_key),
                 ),
                 'apiKey' => array(
-                    'title' => __('backend/configapi_key_label', 'woocommerce-finance-gateway'),
+                    'title' => $this->_translate('backend/config', 'api_key_label'),
                     'type' => 'text',
-                    'description' => __('backend/configapi_key_description', 'woocommerce-finance-gateway'),
+                    'description' => $this->_translate('backend/config', 'api_key_description'),
                     'default' => '',
                 )
             );
@@ -1073,57 +1080,57 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                         $this->form_fields,
                         array(
                             'secret' => array(
-                                'title' => __('backend/configshared_secret_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'shared_secret_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configshared_secret_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'shared_secret_description'),
                                 'default' => '',
                             ),
                             'Checkout Settings' => array(
-                                'title' => __('backend/configcheckout_settings_header', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'checkout_settings_header'),
                                 'type' => 'title',
                                 'class' => 'border',
                             ),
                             'enabled' => array(
-                                'title' => __('backend/configplugin_active_label', 'woocommerce-finance-gateway'),
-                                'label' => __('backend/pluginenabled_option', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'plugin_active_label'),
+                                'label' => $this->_translate('backend/plugin', 'enabled_option'),
                                 'type' => 'checkbox',
-                                'description' => __('backend/configplugin_active_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'plugin_active_description'),
                                 'default' => 'no',
                             ),
                             'title' => array(
-                                'title' => __('backend/configcheckout_title_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'checkout_title_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configcheckout_title_description', 'woocommerce-finance-gateway'),
-                                'default' => __('frontend/checkoutcheckout_title_default', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'checkout_title_description'),
+                                'default' => $this->_translate('frontend/checkout', 'checkout_title_default'),
                             ),
                             'description' => array(
-                                'title' => __('backend/configcheckout_description_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'checkout_description_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configcheckout_description_description', 'woocommerce-finance-gateway'),
-                                'default' => __('frontend/checkoutcheckout_description_default', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'checkout_description_description'),
+                                'default' => $this->_translate('frontend/checkout', 'checkout_description_default'),
                             ),
                             'Conditions Settings' => array(
-                                'title' => __('backend/configconditions_settings_header', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'conditions_settings_header'),
                                 'type' => 'title',
                                 'class' => 'border',
                             ),
                         )
                     );
                     $this->form_fields['showFinanceOptions'] = array(
-                        'title' => __('backend/configlimit_plans_label', 'woocommerce-finance-gateway'),
+                        'title' => $this->_translate('backend/config', 'limit_plans_label'),
                         'type' => 'select',
-                        'description' => __('backend/configlimit_plans_description', 'woocommerce-finance-gateway'),
+                        'description' => $this->_translate('backend/config', 'limit_plans_description'),
                         'default' => 'all',
                         'options' => array(
-                            'all'       => __('backend/configshow_all_plans_option', 'woocommerce-finance-gateway'),
-                            'selection' => __('backend/configselect_specific_plans_option', 'woocommerce-finance-gateway')
+                            'all'       => $this->_translate('backend/config', 'show_all_plans_option'),
+                            'selection' => $this->_translate('backend/config', 'select_specific_plans_option')
                         ),
                     );
                     $this->form_fields['showFinanceOptionSelection'] = array(
-                        'title' => __('backend/configrefine_plans_label', 'woocommerce-finance-gateway'),
+                        'title' => $this->_translate('backend/config', 'refine_plans_label'),
                         'type' => 'multiselect',
                         'options' => $options,
-                        'description' => __('backend/configrefine_plans_instructions', 'woocommerce-finance-gateway'),
+                        'description' => $this->_translate('backend/config', 'refine_plans_instructions'),
                         'default' => 'all',
                         'class' => 'border_height',
                     );
@@ -1132,110 +1139,110 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                         $this->form_fields,
                         array(
                             'cartThreshold' => array(
-                                'title' => __('backend/configcart_threshold_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'cart_threshold_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configcart_threshold_description', 'woocommerce-finance-gateway')
+                                'description' => $this->_translate('backend/config', 'cart_threshold_description')
                             ),
                             'maxLoanAmount' => array(
-                                'title' => __('backend/configcart_maximum_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'cart_maximum_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configcart_maximum_description', 'woocommerce-finance-gateway')
+                                'description' => $this->_translate('backend/config', 'cart_maximum_description')
                             ),
                             'productSelect' => array(
-                                'title' => __('backend/configproduct_selection_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'product_selection_label'),
                                 'type' => 'select',
                                 'default' => 'All',
                                 'options' => array(
-                                    'all' => __('backend/configfinance_all_products_option', 'woocommerce-finance-gateway'),
-                                    'selected' => __('backend/configfinance_specific_products_option', 'woocommerce-finance-gateway'),
-                                    'price' => __('backend/configfinance_threshold_products_option', 'woocommerce-finance-gateway'),
+                                    'all' => $this->_translate('backend/config', 'finance_all_products_option'),
+                                    'selected' => $this->_translate('backend/config', 'finance_specific_products_option'),
+                                    'price' => $this->_translate('backend/config', 'finance_threshold_products_option'),
                                 ),
-                                'description' => __('backend/configproduct_select_plans_guide_msg', 'woocommerce-finance-gateway')
+                                'description' => $this->_translate('backend/config', 'product_select_plans_guide_msg')
                             ),
                             'priceSelection' => array(
-                                'title' => __('backend/configproduct_price_threshold_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'product_price_threshold_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configproduct_price_threshold_description', 'woocommerce-finance-gateway')
+                                'description' => $this->_translate('backend/config', 'product_price_threshold_description')
                             ),
                             'Widget Settings' => array(
-                                'title' => __('backend/configwidget_settings_header', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'widget_settings_header'),
                                 'type' => 'title',
                                 'class' => 'border',
                             ),
                             'calcConfApiUrl' => array(
-                                'title' => __('backend/configcalc_conf_api_url_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'calc_conf_api_url_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configcalc_conf_api_url_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'calc_conf_api_url_description'),
                                 'default' => '',
                             ),
                             'showWidget' => array(
-                                'title' => __('backend/configshow_widget_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'show_widget_label'),
                                 'type' => 'select',
                                 'default' => 'show',
-                                'description' => __('backend/configshow_widget_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'show_widget_description'),
                                 'options' => array(
-                                    'show' => __('globalyes', 'woocommerce-finance-gateway'),
-                                    'disabled' => __('globalno', 'woocommerce-finance-gateway'),
+                                    'show' => $this->_translate('global', 'yes'),
+                                    'disabled' => $this->_translate('global', 'no'),
                                 ),
                             ),
                             'calculatorTheme' => array(
-                                'title' => __('backend/configwidget_mode_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'widget_mode_label'),
                                 'type' => 'select',
                                 'default' => 'enabled',
-                                'description' => __('backend/configwidget_mode_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'widget_mode_description'),
                                 'options' => array(
-                                    'enabled' => __('backend/configcalculator_option', 'woocommerce-finance-gateway'),
-                                    'disabled' => __('backend/configlightbox_option', 'woocommerce-finance-gateway'),
+                                    'enabled' => $this->_translate('backend/config', 'calculator_option'),
+                                    'disabled' => $this->_translate('backend/config', 'lightbox_option'),
                                 ),
                             ),
                             'widgetThreshold' => array(
-                                'title' => __('backend/configwidget_minimum_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'widget_minimum_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configwidget_minimum_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'widget_minimum_description'),
                             ),
                             'buttonText' => array(
-                                'title' => __('backend/configwidget_button_text_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'widget_button_text_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configwidget_button_text_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'widget_button_text_description'),
                                 'default' => '',
                             ),
                             'footnote' => array(
-                                'title' => __('backend/configwidget_footnote_label', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'widget_footnote_label'),
                                 'type' => 'text',
-                                'description' => __('backend/configwidget_footnote_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'widget_footnote_description'),
                                 'default' => '',
                             ),
                             'useStoreLanguage' => array(
-                                'title' => __('backend/configuse_store_language_label', 'woocommerce-finance-gateway'),
-                                'label' => __('backend/pluginenabled_option', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'use_store_language_label'),
+                                'label' => $this->_translate('backend/plugin', 'enabled_option'),
                                 'type' => 'checkbox',
-                                'description' => __('backend/configuse_store_language_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'use_store_language_description'),
                                 'default' => 'no'
                             ),
                             'Notifications Settings' => array(
-                                'title' => __('backend/confignotifications_settings_header', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'notifications_settings_header'),
                                 'type' => 'title',
                                 'class' => 'border',
                             ),
                             'autoFulfillment' => array(
-                                'title' => __('backend/configautomatic_fulfilment_label', 'woocommerce-finance-gateway'),
-                                'label' => __('backend/pluginenabled_option', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'automatic_fulfilment_label'),
+                                'label' => $this->_translate('backend/plugin', 'enabled_option'),
                                 'type' => 'checkbox',
-                                'description' => __('backend/configautomatic_fulfilment_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'automatic_fulfilment_description'),
                                 'default' => "yes",
                             ),
                             'autoRefund' => array(
-                                'title' => __('backend/configautomatic_refund_label', 'woocommerce-finance-gateway'),
-                                'label' => __('backend/pluginenabled_option', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'automatic_refund_label'),
+                                'label' => $this->_translate('backend/plugin', 'enabled_option'),
                                 'type' => 'checkbox',
-                                'description' => __('backend/configautomatic_refund_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'automatic_refund_description'),
                                 'default' => "yes",
                             ),
                             'autoCancel' => array(
-                                'title' => __('backend/configautomatic_cancellation_label', 'woocommerce-finance-gateway'),
-                                'label' => __('backend/pluginenabled_option', 'woocommerce-finance-gateway'),
+                                'title' => $this->_translate('backend/config', 'automatic_cancellation_label'),
+                                'label' => $this->_translate('backend/plugin', 'enabled_option'),
                                 'type' => 'checkbox',
-                                'description' => __('backend/configautomatic_cancellation_description', 'woocommerce-finance-gateway'),
+                                'description' => $this->_translate('backend/config', 'automatic_cancellation_description'),
                                 'default' => "yes",
                             ),
                         )
@@ -1441,15 +1448,19 @@ jQuery(document).ready(function($) {
             global $woocommerce;
             
             $order = new WC_Order($order_id);
-            if (
-                !isset($_POST['divido_plan'], $_POST['submit-payment-form-nonce'])
-            ) {
+
+            // if we have come via the classic checkout
+            if(
+                isset($_POST['submit-payment-form-nonce']) 
+                && !wp_verify_nonce($_POST['submit-payment-form-nonce'], 'submit-payment-form')
+            ){
                 throw new \Exception(
                     esc_html_e('frontend/checkout/errordefault_api_error_msg', 'woocommerce-finance-gateway')
                 );
             }
             
-            if(!wp_verify_nonce($_POST['submit-payment-form-nonce'], 'submit-payment-form')) {
+            // If no divido plan is set, throw exception
+            if (!isset($_POST['divido_plan'])) {
                 throw new \Exception(
                     esc_html_e('frontend/checkout/errordefault_api_error_msg', 'woocommerce-finance-gateway')
                 );
@@ -2130,7 +2141,6 @@ jQuery(document).ready(function($) {
          * @return array
          */
         public function showOptionAtCheckout(array $gateways):array{
-            
             if(!isset($gateways[$this->id])){
                 return $gateways;
             }
@@ -2224,6 +2234,10 @@ jQuery(document).ready(function($) {
             }
 
             return (is_numeric($max)) ? floatval($max/100) : null;
+        }
+
+        private function _translate($key, $value) {
+            return __("{$key}{$value}", "woocommerce-finance-gateway");
         }
     }
 
