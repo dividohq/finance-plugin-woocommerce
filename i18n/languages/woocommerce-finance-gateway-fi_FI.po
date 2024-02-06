@@ -1,0 +1,577 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: plugins\n"
+"Language: fi\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: 
+msgctxt "backend/config"
+msgid "api_key_label"
+msgstr "API-avain"
+
+#: 
+msgctxt "backend/config"
+msgid "shared_secret_label"
+msgstr "Turvatunnus"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_title_label"
+msgstr "Checkoutin otsikko"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_description_label"
+msgstr "Checkoutin kuvaus"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_threshold_label"
+msgstr "Ostoskorin raja-arvo"
+
+#: 
+msgctxt "backend/config"
+msgid "show_widget_label"
+msgstr "Näytä widget"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_minimum_label"
+msgstr "Widget minimi"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_minimum_description"
+msgstr "Näytä widget vain, jos tuotteen hinta ylittää asetetun minimin"
+
+#: 
+msgctxt "backend/config"
+msgid "show_widget_description"
+msgstr "Näytä widget rahoitusvaihtoehtoineen tuotesivulla"
+
+#: 
+msgctxt "backend/config"
+msgid "api_key_description"
+msgstr "Rahoituksen tarjoaja toimittaa API-avaimen"
+
+#: 
+msgctxt "backend/config"
+msgid "shared_secret_description"
+msgstr "Valinnainen turvatunnus on sovittu koodi, jota käytetään tietojen tarkistamiseen sinun ja rahoittajan välillä"
+
+#: 
+msgctxt "backend/config"
+msgid "limit_plans_label"
+msgstr "Rahoitusvaihtoehdot"
+
+#: 
+msgctxt "backend/config"
+msgid "limit_plans_description"
+msgstr "Valitse suunnitelmat, jotka haluat asettaa asiakkaiden saataville"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_threshold_description"
+msgstr "Ostoskorin minimiarvo, jotta rahoitus olisi vaihtoehto kassalla"
+
+#: 
+msgctxt "frontend/checkout/error"
+msgid "default_api_error_msg"
+msgstr "Emme pysty käsittelemään tätä tilausta valitulla maksutavalla. Valitse toinen menetelmä"
+
+#: 
+msgctxt "backend/config"
+msgid "plugin_active_label"
+msgstr "aktiivinen"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_title_description"
+msgstr "Maksutavan nimi kassalla"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_description_description"
+msgstr "Kuvaus maksutavasta kassalla"
+
+#: 
+msgctxt "backend/config"
+msgid "product_selection_label"
+msgstr "Tuotevalinta"
+
+#: 
+msgctxt "backend/config"
+msgid "refine_plans_label"
+msgstr "Tarkenna rahoitusvaihtoehtoja"
+
+#: 
+msgctxt "backend/config"
+msgid "show_all_plans_option"
+msgstr "Näytä kaikki rahoitusvaihtoehdot"
+
+#: 
+msgctxt "backend/config"
+msgid "select_specific_plans_option"
+msgstr "Valitse tietyt rahoitusvaihtoehdot"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_all_products_option"
+msgstr "Kaikki tuotteet"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_specific_products_option"
+msgstr "Rahoita vain tietyt tuotteet"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_threshold_products_option"
+msgstr "Kaikki tuotteet tietyn hinnan yläpuolella"
+
+#: 
+msgctxt "backend/config"
+msgid "product_selection_description"
+msgstr "Muokkaa, mitä tuotteita voidaan rahoittaa"
+
+#: 
+msgctxt "backend/calculator"
+msgid "calculator_active_label"
+msgstr "Rahoituslaskuri aktiivinen"
+
+#: 
+msgctxt "frontend/payment"
+msgid "redirection_msg"
+msgstr "Sinut ohjataan täyttämään rahoitushakemus tilauksen vahvistamisen jälkeen"
+
+#: 
+msgctxt "backend/config"
+msgid "plugin_active_description"
+msgstr "Ota rahoitusvaihtoehto käyttöön tai poista se käytöstä kassalla"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_footnote_label"
+msgstr "Alaviite"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_button_text_label"
+msgstr "Painikkeen teksti"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_button_text_description"
+msgstr "Widget-painikkeessa näkyvä teksti"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_footnote_description"
+msgstr "Ehdot ja tarkennukset, jotka näkyvät widgetin alla"
+
+#: 
+msgctxt "backend/plugin"
+msgid "enabled_option"
+msgstr "käytössä"
+
+#: 
+msgctxt "backend/config"
+msgid "lightbox_option"
+msgstr "Lightbox"
+
+#: 
+msgctxt "backend/config"
+msgid "calculator_option"
+msgstr "Laskin"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_mode_label"
+msgstr "Tila"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_mode_description"
+msgstr "Näytetäänkö widget heti (laskin) vai kun nappia napsautetaan (lightbox)"
+
+#: 
+msgctxt "backend/config"
+msgid "product_price_threshold_label"
+msgstr "Tuotteen hintakynnys"
+
+#: 
+msgctxt "backend/config"
+msgid "product_price_threshold_description"
+msgstr "Tuotteen minimihinta, jotta rahoitus mahdollinen"
+
+#: 
+msgctxt "global"
+msgid "plugin_title"
+msgstr "Maksa rahoituksella"
+
+#: 
+msgctxt "global"
+msgid "yes"
+msgstr "Kyllä"
+
+#: 
+msgctxt "global"
+msgid "no"
+msgstr "Ei"
+
+#: 
+msgctxt "global"
+msgid "plugin_description"
+msgstr "Tämän laajennuksen avulla voit hyväksyä rahoituksella maksettuja ostoja kaupassasi"
+
+#: 
+msgctxt "backend"
+msgid "settings_label"
+msgstr "asetukset"
+
+#: 
+msgctxt "global"
+msgid "order_error_description_prefix"
+msgstr "Tilausta ei voitu käsitellä seuraavan virheen vuoksi"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_maximum_label"
+msgstr "Ostoskorin maksimiarvo"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_maximum_description"
+msgstr "Ostoskorin maksimiarvo, jotta rahoitus olisi vaihtoehto kassalla"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_fulfilment_label"
+msgstr "Ota automaattinen täyttö käyttöön?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_fulfilment_description"
+msgstr "Ilmoita luotonantajalle automaattisesti, että tilaus on valmis, kun muutat sen määritettyyn tilaan"
+
+#: 
+msgctxt "backend/order"
+msgid "finance_reference_number_label"
+msgstr "Rahoituksen viitenumero"
+
+#: 
+msgctxt "backend/order"
+msgid "finance_plan_id_label"
+msgstr "Rahoitusvaihtoehdon tunnus"
+
+#: 
+msgctxt "backend/order"
+msgid "shared_secret_error_msg"
+msgstr "Turvavirhe: Turvatunnus ei vastannut odotettua"
+
+#: 
+msgctxt "backend/order"
+msgid "order_amount_error_msg"
+msgstr "Rahoitusvirhe: Haettu luoton määrä ei vastannut tilauksen summaa. Tilaus on siirretty odottamaan"
+
+#: 
+msgctxt "backend/order"
+msgid "order_status_label"
+msgstr "Tilauksen tila"
+
+#: 
+msgctxt "global"
+msgid "finance_label"
+msgstr "Rahoitus"
+
+#: 
+msgctxt "frontend/product"
+msgid "available_on_finance_label"
+msgstr "Saatavana rahoituksella"
+
+#: 
+msgctxt "frontend/product"
+msgid "default_settings_label"
+msgstr "Oletusasetukset"
+
+#: 
+msgctxt "frontend/product"
+msgid "selected_plans_label"
+msgstr "Valitut rahoitusvaihtoehdot"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "checkout_title_default"
+msgstr "Maksa erissä"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "checkout_description_default"
+msgstr "Jaa osto tasaeriin"
+
+#: 
+msgctxt "backend/config"
+msgid "general_settings_header"
+msgstr "Yleiset asetukset"
+
+#: 
+msgctxt "backend/config"
+msgid "refine_plans_instructions"
+msgstr "Vaihto- tai Control-napsauttamalla voit valita useita kohteita luettelosta"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_settings_header"
+msgstr "Widget-asetukset"
+
+#: 
+msgctxt "backend/config"
+msgid "order_settings_header"
+msgstr "Tilausasetukset"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_refund_label"
+msgstr "Ota automaattiset hyvitykset käyttöön?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_refund_description"
+msgstr "Ilmoita luotonantajalle automaattisesti, että tilaus palautetaan, kun sen tilaksi asetetaan palautettava tilaus"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_cancellation_label"
+msgstr "Ota automaattinen peruutus käyttöön?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_cancellation_description"
+msgstr "Ilmoita luotonantajalle automaattisesti, että tilaus peruutetaan, kun sen tilaksi asetetaan peruutettu"
+
+#: 
+msgctxt "backend/error"
+msgid "invalid_api_key_error"
+msgstr "Väärä tai virheellinen API-avain"
+
+#: 
+msgctxt "backend"
+msgid "contact_financier_msg"
+msgstr "Ota yhteyttä rahoituksen tarjoajaan saadaksesi lisätietoja"
+
+#: 
+msgctxt "frontend/checkout/error"
+msgid "invalid_country_error"
+msgstr "Valitettavasti rahoitusvaihtoehtoja ei ole saatavilla tällä hetkellä"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "choose_country_msg"
+msgstr "Valitse maa, ennen kuin jatkat ostamista"
+
+#: 
+msgctxt "backend/order"
+msgid "payment_rejection_error"
+msgstr "Rahoitusmaksu hylätty"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_fulfillment_sent_msg"
+msgstr "Automaattisen täytön pyyntö lähetetty"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_refund_sent_msg"
+msgstr "Automaattinen hyvityspyyntö lähetetty"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_cancellation_sent_msg"
+msgstr "Automaattinen peruutuspyyntö lähetetty"
+
+#: 
+msgctxt "global"
+msgid "order_id_label"
+msgstr "tilausnumero"
+
+#: 
+msgctxt "global/order"
+msgid "discount_label"
+msgstr "Alennus"
+
+#: 
+msgctxt "global/order"
+msgid "fee_tax_label"
+msgstr "Palkkiot verojen"
+
+#: 
+msgctxt "global/order"
+msgid "fees_label"
+msgstr "Palkkiot"
+
+#: 
+msgctxt "global/order"
+msgid "shipping_label"
+msgstr "Toimituskulut"
+
+#: 
+msgctxt "global/order"
+msgid "taxes_label"
+msgstr "Vero (ALV)"
+
+#: 
+msgctxt "global/order"
+msgid "other_label"
+msgstr "Muut kulut"
+
+#: 
+msgctxt "backend/config"
+msgid "use_store_language_label"
+msgstr "Käytätkö kaupan kieltä?"
+
+#: 
+msgctxt "backend/config"
+msgid "use_store_language_description"
+msgstr "Ohita rahoituslaskurin kieli myymälän kielen kanssa"
+
+#: 
+msgctxt "backend/config"
+msgid "environment_url_label"
+msgstr "Ympäristön URL -osoite"
+
+#: 
+msgctxt "backend/config"
+msgid "environment_url_description"
+msgstr "Lisää rahoituspalveluntarjoajasi toimittama ympäristön URL -osoite"
+
+#: 
+msgctxt "backend/error"
+msgid "environment_url_error"
+msgstr "Virheellinen tai virheellinen ympäristön URL -osoite"
+
+#: 
+msgctxt "backend/error"
+msgid "environment_url_error_msg"
+msgstr "Ympäristön URL -osoite ei ole tavoitettavissa:"
+
+#: 
+msgctxt "backend/error"
+msgid "environment_unhealthy_error_msg"
+msgstr "Jotain voi olla vialla ympäristössä. Se palasi:"
+
+#: 
+msgctxt "global"
+msgid "if_applicable"
+msgstr "tarvittaessa"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_settings_header"
+msgstr "Checkout-asetukset"
+
+#: 
+msgctxt "backend/config"
+msgid "conditions_settings_header"
+msgstr "Ehdot Asetukset"
+
+#: 
+msgctxt "backend/config"
+msgid "notifications_settings_header"
+msgstr "Ilmoitusasetukset"
+
+#: 
+msgctxt "backend/error"
+msgid "widget_threshhold_not_valid_error"
+msgstr "Widgetin vähimmäisarvo ei kelpaa"
+
+#: 
+msgctxt "backend/error"
+msgid "widget_threshhold_not_valid_error_msg"
+msgstr "Widgetin minimiarvo on muotoiltava numeerisena arvona"
+
+#: 
+msgctxt "backend/config"
+msgid "calc_conf_api_url_label"
+msgstr "Calculator Configuration API URL"
+
+#: 
+msgctxt "backend/config"
+msgid "calc_conf_api_url_description"
+msgstr "Syötä tämä URL-osoite, jos se on toimitettu sinulle"
+
+#: 
+msgctxt "backend/warning"
+msgid "refund_amount_warning_msg"
+msgstr "Tästä hakemuksesta palautettava tosiasiallinen summa on %s. Tämän ylittävät hyvitysyritykset käsitellään täysimääräisenä hyvityksenä %s:lle"
+
+#: 
+msgctxt "backend/prompt"
+msgid "cancel_confirmation_prompt"
+msgstr "Haluatko varmasti peruuttaa tämän tilauksen?"
+
+#: 
+msgctxt "backend/prompt"
+msgid "refund_confirmation_prompt"
+msgstr "Haluatko varmasti hyvittää tämän tilauksen?"
+
+#: 
+msgctxt "backend/warning"
+msgid "cancel_amount_warning_msg"
+msgstr "Lainanantaja voi peruuttaa tämän hakemuksen tosiasiallisen summan, joka on %s"
+
+#: 
+msgctxt "backend/error"
+msgid "update_api_key_error_msg"
+msgstr "Näyttää siltä, että käytät eri API-avainta kuin se, jota käytettiin tämän sovelluksen luomiseen. Palaa kyseiseen API-avaimeen, jos haluat ilmoittaa lainanantajalle tästä tilanmuutoksesta"
+
+#: 
+msgctxt "backend/error"
+msgid "unexpected_error_msg"
+msgstr "Odottamaton virhe on tapahtunut"
+
+#: 
+msgctxt "backend/response"
+msgid "refund_success_msg"
+msgstr "Lainanantajalle on ilmoitettu hyvityspyynnöstä (palautustunnus. %s)"
+
+#: 
+msgctxt "backend/response"
+msgid "cancel_success_msg"
+msgstr "Lainanantajalle on ilmoitettu peruutuspyynnöstä (Peruutustunnus. %s)"
+
+#: 
+msgctxt "backend/error"
+msgid "order_id_error_msg"
+msgstr "Tilausta ei löytynyt tunnuksella"
+
+#: 
+msgctxt "backend/config"
+msgid "product_select_plans_guide_msg"
+msgstr "Siirry tuotteen Rahoitus-välilehteen ja valitse suunnitelmat, jos käytät tiettyjä tuotteita"
+
+#: 
+msgctxt "backend/prompt"
+msgid "reason_request_msg"
+msgstr "%s pyytää sinua antamaan syyn alla olevasta luettelosta"
+
+#: 
+msgctxt "backend/prompt"
+msgid "proceed_prompt"
+msgstr "Haluatko jatkaa?"
+
+#: 
+msgctxt "backend/option"
+msgid "proceed_without_lender_option"
+msgstr "jatka (ilmoittamatta lainanantajalle)"
+
+#: 
+msgctxt "backend/option"
+msgid "proceed_with_lender_option"
+msgstr "jatka ja ilmoita lainanantajalle"
+
+#: 
+msgctxt "backend/warning"
+msgid "selected_plans_specific_products_warning_msg"
+msgstr "Huomaa: %s on käytössä vain, kun lisäosan kokoonpanon %s-vaihtoehto on asetettu arvoon %s"

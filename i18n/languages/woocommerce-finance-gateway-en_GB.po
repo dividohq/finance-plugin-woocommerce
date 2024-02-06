@@ -1,0 +1,577 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: plugins\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: 
+msgctxt "backend/config"
+msgid "api_key_label"
+msgstr "API Key"
+
+#: 
+msgctxt "backend/config"
+msgid "shared_secret_label"
+msgstr "Shared Secret"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_title_label"
+msgstr "Checkout Title"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_description_label"
+msgstr "Checkout Description"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_threshold_label"
+msgstr "Cart Threshold"
+
+#: 
+msgctxt "backend/config"
+msgid "show_widget_label"
+msgstr "Show Widget"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_minimum_label"
+msgstr "Widget Minimum"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_minimum_description"
+msgstr "Only display the widget if the product price is over the specified amount"
+
+#: 
+msgctxt "backend/config"
+msgid "show_widget_description"
+msgstr "Show a handy widget with the finance options on your products page"
+
+#: 
+msgctxt "backend/config"
+msgid "api_key_description"
+msgstr "The API-key should be supplied by your finance provider"
+
+#: 
+msgctxt "backend/config"
+msgid "shared_secret_description"
+msgstr "The optional shared secret is an agreed code used to verify information between you and your finance provider"
+
+#: 
+msgctxt "backend/config"
+msgid "limit_plans_label"
+msgstr "Limit Plans"
+
+#: 
+msgctxt "backend/config"
+msgid "limit_plans_description"
+msgstr "Choose the plans you want to make available to your customers"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_threshold_description"
+msgstr "The minimum amount necessary for the cart to total in order for finance to be an option at checkout"
+
+#: 
+msgctxt "frontend/checkout/error"
+msgid "default_api_error_msg"
+msgstr "We are unable to process this order with the chosen payment method. Please choose another method"
+
+#: 
+msgctxt "backend/config"
+msgid "plugin_active_label"
+msgstr "Active"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_title_description"
+msgstr "The name of the payment option at checkout"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_description_description"
+msgstr "The description of the payment option at checkout"
+
+#: 
+msgctxt "backend/config"
+msgid "product_selection_label"
+msgstr "Product Selection"
+
+#: 
+msgctxt "backend/config"
+msgid "refine_plans_label"
+msgstr "Refine Plans list"
+
+#: 
+msgctxt "backend/config"
+msgid "show_all_plans_option"
+msgstr "Show all plans"
+
+#: 
+msgctxt "backend/config"
+msgid "select_specific_plans_option"
+msgstr "Select specific plans"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_all_products_option"
+msgstr "All products"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_specific_products_option"
+msgstr "Finance specific products"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_threshold_products_option"
+msgstr "All products above a defined price"
+
+#: 
+msgctxt "backend/config"
+msgid "product_selection_description"
+msgstr "Customise which products can be financed"
+
+#: 
+msgctxt "backend/calculator"
+msgid "calculator_active_label"
+msgstr "Calculator Active"
+
+#: 
+msgctxt "frontend/payment"
+msgid "redirection_msg"
+msgstr "You will be redirected to complete this finance application after you confirm your order"
+
+#: 
+msgctxt "backend/config"
+msgid "plugin_active_description"
+msgstr "Enable or disable the finance option at checkout"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_footnote_label"
+msgstr "Footnote"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_button_text_label"
+msgstr "Button text"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_button_text_description"
+msgstr "Text that appears on the widget button"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_footnote_description"
+msgstr "Small print that appears at the end of the widget"
+
+#: 
+msgctxt "backend/plugin"
+msgid "enabled_option"
+msgstr "Enabled"
+
+#: 
+msgctxt "backend/config"
+msgid "lightbox_option"
+msgstr "Lightbox"
+
+#: 
+msgctxt "backend/config"
+msgid "calculator_option"
+msgstr "Calculator"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_mode_label"
+msgstr "Mode"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_mode_description"
+msgstr "Whether the widget appears as immediately (calculator), or when a button is clicked (lightbox)"
+
+#: 
+msgctxt "backend/config"
+msgid "product_price_threshold_label"
+msgstr "Product Price Threshold"
+
+#: 
+msgctxt "backend/config"
+msgid "product_price_threshold_description"
+msgstr "The minimum amount a product must cost to be viable for finance"
+
+#: 
+msgctxt "global"
+msgid "plugin_title"
+msgstr "Pay by Finance"
+
+#: 
+msgctxt "global"
+msgid "yes"
+msgstr "Yes"
+
+#: 
+msgctxt "global"
+msgid "no"
+msgstr "No"
+
+#: 
+msgctxt "global"
+msgid "plugin_description"
+msgstr "This extension allows you to accept finance payments in your store"
+
+#: 
+msgctxt "backend"
+msgid "settings_label"
+msgstr "Settings"
+
+#: 
+msgctxt "global"
+msgid "order_error_description_prefix"
+msgstr "This order could not be processed due to the following error"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_maximum_label"
+msgstr "Cart Maximum"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_maximum_description"
+msgstr "The maximum amount that a cart can total in order for finance to be an option at checkout"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_fulfilment_label"
+msgstr "Enable Automatic Fulfilment?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_fulfilment_description"
+msgstr "Automatically notify the lender that the order is complete whenever you change it to a specified status"
+
+#: 
+msgctxt "backend/order"
+msgid "finance_reference_number_label"
+msgstr "Finance Reference Number"
+
+#: 
+msgctxt "backend/order"
+msgid "finance_plan_id_label"
+msgstr "Finance Plan ID"
+
+#: 
+msgctxt "backend/order"
+msgid "shared_secret_error_msg"
+msgstr "Security Error: Shared secret did not match expected"
+
+#: 
+msgctxt "backend/order"
+msgid "order_amount_error_msg"
+msgstr "Finance error: The requested credit amount did not match the order sum. Order has been put on hold"
+
+#: 
+msgctxt "backend/order"
+msgid "order_status_label"
+msgstr "Order Status"
+
+#: 
+msgctxt "global"
+msgid "finance_label"
+msgstr "Finance"
+
+#: 
+msgctxt "frontend/product"
+msgid "available_on_finance_label"
+msgstr "Available on Finance"
+
+#: 
+msgctxt "frontend/product"
+msgid "default_settings_label"
+msgstr "Default Settings"
+
+#: 
+msgctxt "frontend/product"
+msgid "selected_plans_label"
+msgstr "Selected Plans"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "checkout_title_default"
+msgstr "Pay in instalments"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "checkout_description_default"
+msgstr "Break your purchase down into smaller regular instalments"
+
+#: 
+msgctxt "backend/config"
+msgid "general_settings_header"
+msgstr "General Settings"
+
+#: 
+msgctxt "backend/config"
+msgid "refine_plans_instructions"
+msgstr "Shift-click or Control-click to select multiple items in the list"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_settings_header"
+msgstr "Widget Settings"
+
+#: 
+msgctxt "backend/config"
+msgid "order_settings_header"
+msgstr "Order Settings"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_refund_label"
+msgstr "Enable Automatic Refunds?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_refund_description"
+msgstr "Automatically notify the lender that the order is refunded whenever an order's status is set to refunded"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_cancellation_label"
+msgstr "Enable Automatic Cancellation?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_cancellation_description"
+msgstr "Automatically notify the lender that the order is cancelled whenever an order's status is set to cancelled"
+
+#: 
+msgctxt "backend/error"
+msgid "invalid_api_key_error"
+msgstr "Incorrect or invalid API key"
+
+#: 
+msgctxt "backend"
+msgid "contact_financier_msg"
+msgstr "Please contact your finance provider for more information"
+
+#: 
+msgctxt "frontend/checkout/error"
+msgid "invalid_country_error"
+msgstr "Unfortunately a finance option is not currently available for your country"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "choose_country_msg"
+msgstr "Please select your country before continuing your purchase"
+
+#: 
+msgctxt "backend/order"
+msgid "payment_rejection_error"
+msgstr "Finance Payment Rejected"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_fulfillment_sent_msg"
+msgstr "Auto Fulfillment request sent"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_refund_sent_msg"
+msgstr "Auto Refund Request sent"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_cancellation_sent_msg"
+msgstr "Auto Cancellation request sent"
+
+#: 
+msgctxt "global"
+msgid "order_id_label"
+msgstr "Order ID"
+
+#: 
+msgctxt "global/order"
+msgid "discount_label"
+msgstr "Discount"
+
+#: 
+msgctxt "global/order"
+msgid "fee_tax_label"
+msgstr "Fees-tax"
+
+#: 
+msgctxt "global/order"
+msgid "fees_label"
+msgstr "Fees"
+
+#: 
+msgctxt "global/order"
+msgid "shipping_label"
+msgstr "Shipping and handling"
+
+#: 
+msgctxt "global/order"
+msgid "taxes_label"
+msgstr "Taxes"
+
+#: 
+msgctxt "global/order"
+msgid "other_label"
+msgstr "Other"
+
+#: 
+msgctxt "backend/config"
+msgid "use_store_language_label"
+msgstr "Use store language?"
+
+#: 
+msgctxt "backend/config"
+msgid "use_store_language_description"
+msgstr "Override the language of the finance calculator with store locale language"
+
+#: 
+msgctxt "backend/config"
+msgid "environment_url_label"
+msgstr "Environment URL"
+
+#: 
+msgctxt "backend/config"
+msgid "environment_url_description"
+msgstr "Please insert the environment URL supplied by your finance provider"
+
+#: 
+msgctxt "backend/error"
+msgid "environment_url_error"
+msgstr "Incorrect or invalid environment URL"
+
+#: 
+msgctxt "backend/error"
+msgid "environment_url_error_msg"
+msgstr "Environment URL is unreachable:"
+
+#: 
+msgctxt "backend/error"
+msgid "environment_unhealthy_error_msg"
+msgstr "Something may be wrong with the environment. It returned:"
+
+#: 
+msgctxt "global"
+msgid "if_applicable"
+msgstr "if applicable"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_settings_header"
+msgstr "Checkout Settings"
+
+#: 
+msgctxt "backend/config"
+msgid "conditions_settings_header"
+msgstr "Conditions Settings"
+
+#: 
+msgctxt "backend/config"
+msgid "notifications_settings_header"
+msgstr "Notifications Settings"
+
+#: 
+msgctxt "backend/error"
+msgid "widget_threshhold_not_valid_error"
+msgstr "Widget minimum value is not valid"
+
+#: 
+msgctxt "backend/error"
+msgid "widget_threshhold_not_valid_error_msg"
+msgstr "Widget minimum needs to be formatted as a numeric value"
+
+#: 
+msgctxt "backend/config"
+msgid "calc_conf_api_url_label"
+msgstr "Calculator Configuration API URL"
+
+#: 
+msgctxt "backend/config"
+msgid "calc_conf_api_url_description"
+msgstr "Input this URL if it has been supplied to you"
+
+#: 
+msgctxt "backend/warning"
+msgid "refund_amount_warning_msg"
+msgstr "The de-facto amount refundable for this application is %s. Any refund attempt exceeding this will be processed as a full refund for %s"
+
+#: 
+msgctxt "backend/prompt"
+msgid "cancel_confirmation_prompt"
+msgstr "Are you sure you want to cancel this order?"
+
+#: 
+msgctxt "backend/prompt"
+msgid "refund_confirmation_prompt"
+msgstr "Are you sure you want to refund this order?"
+
+#: 
+msgctxt "backend/warning"
+msgid "cancel_amount_warning_msg"
+msgstr "The de-facto amount that can be cancelled by the lender for this application is %s"
+
+#: 
+msgctxt "backend/error"
+msgid "update_api_key_error_msg"
+msgstr "It appears you may be using a different API Key to the one used to create this application. Please revert to that API key if you wish to notify the lender of this status change"
+
+#: 
+msgctxt "backend/error"
+msgid "unexpected_error_msg"
+msgstr "An unexpected error has occurred"
+
+#: 
+msgctxt "backend/response"
+msgid "refund_success_msg"
+msgstr "The lender has been notified of the refund request (Refund ID. %s)"
+
+#: 
+msgctxt "backend/response"
+msgid "cancel_success_msg"
+msgstr "The lender has been notified of the cancellation request (Cancellation ID. %s)"
+
+#: 
+msgctxt "backend/error"
+msgid "order_id_error_msg"
+msgstr "Could not find order with ID"
+
+#: 
+msgctxt "backend/config"
+msgid "product_select_plans_guide_msg"
+msgstr "Please go to the Finance tab of a Product and select plans if using the specific products option"
+
+#: 
+msgctxt "backend/prompt"
+msgid "reason_request_msg"
+msgstr "%s requests that you provide a reason from the list below"
+
+#: 
+msgctxt "backend/prompt"
+msgid "proceed_prompt"
+msgstr "Do you wish to proceed?"
+
+#: 
+msgctxt "backend/option"
+msgid "proceed_without_lender_option"
+msgstr "proceed (without notifying lender)"
+
+#: 
+msgctxt "backend/option"
+msgid "proceed_with_lender_option"
+msgstr "proceed and notify lender"
+
+#: 
+msgctxt "backend/warning"
+msgid "selected_plans_specific_products_warning_msg"
+msgstr "Please note: %s is only used when the %s option in the plugin configuration is set to %s"
