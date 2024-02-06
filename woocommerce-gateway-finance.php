@@ -89,6 +89,10 @@ class WC_Finance_Payments {
 		return untrailingslashit( plugins_url( '/', __FILE__ ) );
 	}
 
+    public static function plugin_base_basename() {
+        return plugin_basename(__FILE__);
+    }
+
 	/**
 	 * Plugin url.
 	 *
@@ -118,6 +122,24 @@ class WC_Finance_Payments {
         if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
             \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
         }
+    }
+
+    /**
+     * Add plugin action links.
+     *
+     * Add a link to the settings page on the plugins.php page.
+     *
+     * @since 2.0.2
+     *
+     * @param  array $links List of existing plugin action links.
+     * @return array         List of modified plugin action links.
+     */
+    public function finance_gateway_settings_link($links)
+    {
+        $_link = '<a href="' . esc_url(admin_url('/admin.php?page=wc-settings&tab=checkout&section=finance')) . '">' . __('backendsettings_label', 'woocommerce-finance-gateway') . '</a>';
+        $links[] = $_link;
+
+        return $links;
     }
 }
 

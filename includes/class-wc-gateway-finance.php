@@ -252,7 +252,7 @@ function woocommerce_finance_init()
                 add_action('admin_enqueue_scripts', array($this, 'wpdocs_enqueue_custom_admin_style'));
                 add_action('wp_footer', array($this, 'add_calc_conf_to_footer'));
                 
-                add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'finance_gateway_settings_link'));
+                add_filter('plugin_action_links_' . WC_Finance_Payments::plugin_base_basename(), array($this, 'finance_gateway_settings_link'));
 
                 add_filter('woocommerce_available_payment_gateways', array($this, 'showOptionAtCheckout'));
 
@@ -875,9 +875,8 @@ jQuery(document).ready(function() {
                 : '';
             
             include_once sprintf(
-                '%s/%s/includes/widget.php',
-                WP_PLUGIN_DIR, 
-                plugin_basename(dirname(__FILE__))
+                '%s/includes/widget.php',
+                WC_Finance_Payments::plugin_abspath()
             );
             
         }
@@ -1427,9 +1426,8 @@ jQuery(document).ready(function($) {
             $shortApiKey = explode('.',$this->api_key)[0];
             $calcConfApiUrl = $this->calculator_config_api_url;
             include_once sprintf(
-                '%s/%s/includes/checkout.php',
-                WP_PLUGIN_DIR,
-                plugin_basename(dirname(__FILE__))
+                '%s/includes/checkout.php',
+                WC_Finance_Payments::plugin_abspath()
             );
             
         }
@@ -1990,8 +1988,7 @@ jQuery(document).ready(function($) {
          */
         function finance_gateway_settings_link($links)
         {
-
-            $_link = '<a href="' . esc_url(admin_url('/admin.php?page=wc-settings&tab=checkout&section=finance')) . '">' . __('backendsettings_label', 'woocommerce-finance-gateway') . '</a>';
+            $_link = '<a href="' . esc_url(admin_url(sprintf('/admin.php?page=wc-settings&tab=checkout&section=%s', $this->id))) . '">' . __('backendsettings_label', 'woocommerce-finance-gateway') . '</a>';
             $links[] = $_link;
 
             return $links;
