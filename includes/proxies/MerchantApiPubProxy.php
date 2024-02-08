@@ -29,7 +29,7 @@ class MerchantApiPubProxy{
             'CANCELLATION' => '/applications/%s/cancellations'
         ],
         'PATCH' => [
-            'APPLICATION' => '/application/%s'
+            'APPLICATION' => '/applications/%s'
         ]
     ];
 
@@ -250,7 +250,7 @@ class MerchantApiPubProxy{
         $method = 'PATCH';
         $action = 'APPLICATION';
 
-        $body = $application->getPayload();
+        $body = $application->getJsonPayload();
 
         $path = sprintf(
             self::PATHS[$method][$action],

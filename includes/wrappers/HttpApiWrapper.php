@@ -85,7 +85,7 @@ class HttpApiWrapper{
             'body' => $body
         ]);
 
-        $url = sprintf("%s%s?%s", $this->baseUri, $path);
+        $url = sprintf("%s%s", $this->baseUri, $path);
 
         $response = wp_remote_post(
             $url,
