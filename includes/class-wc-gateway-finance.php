@@ -1591,19 +1591,19 @@ jQuery(document).ready(function($) {
                 $secret = $this->create_signature(json_encode($application->getPayload()), $this->secret);
                 $proxy->addSecretHeader($secret);
             }
-            
-            if (empty(get_post_meta($order_id, "_finance_reference", true))) {
-                $response = $proxy->postApplication($application);
-            } else {
-                $applicationId = get_post_meta($order_id, "_finance_reference", true);
-                $application = $application->withId($applicationId);
-                $response = $proxy->updateApplication($application);
-            }
-            
-            $result_id = $response->data->id;
-            $result_redirect = $response->data->urls->application_url;
-                
+
             try {
+                if (empty(get_post_meta($order_id, "_finance_reference", true))) {
+                    $response = $proxy->postApplication($application);
+                } else {
+                    $applicationId = get_post_meta($order_id, "_finance_reference", true);
+                    $application = $application->withId($applicationId);
+                    $this->logger->debug($application->getJsonPayload());
+                    $response = $proxy->updateApplication($application);
+                }
+                
+                $result_id = $response->data->id;
+                $result_redirect = $response->data->urls->application_url;
 
                 update_post_meta($order_id, '_finance_reference', $result_id);
                 update_post_meta($order_id, '_finance_description', $response->data->finance_plan->description ?? $_POST['divido_plan']);
@@ -1613,7 +1613,11 @@ jQuery(document).ready(function($) {
                     'result' => 'success',
                     'redirect' => $result_redirect,
                 );
+            } catch (MerchantApiBadResponseException|MerchantApiBadResponseException $e){
+                $this->logger->error(sprintf("%s API Error: %s", $this->method_title, $e->getMessage()));
+                throw $e;
             } catch (Exception $e) {
+                $this->logger->error($e->getMessage());
                 $cancel_note = sprintf(
                     "%s (%s: %s) %s: %s",
                     __('backend/orderpayment_rejection_error', 'woocommerce-finance-gateway'),
