@@ -35,12 +35,12 @@ Product Selection: Allows you to pick the products on which finance will be avai
 Show Product Widget: Allows you to turn on/off the small widget which appears underneath the price on product pages.
 Show Calculator Widget: Allows you to turn on/off the Calculator widget which appears at the bottom of product pages.
 Widget Threshold: Allows you to set the minimum amount for the "Product Widget" to show.
-Widget Prefix: Allows you to add a prefix to the "Product Widget".
-Widget Suffix: Allows you to add a suffix to the "Product Widget".
 Enable/Disable Automatic Fulfillment: Allows you to select if an "Activation" call should be made automatically to the lender once the order goes to "Completed"
 Enable/Disable Automatic Refunds: Allows you to select if a "Refund" call should be made automatically to the lender once the order goes to "Refunded"
 Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation" call should be made automatically to the lender once the order goes to "Cancelled"
-
+WooCommerce Blocks compatibility
+WooCommerce HPOS compatability
+Shortcode Calculator widget to display finance options ad-hoc
 
 
  == Changelog ==
