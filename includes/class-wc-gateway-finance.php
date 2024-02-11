@@ -64,6 +64,9 @@ function woocommerce_finance_init()
 
         private string $environment;
 
+        const TRANSIENT_PLANS = 'finances';
+
+        const TRANSIENT_APIKEY = 'api_key';
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
 
@@ -259,7 +262,7 @@ function woocommerce_finance_init()
         {
             if($id === 'finance'){
                 $logoUrl = null;
-                set_transient("finances", ""); 
+                set_transient(self::TRANSIENT_PLANS, ""); 
                 foreach($this->get_all_finances() as $plan){
                     if(!empty($plan->lender->branding->logo_url)){
                         $logoUrl = $plan->lender->branding->logo_url;
@@ -365,9 +368,8 @@ function woocommerce_finance_init()
         function get_all_finances()
         {
             $finances = false;
-            $transient_name = 'finances';
-            $finances = get_transient($transient_name);
-            $apiKey = get_transient("api_key");
+            $finances = get_transient(self::TRANSIENT_PLANS);
+            $apiKey = get_transient(self::TRANSIENT_APIKEY);
 
             // only fetch new finances if the api key is different
             // OR API key transisent is not set
@@ -381,8 +383,8 @@ function woocommerce_finance_init()
                     $response = $proxy->getFinancePlans();
                     $plans = $response->data;
 
-                    set_transient($transient_name, $plans, 60 * 60 * 1);
-                    set_transient("api_key", $this->api_key);
+                    set_transient(self::TRANSIENT_PLANS, $plans, 60 * 60 * 1);
+                    set_transient(self::TRANSIENT_APIKEY, $this->api_key);
 
                     return $plans;
                 } catch (Exception $e) {
