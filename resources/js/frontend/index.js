@@ -13,6 +13,8 @@ const defaultLabel = __(
 );
 
 const label = decodeEntities( settings.title ) || defaultLabel;
+const logoUrl = settings.logo
+const lender = decodeEntities( settings.description) || defaultLabel;
 const description = decodeEntities( settings.description || '' );
 const footnote = decodeEntities( settings.footnote || '' );
 const plans = (settings.plans) ? settings.plans : "";
@@ -33,8 +35,17 @@ const FinanceWidget = ({price}) => {
  * @param {*} props Props from payment API.
  */
 const Label = ( props ) => {
-	const { PaymentMethodLabel } = props.components;
-	return <PaymentMethodLabel text={ label } />;
+	const containerStyle =  {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "100%"
+    }
+
+	return <div style={containerStyle}>
+        <div >{ label }</div>
+        <img src={ logoUrl } alt={ lender } style={{marginRight: "16px"}} />
+    </div>;
 };
 
 /**

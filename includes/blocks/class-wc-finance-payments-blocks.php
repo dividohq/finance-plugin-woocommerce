@@ -1,5 +1,7 @@
 <?php
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
+use Divido\Woocommerce\FinanceGateway\Proxies\MerchantApiPubProxy;
+use Divido\MerchantSDK\Environment;
 
 /**
  * Finance Payments Blocks integration
@@ -77,14 +79,38 @@ final class WC_Gateway_Finance_Blocks_Support extends AbstractPaymentMethodType 
 	 * @return array
 	 */
 	public function get_payment_method_data() {
+
 		return [
 			'name'        => $this->gateway->id,
 			'title'       => $this->get_setting( 'title' ),
 			'description' => $this->get_setting( 'description' ),
 			'footnote' => $this->get_setting( 'footnote' ),
+			'logo' => $this->getLogoUrl(),
 			'active' => $this->get_setting('enabled') === "yes",
 			'plans' => ($this->get_setting('showFinanceOptions') === "all") ? false : $this->get_setting('showFinanceOptionSelection'),
 			'supports' => array_filter( $this->gateway->supports, [ $this->gateway, 'supports' ] )
 		];
+	}
+
+	private function getLogoUrl(): ?string {
+		if(get_transient(WC_Gateway_Finance::TRANSIENT_PLANS)) {
+			$plans = get_transient(WC_Gateway_Finance::TRANSIENT_PLANS);
+		} elseif(!empty(get_transient(WC_Gateway_Finance::TRANSIENT_APIKEY))){
+			$apiKey = get_transient(WC_Gateway_Finance::TRANSIENT_APIKEY);
+			$environment = Environment::getEnvironmentFromAPIKey($apiKey);
+			$apiUrl = (array_key_exists($environment, Environment::CONFIGURATION)) ? Environment::CONFIGURATION[$environment]['base_uri'] : null;
+			if($apiUrl === null) return null;
+			$proxy = new MerchantApiPubProxy($apiUrl, $apiKey);
+			$plans = $proxy->getFinancePlans();
+		}
+		if($plans){
+			foreach($plans as $plan){
+				if(!empty($plan->lender->branding->logo_url)){
+					return  $plan->lender->branding->logo_url;
+				}
+			}
+			return json_encode($plan);
+		}
+		return null;
 	}
 }
