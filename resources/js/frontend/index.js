@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { registerPaymentMethod } from '@woocommerce/blocks-registry';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getSetting } from '@woocommerce/settings';
@@ -8,8 +8,8 @@ import { getSetting } from '@woocommerce/settings';
 const settings = getSetting( 'divido-finance_data', {} );
 
 const defaultLabel = __(
-	'Finance',
-	'woo-gutenberg-products-block'
+    'Finance',
+    'woo-gutenberg-products-block'
 );
 
 const label = decodeEntities( settings.title ) || defaultLabel;
@@ -35,14 +35,14 @@ const FinanceWidget = ({price}) => {
  * @param {*} props Props from payment API.
  */
 const Label = ( props ) => {
-	const containerStyle =  {
+    const containerStyle =  {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         width: "100%"
     }
 
-	return <div style={containerStyle}>
+    return <div style={containerStyle}>
         <div >{ label }</div>
         <img src={ logoUrl } alt={ lender } style={{marginRight: "16px"}} />
     </div>;
@@ -53,7 +53,7 @@ const Label = ( props ) => {
  */
 const Content = (props) => {
     const { eventRegistration, emitResponse } = props;
-	const { onPaymentProcessing } = eventRegistration;
+    const { onPaymentProcessing } = eventRegistration;
     useEffect( () => {
         if(typeof __widgetInstance !== 'undefined')__widgetInstance.init();
         if(typeof __calculator !== 'undefined')__calculator.init();
@@ -85,7 +85,7 @@ const Content = (props) => {
     }, [
         emitResponse.responseTypes.ERROR,
         emitResponse.responseTypes.SUCCESS,
-		onPaymentProcessing
+        onPaymentProcessing
     ]);
     return <div>
         <div>{description}</div>
@@ -97,15 +97,15 @@ const Content = (props) => {
  * Finance payment method config object.
  */
 const Finance = {
-	name: settings.name,
-	label: <Label />,
-	content: <Content />,
-	edit: <Content />,
-	canMakePayment: () => settings.active,
-	ariaLabel: label,
-	supports: {
-		features: settings.supports,
-	},
+    name: settings.name,
+    label: <Label />,
+    content: <Content />,
+    edit: <Content />,
+    canMakePayment: () => settings.active,
+    ariaLabel: label,
+    supports: {
+        features: settings.supports,
+    },
 };
 
 registerPaymentMethod( Finance );
