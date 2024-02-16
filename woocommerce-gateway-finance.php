@@ -44,6 +44,7 @@ class WC_Finance_Payments {
         // Registers WooCommerce Blocks integration.
         add_action( 'woocommerce_blocks_loaded', array( __CLASS__, 'block_support' ) );
 
+        // Confirms High-Performance Order Storage support
         add_action( 'before_woocommerce_init', array(__CLASS__, 'hpos_support'));
 
     }
