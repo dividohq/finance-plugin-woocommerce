@@ -55,8 +55,11 @@ const Content = (props) => {
     const { eventRegistration, emitResponse } = props;
     const { onPaymentProcessing } = eventRegistration;
     useEffect( () => {
-        if(typeof __widgetInstance !== 'undefined')__widgetInstance.init();
-        if(typeof __calculator !== 'undefined')__calculator.init();
+        if(typeof __widgetInstance !== 'undefined'){
+            __widgetInstance.init();
+        } else if (typeof __calculator !== 'undefined') {
+            __calculator.init();
+        }
         const processing = onPaymentProcessing( async () => {
             if(document.getElementsByName('divido_plan').length <= 0){
                 return {
