@@ -179,8 +179,6 @@ function woocommerce_finance_init()
             // set the tenancy environment based on the user input "url" field or default it from the api key
             $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
 
-            add_filter('woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2);
-
             // Load logger.
             $this->logger = wc_get_logger();
 
@@ -250,30 +248,6 @@ function woocommerce_finance_init()
                 add_filter('woocommerce_available_payment_gateways', array($this, 'showOptionAtCheckout'));
 
                 $hooksAdded = true;
-            }
-        }
-
-        /**
-         * @param $icon
-         * @param $id
-         * @return string
-         */
-        public function custom_gateway_icon($icon, $id)
-        {
-            if($id === 'finance'){
-                $logoUrl = null;
-                set_transient(self::TRANSIENT_PLANS, ""); 
-                foreach($this->get_all_finances() as $plan){
-                    if(!empty($plan->lender->branding->logo_url)){
-                        $logoUrl = $plan->lender->branding->logo_url;
-                        break;
-                    }
-                }
-                return ($logoUrl === null)
-                    ? null
-                    : "<img style='float:right; max-height: 24px' src='{$logoUrl}' />";
-            } else {
-                return $icon;
             }
         }
 
