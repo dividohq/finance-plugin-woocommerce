@@ -1,0 +1,577 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: plugins\n"
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: 
+msgctxt "backend/config"
+msgid "api_key_label"
+msgstr "Clave API"
+
+#: 
+msgctxt "backend/config"
+msgid "shared_secret_label"
+msgstr "Clave secreta"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_title_label"
+msgstr "Título de pago"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_description_label"
+msgstr "Descripción del pago"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_threshold_label"
+msgstr "Umbral del carro"
+
+#: 
+msgctxt "backend/config"
+msgid "show_widget_label"
+msgstr "Mostrar widget"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_minimum_label"
+msgstr "Mínimo de widget"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_minimum_description"
+msgstr "Solo muestre el widget si el precio del producto supera la cantidad especificada"
+
+#: 
+msgctxt "backend/config"
+msgid "show_widget_description"
+msgstr "Muestre un útil widget con las opciones de financiación en su página de productos"
+
+#: 
+msgctxt "backend/config"
+msgid "api_key_description"
+msgstr "La clave API debe ser proporcionada por su proveedor de finanzas"
+
+#: 
+msgctxt "backend/config"
+msgid "shared_secret_description"
+msgstr "El secreto compartido opcional es un código acordado que se utiliza para verificar la información entre usted y su proveedor de finanzas."
+
+#: 
+msgctxt "backend/config"
+msgid "limit_plans_label"
+msgstr "Planes de límite"
+
+#: 
+msgctxt "backend/config"
+msgid "limit_plans_description"
+msgstr "Elija los planes que desea poner a disposición de sus clientes."
+
+#: 
+msgctxt "backend/config"
+msgid "cart_threshold_description"
+msgstr "El monto mínimo necesario para que el carrito totalice para que las finanzas sean una opción al momento de pagar"
+
+#: 
+msgctxt "frontend/checkout/error"
+msgid "default_api_error_msg"
+msgstr "No podemos procesar este pedido con el método de pago elegido. Por favor elige otro método"
+
+#: 
+msgctxt "backend/config"
+msgid "plugin_active_label"
+msgstr "Activo"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_title_description"
+msgstr "El nombre de la opción de pago al finalizar la compra"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_description_description"
+msgstr "La descripción de la opción de pago al finalizar la compra"
+
+#: 
+msgctxt "backend/config"
+msgid "product_selection_label"
+msgstr "Selección de producto"
+
+#: 
+msgctxt "backend/config"
+msgid "refine_plans_label"
+msgstr "Lista de planes de refinamiento"
+
+#: 
+msgctxt "backend/config"
+msgid "show_all_plans_option"
+msgstr "Mostrar todos los planes"
+
+#: 
+msgctxt "backend/config"
+msgid "select_specific_plans_option"
+msgstr "Seleccionar planes específicos"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_all_products_option"
+msgstr "Todos los productos"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_specific_products_option"
+msgstr "Financiar productos específicos"
+
+#: 
+msgctxt "backend/config"
+msgid "finance_threshold_products_option"
+msgstr "Todos los productos por encima de un precio definido."
+
+#: 
+msgctxt "backend/config"
+msgid "product_selection_description"
+msgstr "Personaliza qué productos se pueden financiar"
+
+#: 
+msgctxt "backend/calculator"
+msgid "calculator_active_label"
+msgstr "Calculadora activa"
+
+#: 
+msgctxt "frontend/payment"
+msgid "redirection_msg"
+msgstr "Será redirigido para completar esta solicitud de financiación después de confirmar su pedido"
+
+#: 
+msgctxt "backend/config"
+msgid "plugin_active_description"
+msgstr "Habilitar o deshabilitar la opción de financiación al finalizar la compra"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_footnote_label"
+msgstr "Nota"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_button_text_label"
+msgstr "Botón de texto"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_button_text_description"
+msgstr "Texto que aparece en el botón del widget"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_footnote_description"
+msgstr "Letra pequeña que aparece al final del widget"
+
+#: 
+msgctxt "backend/plugin"
+msgid "enabled_option"
+msgstr "Habilitado"
+
+#: 
+msgctxt "backend/config"
+msgid "lightbox_option"
+msgstr "Caja ligera"
+
+#: 
+msgctxt "backend/config"
+msgid "calculator_option"
+msgstr "Calculadora"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_mode_label"
+msgstr "Moda"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_mode_description"
+msgstr "Si el widget aparece como inmediatamente (calculadora) o cuando se hace clic en un botón (lightbox)"
+
+#: 
+msgctxt "backend/config"
+msgid "product_price_threshold_label"
+msgstr "Umbral de precio del producto"
+
+#: 
+msgctxt "backend/config"
+msgid "product_price_threshold_description"
+msgstr "La cantidad mínima que debe costar un producto para ser viable para la financiación"
+
+#: 
+msgctxt "global"
+msgid "plugin_title"
+msgstr "Pagar por finanzas"
+
+#: 
+msgctxt "global"
+msgid "yes"
+msgstr "si"
+
+#: 
+msgctxt "global"
+msgid "no"
+msgstr "No"
+
+#: 
+msgctxt "global"
+msgid "plugin_description"
+msgstr "Esta extensión le permite aceptar pagos financieros en su tienda"
+
+#: 
+msgctxt "backend"
+msgid "settings_label"
+msgstr "Configuración"
+
+#: 
+msgctxt "global"
+msgid "order_error_description_prefix"
+msgstr "Este pedido no se pudo procesar debido al siguiente error"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_maximum_label"
+msgstr "Carrito Máximo"
+
+#: 
+msgctxt "backend/config"
+msgid "cart_maximum_description"
+msgstr "La cantidad máxima que un carrito puede totalizar para que las finanzas sean una opción al momento de pagar"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_fulfilment_label"
+msgstr "¿Habilitar el cumplimiento automático?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_fulfilment_description"
+msgstr "Notifique automáticamente al prestamista que el pedido está completo cada vez que lo cambia a un estado específico"
+
+#: 
+msgctxt "backend/order"
+msgid "finance_reference_number_label"
+msgstr "Número de referencia de finanzas"
+
+#: 
+msgctxt "backend/order"
+msgid "finance_plan_id_label"
+msgstr "ID del plan financiero"
+
+#: 
+msgctxt "backend/order"
+msgid "shared_secret_error_msg"
+msgstr "Error de seguridad: el secreto compartido no coincide con el esperado"
+
+#: 
+msgctxt "backend/order"
+msgid "order_amount_error_msg"
+msgstr "Error de financiación: el importe del crédito solicitado no coincide con la suma del pedido. La orden ha sido puesta en espera"
+
+#: 
+msgctxt "backend/order"
+msgid "order_status_label"
+msgstr "Estado del pedido"
+
+#: 
+msgctxt "global"
+msgid "finance_label"
+msgstr "Financiar"
+
+#: 
+msgctxt "frontend/product"
+msgid "available_on_finance_label"
+msgstr "Disponible en finanzas"
+
+#: 
+msgctxt "frontend/product"
+msgid "default_settings_label"
+msgstr "Configuración por defecto"
+
+#: 
+msgctxt "frontend/product"
+msgid "selected_plans_label"
+msgstr "Planes seleccionados"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "checkout_title_default"
+msgstr "Pagar en cuotas"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "checkout_description_default"
+msgstr "Divide tu compra en cuotas regulares más pequeñas"
+
+#: 
+msgctxt "backend/config"
+msgid "general_settings_header"
+msgstr "Configuración general"
+
+#: 
+msgctxt "backend/config"
+msgid "refine_plans_instructions"
+msgstr "Shift-clic o Control-clic para seleccionar varios elementos en la lista"
+
+#: 
+msgctxt "backend/config"
+msgid "widget_settings_header"
+msgstr "Configuraciones de widgets"
+
+#: 
+msgctxt "backend/config"
+msgid "order_settings_header"
+msgstr "Configuraciones de orden"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_refund_label"
+msgstr "¿Habilitar reembolsos automáticos?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_refund_description"
+msgstr "Notifique automáticamente al prestamista que el pedido se reembolsará siempre que el estado de un pedido se establezca en reembolsado"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_cancellation_label"
+msgstr "Habilitar cancelación automática?"
+
+#: 
+msgctxt "backend/config"
+msgid "automatic_cancellation_description"
+msgstr "Notifique automáticamente al prestamista que el pedido se cancela siempre que el estado de un pedido esté configurado como cancelado"
+
+#: 
+msgctxt "backend/error"
+msgid "invalid_api_key_error"
+msgstr "Clave API incorrecta o inválida"
+
+#: 
+msgctxt "backend"
+msgid "contact_financier_msg"
+msgstr "Póngase en contacto con su proveedor de finanzas para obtener más información."
+
+#: 
+msgctxt "frontend/checkout/error"
+msgid "invalid_country_error"
+msgstr "Lamentablemente, una opción de financiación no está disponible actualmente para su país"
+
+#: 
+msgctxt "frontend/checkout"
+msgid "choose_country_msg"
+msgstr "Seleccione su país antes de continuar con su compra."
+
+#: 
+msgctxt "backend/order"
+msgid "payment_rejection_error"
+msgstr "Pago de financiación rechazado"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_fulfillment_sent_msg"
+msgstr "Solicitud de cumplimiento automático enviada"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_refund_sent_msg"
+msgstr "Solicitud de reembolso automático enviada"
+
+#: 
+msgctxt "backend/order"
+msgid "automatic_cancellation_sent_msg"
+msgstr "Solicitud de cancelación automática enviada"
+
+#: 
+msgctxt "global"
+msgid "order_id_label"
+msgstr "Solicitar ID"
+
+#: 
+msgctxt "global/order"
+msgid "discount_label"
+msgstr "Descuento"
+
+#: 
+msgctxt "global/order"
+msgid "fee_tax_label"
+msgstr "Tarifa impuesto"
+
+#: 
+msgctxt "global/order"
+msgid "fees_label"
+msgstr "Tarifa"
+
+#: 
+msgctxt "global/order"
+msgid "shipping_label"
+msgstr "Envío y manipulación"
+
+#: 
+msgctxt "global/order"
+msgid "taxes_label"
+msgstr "Impuestos"
+
+#: 
+msgctxt "global/order"
+msgid "other_label"
+msgstr "Otra"
+
+#: 
+msgctxt "backend/config"
+msgid "use_store_language_label"
+msgstr "¿Usar el idioma de la tienda?"
+
+#: 
+msgctxt "backend/config"
+msgid "use_store_language_description"
+msgstr "Anule el idioma de la calculadora financiera con el idioma de la tienda"
+
+#: 
+msgctxt "backend/config"
+msgid "environment_url_label"
+msgstr "URL del entorno"
+
+#: 
+msgctxt "backend/config"
+msgid "environment_url_description"
+msgstr "Inserte la URL del entorno proporcionada por su proveedor financiero."
+
+#: 
+msgctxt "backend/error"
+msgid "environment_url_error"
+msgstr "URL de entorno incorrecta o no válida"
+
+#: 
+msgctxt "backend/error"
+msgid "environment_url_error_msg"
+msgstr "No se puede acceder a la URL del entorno:"
+
+#: 
+msgctxt "backend/error"
+msgid "environment_unhealthy_error_msg"
+msgstr "Algo puede estar mal con el medio ambiente. Regresó:"
+
+#: 
+msgctxt "global"
+msgid "if_applicable"
+msgstr "si es aplicable"
+
+#: 
+msgctxt "backend/config"
+msgid "checkout_settings_header"
+msgstr "Configuración de pago"
+
+#: 
+msgctxt "backend/config"
+msgid "conditions_settings_header"
+msgstr "Configuración de condiciones"
+
+#: 
+msgctxt "backend/config"
+msgid "notifications_settings_header"
+msgstr "Configuracion de notificaciones"
+
+#: 
+msgctxt "backend/error"
+msgid "widget_threshhold_not_valid_error"
+msgstr "El valor mínimo del widget no es válido"
+
+#: 
+msgctxt "backend/error"
+msgid "widget_threshhold_not_valid_error_msg"
+msgstr "El mínimo del widget debe formatearse como un valor numérico"
+
+#: 
+msgctxt "backend/config"
+msgid "calc_conf_api_url_label"
+msgstr "URL de la API de configuración de la calculadora"
+
+#: 
+msgctxt "backend/config"
+msgid "calc_conf_api_url_description"
+msgstr "Ingrese esta URL si se le ha proporcionado"
+
+#: 
+msgctxt "backend/warning"
+msgid "refund_amount_warning_msg"
+msgstr "El monto de facto reembolsable para esta aplicación es %s. Cualquier intento de reembolso que exceda esto se procesará como un reembolso completo para %s"
+
+#: 
+msgctxt "backend/prompt"
+msgid "cancel_confirmation_prompt"
+msgstr "¿Está seguro de que desea cancelar este pedido?"
+
+#: 
+msgctxt "backend/prompt"
+msgid "refund_confirmation_prompt"
+msgstr "¿Está seguro de que desea reembolsar este pedido?"
+
+#: 
+msgctxt "backend/warning"
+msgid "cancel_amount_warning_msg"
+msgstr "El monto de facto que puede cancelar el prestamista para esta aplicación es %s"
+
+#: 
+msgctxt "backend/error"
+msgid "update_api_key_error_msg"
+msgstr "Parece que puede estar utilizando una clave API diferente a la utilizada para crear esta aplicación. Vuelva a esa clave API si desea notificar al prestamista sobre este cambio de estado"
+
+#: 
+msgctxt "backend/error"
+msgid "unexpected_error_msg"
+msgstr "Ha ocurrido un error inesperado"
+
+#: 
+msgctxt "backend/response"
+msgid "refund_success_msg"
+msgstr "El prestamista ha sido notificado de la solicitud de reembolso (Refund ID. %s)"
+
+#: 
+msgctxt "backend/response"
+msgid "cancel_success_msg"
+msgstr "El prestamista ha sido notificado de la solicitud de cancelación (ID de cancelación. %s)"
+
+#: 
+msgctxt "backend/error"
+msgid "order_id_error_msg"
+msgstr "No se pudo encontrar el pedido con ID"
+
+#: 
+msgctxt "backend/config"
+msgid "product_select_plans_guide_msg"
+msgstr "Vaya a la pestaña Finanzas de un Producto y seleccione planes si utiliza la opción de productos específicos"
+
+#: 
+msgctxt "backend/prompt"
+msgid "reason_request_msg"
+msgstr "%s solicita que proporciones un motivo de la lista siguiente"
+
+#: 
+msgctxt "backend/prompt"
+msgid "proceed_prompt"
+msgstr "¿Desea continuar?"
+
+#: 
+msgctxt "backend/option"
+msgid "proceed_without_lender_option"
+msgstr "proceder (sin notificar al prestamista)"
+
+#: 
+msgctxt "backend/option"
+msgid "proceed_with_lender_option"
+msgstr "proceder y notificar al prestamista"
+
+#: 
+msgctxt "backend/warning"
+msgid "selected_plans_specific_products_warning_msg"
+msgstr "Tenga en cuenta: %s solo se usa cuando la opción %s en la configuración del complemento está configurada en %s"

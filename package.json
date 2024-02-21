@@ -1,0 +1,23 @@
+{
+	"name": "woocommerce-gateway-finance",
+	"title": "WooCommerce Finance Payments",
+	"version": "0.0.1",
+	"author": "Divido",
+	"license": "GPL-3.0+",
+	"keywords": [],
+	"engines": {
+		"node": ">=6.9.4",
+		"npm": ">=1.1.0"
+	},
+	"devDependencies": {
+		"@woocommerce/dependency-extraction-webpack-plugin": "^2.2.0",
+		"@wordpress/scripts": "^27.1.0",
+		"cross-env": "7.0.3"
+	},
+	"scripts": {
+		"start": "wp-scripts start",
+		"build": "wp-scripts build",
+		"packages-update": "wp-scripts packages-update",
+		"check-engines": "wp-scripts check-engines"
+	}
+}

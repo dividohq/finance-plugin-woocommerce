@@ -6,9 +6,9 @@ Tags:              woothemes,woocommerce,payment gateway,payment,module,ecommerc
 Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
-Tested up to:      6.4.1
-Stable tag:        2.7.2
-Version:           2.7.2
+Tested up to:      6.4.3
+Stable tag:        2.8.0
+Version:           2.8.0
 
 License: GPLv2 or later
 
@@ -35,15 +35,19 @@ Product Selection: Allows you to pick the products on which finance will be avai
 Show Product Widget: Allows you to turn on/off the small widget which appears underneath the price on product pages.
 Show Calculator Widget: Allows you to turn on/off the Calculator widget which appears at the bottom of product pages.
 Widget Threshold: Allows you to set the minimum amount for the "Product Widget" to show.
-Widget Prefix: Allows you to add a prefix to the "Product Widget".
-Widget Suffix: Allows you to add a suffix to the "Product Widget".
 Enable/Disable Automatic Fulfillment: Allows you to select if an "Activation" call should be made automatically to the lender once the order goes to "Completed"
 Enable/Disable Automatic Refunds: Allows you to select if a "Refund" call should be made automatically to the lender once the order goes to "Refunded"
 Enable/Disable Automatic Cancellation: Allows you to select if an "Cancellation" call should be made automatically to the lender once the order goes to "Cancelled"
-
+WooCommerce Blocks compatibility
+WooCommerce HPOS compatability
+Shortcode Calculator widget to display finance options ad-hoc
 
 
  == Changelog ==
+
+Version 2.8.0
+Feat: Adds Woocommerce blocks compatibility
+Chore: Confirms HPOS compatibility
 
 Version 2.7.2
 Feat: Adds shipping address to finance application and improves address parsing
