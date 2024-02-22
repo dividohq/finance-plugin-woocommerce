@@ -98,9 +98,6 @@ function woocommerce_finance_init()
                 WC_Finance_Payments::plugin_abspath(). 'i18n/languages'
             )) {
                 $locale = determine_locale();
-                //$split = explode("_", $locale, 2);
-                //$iso = $split[0];
-                //$dumb_locale = "{$iso}_" . strtoupper($iso);
                 if (!load_textdomain(
                     'woocommerce-finance-gateway',
                     WC_Finance_Payments::plugin_abspath() . "i18n/languages/woocommerce-finance-gateway-{$locale}.mo"
@@ -190,16 +187,6 @@ function woocommerce_finance_init()
             /** ensures we only add related hooks once (seems to occur twice otherwise) */
             global $hooksAdded;
             if (!isset($hooksAdded)) {
-                /*
-                add_action( 'before_woocommerce_init', function() {
-                    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-                        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
-                    }
-                    if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
-                        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
-                    }
-                } );
-                */
                 add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options')); // Version 2.0 Hook.
                 // product settings.
                 add_action('woocommerce_product_write_panel_tabs', array($this, 'product_write_panel_tab'));
