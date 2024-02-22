@@ -8,7 +8,7 @@
  * Plugin Name: Finance Payment Gateway for WooCommerce
  * Plugin URI: http://integrations.divido.com/finance-gateway-woocommerce
  * Description: The Finance Payment Gateway plugin for WooCommerce.
- * Version: 2.8.0
+ * Version: 2.8.1
  *
  * Author: Divido Financial Services Ltd
  * Author URI: www.divido.com
