@@ -372,18 +372,23 @@ function woocommerce_finance_init()
         function enqueue()
         {
             $lender = $this->get_finance_env();
-
+            $isScriptRegistered = false;
             if ($this->isV4()){
                 wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
+                $isScriptRegistered = true;
             } elseif ($this->environment === 'production') {
                 wp_register_script('woocommerce-finance-gateway-calculator', sprintf('//cdn.divido.com/widget/v3/%s.calculator.js', $lender), false, 1.0, true);
-            } else {
+                $isScriptRegistered = true;
+            } elseif($lender !== null) {
                 wp_register_script('woocommerce-finance-gateway-calculator', sprintf('//cdn.divido.com/widget/v3/%s.%s.calculator.js', $lender, $this->environment), false, 1.0, true);
+                $isScriptRegistered = true;
             }
             wp_register_style('woocommerce-finance-gateway-style', WC_Finance_Payments::plugin_url() . '/css/style.css', false, 1.0);
         
             wp_enqueue_style('woocommerce-finance-gateway-style');
-            wp_enqueue_script('woocommerce-finance-gateway-calculator');
+            if($isScriptRegistered){
+                wp_enqueue_script('woocommerce-finance-gateway-calculator');
+            }
         }
 
         /**
@@ -1681,12 +1686,17 @@ jQuery(document).ready(function($) {
             if (!empty($setting)) {
                 return $setting;
             } else {
-                $response = $proxy->getEnvironment();
-                $global = $response->data->environment ?? null;
-                set_transient($transient, $global, 60 * 5);
+                try{
+                    $response = $proxy->getEnvironment();
+                    $global = $response->data->environment ?? null;
+                    set_transient($transient, $global, 60 * 5);
 
-                return $global;
+                    return $global;
+                } catch (\Exception $e){
+                    $this->enabled = false;
+                }
             }
+            return null;
         }
 
         /**
@@ -2096,6 +2106,11 @@ jQuery(document).ready(function($) {
          */
         public function showOptionAtCheckout(array $gateways):array{
             if(!isset($gateways[$this->id])){
+                return $gateways;
+            }
+
+            if(!$this->is_available()){
+                unset($gateways[$this->id]);
                 return $gateways;
             }
 
