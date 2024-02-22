@@ -351,7 +351,7 @@ function woocommerce_finance_init()
                     return $plans;
                 } catch (Exception $e) {
                     if($logger !== null){
-                        $logger->debug('FINANCE', sprintf('Error retrieving plans: %s', $e->getMessage()));
+                        $logger->debug(sprintf('Error retrieving finance plans: %s', $e->getMessage()));
                     }
                 }
             }
@@ -507,7 +507,7 @@ jQuery(document).ready(function() {
                 $callback_sign = isset($_SERVER['HTTP_X_DIVIDO_HMAC_SHA256']) ? $_SERVER['HTTP_X_DIVIDO_HMAC_SHA256'] : ''; // Input var okay.
                 $sign = $this->create_signature($data, $this->secret);
                 if ($callback_sign !== $sign) {
-                    $this->logger->debug('FINANCE', 'ERROR: Hash error');
+                    $this->logger->debug(sprintf('%s: Hash error', $this->id));
                     $data_json = json_decode($data);
                     if (is_object($data_json)) {
                         if ($data_json->metadata->order_number) {
@@ -533,7 +533,16 @@ jQuery(document).ready(function() {
                             // Amount mismatch, hold.
                             $order->update_status('on-hold');
                             $order->add_order_note(__('backend/orderorder_amount_error_msg', 'woocommerce-finance-gateway'));
-                            $this->logger->debug('Finance', 'ERROR: The requested credit of £' . $finance_amount[0] . ' did not match order sum, putting order on hold. Status: ' . $data_json->status . ' Order: ' . $data_json->metadata->order_number . ' Finance Reference: ' . $finance_reference[0]);
+                            $this->logger->debug(
+                                sprintf(
+                                    '%s: The requested credit of £%s did not match order sum, putting order on hold. Status: %s Order: %s Finance Reference: %s',
+                                    $this->id,
+                                    $finance_amount[0],
+                                    $data_json->status,
+                                    $data_json->metadata->order_number,
+                                    $finance_reference[0]
+                                )
+                            );
                             $this->send_json();
                         } else {
                             // Amount matches, update status.
@@ -542,7 +551,6 @@ jQuery(document).ready(function() {
                                 $order->update_status('failed');
                                 $this->send_json();
                             } elseif ('SIGNED' === $data_json->status) {
-                                $this->logger->error('Finance', 'processing');
                                 $order->update_status('processing', $data_json->application);
                                 $this->send_json();
                             } elseif ('READY' === $data_json->status) {
@@ -553,7 +561,15 @@ jQuery(document).ready(function() {
                         }
                         // Log status to order.
                         $order->add_order_note(__('backend/orderorder_status_label', 'woocommerce-finance-gateway') . ': ' . $data_json->status);
-                        $this->logger->debug('Finance', 'STATUS UPDATE: ' . $data_json->status . ' Order: ' . $data_json->metadata->order_number . ' Finance Reference: ' . $finance_reference[0]);
+                        $this->logger->debug(
+                            sprintf(
+                                '%s - Status Update: %s Order: %s Finance Reference: %s',
+                                $this->id,
+                                $data_json->status,
+                                $data_json->metadata->order_number,
+                                $finance_reference[0]
+                            )
+                        );
                     }
                 }
             }
@@ -1291,7 +1307,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                     }
 
                 if (isset($this->api_key) && $this->api_key) {
-                    $response = $this->get_all_finances($this->url, $this->api_key, $this->logger);
+                    $response = $this->get_all_finances($this->url, $this->api_key);
                     if (empty($response)) {
                     ?>
     <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
@@ -1568,7 +1584,6 @@ jQuery(document).ready(function($) {
                 } else {
                     $applicationId = get_post_meta($order_id, "_finance_reference", true);
                     $application = $application->withId($applicationId);
-                    $this->logger->debug($application->getJsonPayload());
                     $response = $proxy->updateApplication($application);
                 }
                 
@@ -1587,7 +1602,7 @@ jQuery(document).ready(function($) {
                 $this->logger->error(sprintf("%s API Error: %s", $this->method_title, $e->getMessage()));
                 throw $e;
             } catch (Exception $e) {
-                $this->logger->error($e->getMessage());
+                $this->logger->error(sprintf("%s: %s", $this->method_title, $e->getMessage()));
                 $cancel_note = sprintf(
                     "%s (%s: %s) %s: %s",
                     __('backend/orderpayment_rejection_error', 'woocommerce-finance-gateway'),
@@ -1631,7 +1646,7 @@ jQuery(document).ready(function($) {
             $finances = array();
             try {
                 if (!isset($this->finance_options)) {
-                    $this->finance_options = $this->get_all_finances($this->url, $this->api_key, $this->logger);
+                    $this->finance_options = $this->get_all_finances($this->url, $this->api_key);
                 }
 
                 foreach ($this->finance_options as $plan) {
@@ -1644,7 +1659,7 @@ jQuery(document).ready(function($) {
                     );
                 }
             } catch (Exception $e) {
-                $this->logger->debug('Finance', sprintf("Error converting finance plans: %s", $e->getMessage()));
+                $this->logger->debug(sprintf("%s: Error converting finance plans: %s", $this->method_title, $e->getMessage()));
                 throw $e;
             }
 
@@ -1857,11 +1872,13 @@ jQuery(document).ready(function($) {
             if ('finance' === $name) {
                 if ('no' !== $this->auto_fulfillment) {
                     $ref_and_finance = $this->get_ref_finance($order);
-                    $this->logger->debug('Finance', 'Auto Fulfillment selected' . $ref_and_finance['ref']);
+                    $this->logger->debug(
+                        sprintf('%s: Auto Fulfillment selected %s', $this->method_title, $ref_and_finance['ref'])
+                    );
                     $this->set_fulfilled($ref_and_finance['ref'], $order_total, $wc_order_id);
                     $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_fulfillment_sent_msg', 'woocommerce-finance-gateway'));
                 } else {
-                    $this->logger->debug('Finance', 'Auto Fulfillment not sent');
+                    $this->logger->debug(sprintf('%s: Auto Fulfillment not sent', $this->method_title));
                 }
             } else {
                 return false;

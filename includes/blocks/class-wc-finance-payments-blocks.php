@@ -1,6 +1,5 @@
 <?php
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
-use Divido\Woocommerce\FinanceGateway\Proxies\MerchantApiPubProxy;
 use Divido\MerchantSDK\Environment;
 
 /**
