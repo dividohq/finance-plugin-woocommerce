@@ -28,7 +28,7 @@ final class WC_Gateway_Finance_Blocks_Support extends AbstractPaymentMethodType 
      * Initializes the payment method type.
      */
     public function initialize() {
-        $this->settings = get_option( 'woocommerce_finance_settings', [] );
+        $this->settings = get_option( 'woocommerce_divido-finance_settings', [] );
         $gateways       = WC()->payment_gateways->payment_gateways();
         $this->gateway  = $gateways[ $this->name ];
     }
@@ -93,23 +93,32 @@ final class WC_Gateway_Finance_Blocks_Support extends AbstractPaymentMethodType 
     }
 
     private function getLogoUrl(): ?string {
-        if(get_transient(WC_Gateway_Finance::TRANSIENT_PLANS)) {
+		$plans = false;
+        if(WC_Gateway_Finance::PLAN_CACHING) {
             $plans = get_transient(WC_Gateway_Finance::TRANSIENT_PLANS);
-        } elseif(!empty(get_transient(WC_Gateway_Finance::TRANSIENT_APIKEY))){
-            $apiKey = get_transient(WC_Gateway_Finance::TRANSIENT_APIKEY);
-            $environment = Environment::getEnvironmentFromAPIKey($apiKey);
-            $apiUrl = (array_key_exists($environment, Environment::CONFIGURATION)) ? Environment::CONFIGURATION[$environment]['base_uri'] : null;
-            if($apiUrl === null) return null;
-            $proxy = new MerchantApiPubProxy($apiUrl, $apiKey);
-            $plans = $proxy->getFinancePlans();
         }
-        if($plans){
+		if(!$plans){
+            $apiKey = $this->get_setting('apiKey');
+			if(empty($apiKey)){
+				return null;
+			}
+
+			$apiUrl = $this->get_setting('url');
+			if(empty($apiUrl)){
+            	$environment = Environment::getEnvironmentFromAPIKey($apiKey);
+            	$apiUrl = (array_key_exists($environment, Environment::CONFIGURATION)) ? Environment::CONFIGURATION[$environment]['base_uri'] : null;
+			}
+			if(empty($apiUrl)){
+				return null;
+			}
+			$plans = WC_Gateway_Finance::get_all_finances($apiUrl, $apiKey);
+        }
+        if(is_iterable($plans)){
             foreach($plans as $plan){
                 if(!empty($plan->lender->branding->logo_url)){
                     return  $plan->lender->branding->logo_url;
                 }
             }
-            return json_encode($plan);
         }
         return null;
     }

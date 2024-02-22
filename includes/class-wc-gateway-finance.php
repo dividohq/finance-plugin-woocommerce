@@ -64,8 +64,9 @@ function woocommerce_finance_init()
 
         private string $environment;
 
+        const PLAN_CACHING = false;
+        const PLAN_CACHING_HOURS = 24*7; // 7 days
         const TRANSIENT_PLANS = 'finances';
-
         const TRANSIENT_APIKEY = 'api_key';
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
@@ -324,36 +325,37 @@ function woocommerce_finance_init()
          *
          * @since 1.0.0
          *
-         * @return array
+         * @return iterable
          */
-        function get_all_finances()
+        public static function get_all_finances(string $url, string $apiKey, WC_Logger $logger=null)
         {
-            $finances = false;
-            $finances = get_transient(self::TRANSIENT_PLANS);
-            $apiKey = get_transient(self::TRANSIENT_APIKEY);
+            $finances = (self::PLAN_CACHING) ? get_transient(self::TRANSIENT_PLANS) : false;
+            if(is_iterable($finances)){
+                return $finances;
+            }
+            $transientApiKey = get_transient(self::TRANSIENT_APIKEY);
 
-            // only fetch new finances if the api key is different
-            // OR API key transisent is not set
-            // OR finances transient is not set
-            if ($apiKey !== $this->api_key || empty($apiKey) || empty($finances)) {
-
+            // only fetch new finances if we don't cache plans
+            // OR the api key has changed since we last cached plans
+            if (!self::PLAN_CACHING || $transientApiKey !== $apiKey) {
                 // Retrieve all finance plans for the merchant.
                 try {
-                    $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
+                    $proxy = new MerchantApiPubProxy($url, $apiKey);
 
                     $response = $proxy->getFinancePlans();
                     $plans = $response->data;
-
-                    set_transient(self::TRANSIENT_PLANS, $plans, 60 * 60 * 1);
-                    set_transient(self::TRANSIENT_APIKEY, $this->api_key);
-
+                    if(self::PLAN_CACHING){
+                        set_transient(self::TRANSIENT_PLANS, $plans, 60 * 60 * self::PLAN_CACHING_HOURS);
+                        set_transient(self::TRANSIENT_APIKEY, $apiKey, 60 * 60 * self::PLAN_CACHING_HOURS);
+                    }
                     return $plans;
                 } catch (Exception $e) {
-                    return [];
+                    if($logger !== null){
+                        $logger->debug('FINANCE', sprintf('Error retrieving plans: %s', $e->getMessage()));
+                    }
                 }
-            } else {
-                return $finances;
             }
+            return [];
         }
 
         function enqueue_action(){
@@ -1289,7 +1291,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                     }
 
                 if (isset($this->api_key) && $this->api_key) {
-                    $response = $this->get_all_finances();
+                    $response = $this->get_all_finances($this->url, $this->api_key, $this->logger);
                     if (empty($response)) {
                     ?>
     <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
@@ -1629,7 +1631,7 @@ jQuery(document).ready(function($) {
             $finances = array();
             try {
                 if (!isset($this->finance_options)) {
-                    $this->finance_options = $this->get_all_finances();
+                    $this->finance_options = $this->get_all_finances($this->url, $this->api_key, $this->logger);
                 }
 
                 foreach ($this->finance_options as $plan) {
