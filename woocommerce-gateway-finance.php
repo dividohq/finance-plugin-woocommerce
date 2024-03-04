@@ -14,7 +14,7 @@
  * Author URI: www.divido.com
  * Text Domain: woocommerce-finance-gateway
  * Domain Path: /i18n/languages/
- * WC tested up to: 8.5.2
+ * WC tested up to: 8.6.1
  *
  */
 
