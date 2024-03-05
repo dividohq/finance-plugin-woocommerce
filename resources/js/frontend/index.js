@@ -44,7 +44,9 @@ const Label = ( props ) => {
 
     return <div style={containerStyle}>
         <div >{ label }</div>
-        <img src={ logoUrl } alt={ lender } style={{marginRight: "16px"}} />
+        { logoUrl && (
+            <img src={ logoUrl } alt={ lender } style={{marginRight: "16px"}} />
+        )}
     </div>;
 };
 

@@ -104,9 +104,7 @@ class MerchantApiPubProxy{
 
         $response = $this->wrapper->get(self::PATHS[$method][$action]);
         
-        $this->validateResponse($method, $action, $response);
-        
-        return $this->responseToObj($response);
+        return $this->validateResponse($method, $action, $response);
     }
 
     /**
@@ -121,9 +119,7 @@ class MerchantApiPubProxy{
 
         $response = $this->wrapper->get(self::PATHS[$method][$action]);
         
-        $this->validateResponse($method, $action, $response);
-        
-        return $this->responseToObj($response);
+        return $this->validateResponse($method, $action, $response);
     }
 
     public function getApplication(string $applicationId) :object{
@@ -137,9 +133,7 @@ class MerchantApiPubProxy{
             )
         );
         
-        $this->validateResponse($method, $action, $response);
-        
-        return $this->responseToObj($response);
+        return $this->validateResponse($method, $action, $response);
     }
 
     /**
@@ -157,9 +151,7 @@ class MerchantApiPubProxy{
         
         $response = $this->wrapper->post(self::PATHS[$method][$action], $body);
         
-        $this->validateResponse($method, $action, $response);
-
-        return $this->responseToObj($response);
+        return $this->validateResponse($method, $action, $response);
     }
 
     /**
@@ -183,9 +175,7 @@ class MerchantApiPubProxy{
 
         $response = $this->wrapper->post($path, $body);
 
-        $this->validateResponse($method, $action, $response);
-
-        return $this->responseToObj($response);
+        return $this->validateResponse($method, $action, $response);
     }
 
     /**
@@ -208,9 +198,7 @@ class MerchantApiPubProxy{
         $body = $cancellation->getJsonPayload();
         $response = $this->wrapper->post($path, $body);
 
-        $this->validateResponse($method, $action, $response);
-
-        return $this->responseToObj($response);
+        return $this->validateResponse($method, $action, $response);
     }
 
     /**
@@ -233,9 +221,7 @@ class MerchantApiPubProxy{
         $body = $refund->getJsonPayload();
         $response = $this->wrapper->post($path, $body);
 
-        $this->validateResponse($method, $action, $response);
-
-        return $this->responseToObj($response);
+        return $this->validateResponse($method, $action, $response);
     }
 
     
@@ -259,9 +245,7 @@ class MerchantApiPubProxy{
 
         $response = $this->wrapper->patch($path, $body);
 
-        $this->validateResponse($method, $action, $response);
-
-        return $this->responseToObj($response);
+        return $this->validateResponse($method, $action, $response);
     }
 
     /**
@@ -270,9 +254,9 @@ class MerchantApiPubProxy{
      * @param string $method
      * @param string $action
      * @param array $response
-     * @return void
+     * @return object
      */
-    private function validateResponse(string $method, string $action, array $response){
+    private function validateResponse(string $method, string $action, array $response) :object{
         $body = $this->responseToObj($response);
         if(isset($body->error) && $body->error === true && isset($body->code)){
             throw new MerchantApiBadResponseException(
@@ -295,6 +279,7 @@ class MerchantApiPubProxy{
                 "An unexpected error occurred when contacting the Merchant API Pub", $statusCode, $action, $method
             );
         }
+        return $body;
     }
 
     /**

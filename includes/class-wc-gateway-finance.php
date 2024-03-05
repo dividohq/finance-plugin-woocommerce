@@ -64,8 +64,9 @@ function woocommerce_finance_init()
 
         private string $environment;
 
+        const PLAN_CACHING = false;
+        const PLAN_CACHING_HOURS = 24*7; // 7 days
         const TRANSIENT_PLANS = 'finances';
-
         const TRANSIENT_APIKEY = 'api_key';
 
         const V4_CALCULATOR_URL = "https://cdn.divido.com/widget/v4/divido.calculator.js";
@@ -98,9 +99,6 @@ function woocommerce_finance_init()
                 WC_Finance_Payments::plugin_abspath(). 'i18n/languages'
             )) {
                 $locale = determine_locale();
-                //$split = explode("_", $locale, 2);
-                //$iso = $split[0];
-                //$dumb_locale = "{$iso}_" . strtoupper($iso);
                 if (!load_textdomain(
                     'woocommerce-finance-gateway',
                     WC_Finance_Payments::plugin_abspath() . "i18n/languages/woocommerce-finance-gateway-{$locale}.mo"
@@ -122,7 +120,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.8.0';
+            $this->plugin_version = '2.8.1';
             $this->wpdocs_load_textdomain();
 
             $this->id = 'divido-finance';
@@ -179,8 +177,6 @@ function woocommerce_finance_init()
             // set the tenancy environment based on the user input "url" field or default it from the api key
             $this->url = (!empty($this->settings['url'])) ? $this->settings['url'] : $this->get_default_merchant_api_pub_url($this->api_key);
 
-            add_filter('woocommerce_gateway_icon', array($this, 'custom_gateway_icon'), 10, 2);
-
             // Load logger.
             $this->logger = wc_get_logger();
 
@@ -192,16 +188,6 @@ function woocommerce_finance_init()
             /** ensures we only add related hooks once (seems to occur twice otherwise) */
             global $hooksAdded;
             if (!isset($hooksAdded)) {
-                /*
-                add_action( 'before_woocommerce_init', function() {
-                    if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-                        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
-                    }
-                    if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
-                        \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
-                    }
-                } );
-                */
                 add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options')); // Version 2.0 Hook.
                 // product settings.
                 add_action('woocommerce_product_write_panel_tabs', array($this, 'product_write_panel_tab'));
@@ -250,30 +236,6 @@ function woocommerce_finance_init()
                 add_filter('woocommerce_available_payment_gateways', array($this, 'showOptionAtCheckout'));
 
                 $hooksAdded = true;
-            }
-        }
-
-        /**
-         * @param $icon
-         * @param $id
-         * @return string
-         */
-        public function custom_gateway_icon($icon, $id)
-        {
-            if($id === 'finance'){
-                $logoUrl = null;
-                set_transient(self::TRANSIENT_PLANS, ""); 
-                foreach($this->get_all_finances() as $plan){
-                    if(!empty($plan->lender->branding->logo_url)){
-                        $logoUrl = $plan->lender->branding->logo_url;
-                        break;
-                    }
-                }
-                return ($logoUrl === null)
-                    ? null
-                    : "<img style='float:right; max-height: 24px' src='{$logoUrl}' />";
-            } else {
-                return $icon;
             }
         }
 
@@ -363,36 +325,37 @@ function woocommerce_finance_init()
          *
          * @since 1.0.0
          *
-         * @return array
+         * @return iterable
          */
-        function get_all_finances()
+        public static function get_all_finances(string $url, string $apiKey, WC_Logger $logger=null)
         {
-            $finances = false;
-            $finances = get_transient(self::TRANSIENT_PLANS);
-            $apiKey = get_transient(self::TRANSIENT_APIKEY);
+            $finances = (self::PLAN_CACHING) ? get_transient(self::TRANSIENT_PLANS) : false;
+            if(is_iterable($finances)){
+                return $finances;
+            }
+            $transientApiKey = get_transient(self::TRANSIENT_APIKEY);
 
-            // only fetch new finances if the api key is different
-            // OR API key transisent is not set
-            // OR finances transient is not set
-            if ($apiKey !== $this->api_key || empty($apiKey) || empty($finances)) {
-
+            // only fetch new finances if we don't cache plans
+            // OR the api key has changed since we last cached plans
+            if (!self::PLAN_CACHING || $transientApiKey !== $apiKey) {
                 // Retrieve all finance plans for the merchant.
                 try {
-                    $proxy = new MerchantApiPubProxy($this->url, $this->api_key);
+                    $proxy = new MerchantApiPubProxy($url, $apiKey);
 
                     $response = $proxy->getFinancePlans();
                     $plans = $response->data;
-
-                    set_transient(self::TRANSIENT_PLANS, $plans, 60 * 60 * 1);
-                    set_transient(self::TRANSIENT_APIKEY, $this->api_key);
-
+                    if(self::PLAN_CACHING){
+                        set_transient(self::TRANSIENT_PLANS, $plans, 60 * 60 * self::PLAN_CACHING_HOURS);
+                        set_transient(self::TRANSIENT_APIKEY, $apiKey, 60 * 60 * self::PLAN_CACHING_HOURS);
+                    }
                     return $plans;
                 } catch (Exception $e) {
-                    return [];
+                    if($logger !== null){
+                        $logger->debug(sprintf('Error retrieving finance plans: %s', $e->getMessage()));
+                    }
                 }
-            } else {
-                return $finances;
             }
+            return [];
         }
 
         function enqueue_action(){
@@ -411,18 +374,23 @@ function woocommerce_finance_init()
         function enqueue()
         {
             $lender = $this->get_finance_env();
-
+            $isScriptRegistered = false;
             if ($this->isV4()){
                 wp_register_script('woocommerce-finance-gateway-calculator', self::V4_CALCULATOR_URL, false, 1.0, true);
+                $isScriptRegistered = true;
             } elseif ($this->environment === 'production') {
                 wp_register_script('woocommerce-finance-gateway-calculator', sprintf('//cdn.divido.com/widget/v3/%s.calculator.js', $lender), false, 1.0, true);
-            } else {
+                $isScriptRegistered = true;
+            } elseif($lender !== null) {
                 wp_register_script('woocommerce-finance-gateway-calculator', sprintf('//cdn.divido.com/widget/v3/%s.%s.calculator.js', $lender, $this->environment), false, 1.0, true);
+                $isScriptRegistered = true;
             }
             wp_register_style('woocommerce-finance-gateway-style', WC_Finance_Payments::plugin_url() . '/css/style.css', false, 1.0);
         
             wp_enqueue_style('woocommerce-finance-gateway-style');
-            wp_enqueue_script('woocommerce-finance-gateway-calculator');
+            if($isScriptRegistered){
+                wp_enqueue_script('woocommerce-finance-gateway-calculator');
+            }
         }
 
         /**
@@ -539,7 +507,7 @@ jQuery(document).ready(function() {
                 $callback_sign = isset($_SERVER['HTTP_X_DIVIDO_HMAC_SHA256']) ? $_SERVER['HTTP_X_DIVIDO_HMAC_SHA256'] : ''; // Input var okay.
                 $sign = $this->create_signature($data, $this->secret);
                 if ($callback_sign !== $sign) {
-                    $this->logger->debug('FINANCE', 'ERROR: Hash error');
+                    $this->logger->debug(sprintf('%s: Hash error', $this->id));
                     $data_json = json_decode($data);
                     if (is_object($data_json)) {
                         if ($data_json->metadata->order_number) {
@@ -565,7 +533,16 @@ jQuery(document).ready(function() {
                             // Amount mismatch, hold.
                             $order->update_status('on-hold');
                             $order->add_order_note(__('backend/orderorder_amount_error_msg', 'woocommerce-finance-gateway'));
-                            $this->logger->debug('Finance', 'ERROR: The requested credit of £' . $finance_amount[0] . ' did not match order sum, putting order on hold. Status: ' . $data_json->status . ' Order: ' . $data_json->metadata->order_number . ' Finance Reference: ' . $finance_reference[0]);
+                            $this->logger->debug(
+                                sprintf(
+                                    '%s: The requested credit of £%s did not match order sum, putting order on hold. Status: %s Order: %s Finance Reference: %s',
+                                    $this->id,
+                                    $finance_amount[0],
+                                    $data_json->status,
+                                    $data_json->metadata->order_number,
+                                    $finance_reference[0]
+                                )
+                            );
                             $this->send_json();
                         } else {
                             // Amount matches, update status.
@@ -574,7 +551,6 @@ jQuery(document).ready(function() {
                                 $order->update_status('failed');
                                 $this->send_json();
                             } elseif ('SIGNED' === $data_json->status) {
-                                $this->logger->error('Finance', 'processing');
                                 $order->update_status('processing', $data_json->application);
                                 $this->send_json();
                             } elseif ('READY' === $data_json->status) {
@@ -585,7 +561,15 @@ jQuery(document).ready(function() {
                         }
                         // Log status to order.
                         $order->add_order_note(__('backend/orderorder_status_label', 'woocommerce-finance-gateway') . ': ' . $data_json->status);
-                        $this->logger->debug('Finance', 'STATUS UPDATE: ' . $data_json->status . ' Order: ' . $data_json->metadata->order_number . ' Finance Reference: ' . $finance_reference[0]);
+                        $this->logger->debug(
+                            sprintf(
+                                '%s - Status Update: %s Order: %s Finance Reference: %s',
+                                $this->id,
+                                $data_json->status,
+                                $data_json->metadata->order_number,
+                                $finance_reference[0]
+                            )
+                        );
                     }
                 }
             }
@@ -1323,7 +1307,7 @@ jQuery("input[name=_tab_finance_active]").change(function() {
                     }
 
                 if (isset($this->api_key) && $this->api_key) {
-                    $response = $this->get_all_finances();
+                    $response = $this->get_all_finances($this->url, $this->api_key);
                     if (empty($response)) {
                     ?>
     <div style="border:1px solid red;color:red;padding:20px;margin:10px;">
@@ -1600,7 +1584,6 @@ jQuery(document).ready(function($) {
                 } else {
                     $applicationId = get_post_meta($order_id, "_finance_reference", true);
                     $application = $application->withId($applicationId);
-                    $this->logger->debug($application->getJsonPayload());
                     $response = $proxy->updateApplication($application);
                 }
                 
@@ -1619,7 +1602,7 @@ jQuery(document).ready(function($) {
                 $this->logger->error(sprintf("%s API Error: %s", $this->method_title, $e->getMessage()));
                 throw $e;
             } catch (Exception $e) {
-                $this->logger->error($e->getMessage());
+                $this->logger->error(sprintf("%s: %s", $this->method_title, $e->getMessage()));
                 $cancel_note = sprintf(
                     "%s (%s: %s) %s: %s",
                     __('backend/orderpayment_rejection_error', 'woocommerce-finance-gateway'),
@@ -1663,7 +1646,7 @@ jQuery(document).ready(function($) {
             $finances = array();
             try {
                 if (!isset($this->finance_options)) {
-                    $this->finance_options = $this->get_all_finances();
+                    $this->finance_options = $this->get_all_finances($this->url, $this->api_key);
                 }
 
                 foreach ($this->finance_options as $plan) {
@@ -1676,7 +1659,7 @@ jQuery(document).ready(function($) {
                     );
                 }
             } catch (Exception $e) {
-                $this->logger->debug('Finance', sprintf("Error converting finance plans: %s", $e->getMessage()));
+                $this->logger->debug(sprintf("%s: Error converting finance plans: %s", $this->method_title, $e->getMessage()));
                 throw $e;
             }
 
@@ -1720,12 +1703,17 @@ jQuery(document).ready(function($) {
             if (!empty($setting)) {
                 return $setting;
             } else {
-                $response = $proxy->getEnvironment();
-                $global = $response->data->environment ?? null;
-                set_transient($transient, $global, 60 * 5);
+                try{
+                    $response = $proxy->getEnvironment();
+                    $global = $response->data->environment ?? null;
+                    set_transient($transient, $global, 60 * 5);
 
-                return $global;
+                    return $global;
+                } catch (\Exception $e){
+                    $this->enabled = false;
+                }
             }
+            return null;
         }
 
         /**
@@ -1884,11 +1872,13 @@ jQuery(document).ready(function($) {
             if ('finance' === $name) {
                 if ('no' !== $this->auto_fulfillment) {
                     $ref_and_finance = $this->get_ref_finance($order);
-                    $this->logger->debug('Finance', 'Auto Fulfillment selected' . $ref_and_finance['ref']);
+                    $this->logger->debug(
+                        sprintf('%s: Auto Fulfillment selected %s', $this->method_title, $ref_and_finance['ref'])
+                    );
                     $this->set_fulfilled($ref_and_finance['ref'], $order_total, $wc_order_id);
                     $order->add_order_note(__('globalfinance_label', 'woocommerce-finance-gateway') . ' - ' . __('backend/orderautomatic_fulfillment_sent_msg', 'woocommerce-finance-gateway'));
                 } else {
-                    $this->logger->debug('Finance', 'Auto Fulfillment not sent');
+                    $this->logger->debug(sprintf('%s: Auto Fulfillment not sent', $this->method_title));
                 }
             } else {
                 return false;
@@ -2135,6 +2125,11 @@ jQuery(document).ready(function($) {
          */
         public function showOptionAtCheckout(array $gateways):array{
             if(!isset($gateways[$this->id])){
+                return $gateways;
+            }
+
+            if(!$this->is_available()){
+                unset($gateways[$this->id]);
                 return $gateways;
             }
 
