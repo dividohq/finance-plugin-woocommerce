@@ -53,8 +53,12 @@ class MerchantApiPubProxy{
 
     const HEADER_KEYS = [
         'API_KEY' => 'X-DIVIDO-API-KEY',
-        'SHARED_SECRET' => 'X-Divido-Hmac-Sha256'
+        'SHARED_SECRET' => 'X-Divido-Hmac-Sha256',
+        'TENANT_ID' => 'X-DIVIDO-TENANT-ID',
     ];
+
+    // set tenant ID to be Divido as default
+    const TENANT_ID = 'divido'
 
     private HttpApiWrapper $wrapper;
 
@@ -63,6 +67,7 @@ class MerchantApiPubProxy{
         $this->wrapper->setHeader('Accept', 'application/json');
         $this->wrapper->setHeader('Content-Type', 'application/json');
         $this->wrapper->setHeader(self::HEADER_KEYS['API_KEY'], $apiKey);
+         $this->wrapper->setHeader(self::HEADER_KEYS['TENANT_ID'], TENANT_ID);
     }
 
     /**
