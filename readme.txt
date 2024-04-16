@@ -7,8 +7,8 @@ Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
 Tested up to:      6.4.3
-Stable tag:        2.8.1
-Version:           2.8.1
+Stable tag:        2.8.2
+Version:           2.8.2
 
 License: GPLv2 or later
 
@@ -44,6 +44,9 @@ Shortcode Calculator widget to display finance options ad-hoc
 
 
  == Changelog ==
+
+ Version 2.8.2
+Chore: add x-divido-version header
 
 Version 2.8.1
 Fix: Disables checkout logo being cached

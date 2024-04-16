@@ -120,7 +120,7 @@ function woocommerce_finance_init()
          */
         function __construct()
         {
-            $this->plugin_version = '2.8.1';
+            $this->plugin_version = '2.8.2';
             $this->wpdocs_load_textdomain();
 
             $this->id = 'divido-finance';
