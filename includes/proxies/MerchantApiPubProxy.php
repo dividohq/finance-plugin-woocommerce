@@ -57,7 +57,7 @@ class MerchantApiPubProxy{
         'VERSION' => 'X-DIVIDO-VERSION',
     ];
 
-    const VERSION = '2'
+    const VERSION = '2';
 
     private HttpApiWrapper $wrapper;
 
