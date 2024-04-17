@@ -57,7 +57,7 @@ class MerchantApiPubProxy{
         'VERSION' => 'X-DIVIDO-VERSION',
     ];
 
-    const VERSION = '2'
+    const VERSION = '2';
 
     private HttpApiWrapper $wrapper;
 
@@ -66,7 +66,7 @@ class MerchantApiPubProxy{
         $this->wrapper->setHeader('Accept', 'application/json');
         $this->wrapper->setHeader('Content-Type', 'application/json');
         $this->wrapper->setHeader(self::HEADER_KEYS['API_KEY'], $apiKey);
-         $this->wrapper->setHeader(self::HEADER_KEYS['VERSION'], VERSION);
+        $this->wrapper->setHeader(self::HEADER_KEYS['VERSION'], self::VERSION);
     }
 
     /**
