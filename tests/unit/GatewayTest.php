@@ -13,7 +13,7 @@ final class GatewayTest extends TestCase
     
     public function testConstruct():void{
         $this->assertSame(
-            'finance',
+            'divido-finance',
             $this->gateway->id
         );
     }
