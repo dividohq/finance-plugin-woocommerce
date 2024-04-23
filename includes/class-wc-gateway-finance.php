@@ -560,18 +560,6 @@ jQuery(document).ready(function() {
                         } else {
                             // Amount matches, update status.
 
-<<<<<<< HEAD:includes/class-wc-gateway-finance.php
-                            if ('DECLINED' === $data_json->status) {
-                                $order->update_status('failed');
-                                $this->send_json();
-                            } elseif ('SIGNED' === $data_json->status) {
-                                $order->update_status('processing', $data_json->application);
-                                $this->send_json();
-                            } elseif ('READY' === $data_json->status) {
-                                $order->add_order_note('Finance status: ' . $data_json->status);
-                                $order->payment_complete();
-                                $this->send_json();
-=======
                             switch($data_json->status){
                                 case self::STATUS_DECLINED:
                                     $order->update_status('failed');
@@ -596,7 +584,6 @@ jQuery(document).ready(function() {
                                     $order->update_status('pending-payment');
                                     $this->send_json();
                                     break;
->>>>>>> 1c7fee6 (feat: extends status triggers):class-wc-gateway-finance.php
                             }
                         }
                         // Log status to order.
