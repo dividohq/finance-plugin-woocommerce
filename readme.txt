@@ -6,7 +6,7 @@ Tags:              woothemes,woocommerce,payment gateway,payment,module,ecommerc
 Author URI:        integrations.divido.com
 Author:            Divido Financial Services Ltd
 Requires at least: 3.0.2
-Tested up to:      6.4.3
+Tested up to:      6.5.2
 Stable tag:        2.8.2
 Version:           2.8.2
 
@@ -45,7 +45,7 @@ Shortcode Calculator widget to display finance options ad-hoc
 
  == Changelog ==
 
- Version 2.8.2
+Version 2.8.2
 Chore: add x-divido-version header
 
 Version 2.8.1

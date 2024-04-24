@@ -91,6 +91,19 @@ function woocommerce_finance_init()
         const REFUND_ACTION = 'refund';
         const CANCEL_ACTION = 'cancel';
 
+        const 
+            STATUS_ACCEPTED = 'ACCEPTED',
+            STATUS_ACTION_LENDER = 'ACTION-LENDER',
+            STATUS_CANCELED = 'CANCELED',
+            STATUS_COMPLETED = 'COMPLETED',
+            STATUS_DECLINED = 'DECLINED',
+            STATUS_DEPOSIT_PAID = 'DEPOSIT-PAID',
+            STATUS_AWAITING_ACTIVATION = 'AWAITING-ACTIVATION',
+            STATUS_FULFILLED = 'FULFILLED',
+            STATUS_REFERRED = 'REFERRED',
+            STATUS_SIGNED = 'SIGNED',
+            STATUS_READY = 'READY';
+
         function wpdocs_load_textdomain()
         {
             if (!load_plugin_textdomain(
@@ -547,16 +560,30 @@ jQuery(document).ready(function() {
                         } else {
                             // Amount matches, update status.
 
-                            if ('DECLINED' === $data_json->status) {
-                                $order->update_status('failed');
-                                $this->send_json();
-                            } elseif ('SIGNED' === $data_json->status) {
-                                $order->update_status('processing', $data_json->application);
-                                $this->send_json();
-                            } elseif ('READY' === $data_json->status) {
-                                $order->add_order_note('Finance status: ' . $data_json->status);
-                                $order->payment_complete();
-                                $this->send_json();
+                            switch($data_json->status){
+                                case self::STATUS_DECLINED:
+                                    $order->update_status('failed');
+                                    $this->send_json();
+                                    break;
+                                case self::STATUS_SIGNED:
+                                    $order->update_status('processing');
+                                    $this->send_json();
+                                    break;
+                                case self::STATUS_READY:
+                                    $order->add_order_note('Finance status: ' . $data_json->status);
+                                    $order->payment_complete();
+                                    $this->send_json();
+                                    break;
+                                case self::STATUS_REFERRED:
+                                    $order->add_order_note('Finance status: ' . $data_json->status);
+                                    $order->update_status('on-hold');
+                                    $this->send_json();
+                                    break;
+                                case self::STATUS_ACCEPTED:
+                                    $order->add_order_note('Finance status: ' . $data_json->status);
+                                    $order->update_status('pending-payment');
+                                    $this->send_json();
+                                    break;
                             }
                         }
                         // Log status to order.
